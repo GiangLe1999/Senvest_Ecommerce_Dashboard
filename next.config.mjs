@@ -5,20 +5,20 @@ const nextConfig = {
     return [
       {
         source: '/',
-        destination: '/en/dashboards/crm',
-        permanent: true,
+        destination: '/en/apps/ecommerce/dashboard',
+        permanent: false,
         locale: false
       },
       {
         source: '/:lang(en|fr|ar)',
-        destination: '/:lang/dashboards/crm',
-        permanent: true,
+        destination: '/:lang/apps/ecommerce/dashboard',
+        permanent: false,
         locale: false
       },
       {
         source: '/((?!(?:en|fr|ar|front-pages|favicon.ico)\\b)):path',
         destination: '/en/:path',
-        permanent: true,
+        permanent: false,
         locale: false
       }
     ]
