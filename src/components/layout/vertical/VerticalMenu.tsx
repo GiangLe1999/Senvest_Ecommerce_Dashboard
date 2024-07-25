@@ -94,10 +94,10 @@ const VerticalMenu = ({ dictionary, scrollMenu }: Props) => {
       >
         <MenuSection label={dictionary["navigation"].appsPages}>
           <MenuItem
-            href={`/${locale}/apps/ecommerce/dashboard`}
+            href={`/${locale}/dashboard`}
             icon={<i className="ri-dashboard-line" />}
             exactMatch={false}
-            activeUrl="/apps/ecommerce/dashboard"
+            activeUrl="/dashboard"
           >
             {dictionary["navigation"].dashboard}
           </MenuItem>
@@ -106,13 +106,13 @@ const VerticalMenu = ({ dictionary, scrollMenu }: Props) => {
             label={dictionary["navigation"].products}
             icon={<i className="ri-shopping-bag-3-line" />}
           >
-            <MenuItem href={`/${locale}/apps/ecommerce/products/list`}>
+            <MenuItem href={`/${locale}/products/list`}>
               {dictionary["navigation"].list}
             </MenuItem>
-            <MenuItem href={`/${locale}/apps/ecommerce/products/add`}>
+            <MenuItem href={`/${locale}/products/add`}>
               {dictionary["navigation"].add}
             </MenuItem>
-            <MenuItem href={`/${locale}/apps/ecommerce/products/category`}>
+            <MenuItem href={`/${locale}/products/category`}>
               {dictionary["navigation"].category}
             </MenuItem>
           </SubMenu>
@@ -121,13 +121,13 @@ const VerticalMenu = ({ dictionary, scrollMenu }: Props) => {
             label={dictionary["navigation"].orders}
             icon={<i className="ri-secure-payment-fill" />}
           >
-            <MenuItem href={`/${locale}/apps/ecommerce/orders/list`}>
+            <MenuItem href={`/${locale}/orders/list`}>
               {dictionary["navigation"].list}
             </MenuItem>
             <MenuItem
-              href={`/${locale}/apps/ecommerce/orders/details/5434`}
+              href={`/${locale}/orders/details/5434`}
               exactMatch={false}
-              activeUrl="/apps/ecommerce/orders/details"
+              activeUrl="/orders/details"
             >
               {dictionary["navigation"].details}
             </MenuItem>
@@ -137,41 +137,41 @@ const VerticalMenu = ({ dictionary, scrollMenu }: Props) => {
             label={dictionary["navigation"].customers}
             icon={<i className="ri-account-pin-circle-line" />}
           >
-            <MenuItem href={`/${locale}/apps/ecommerce/customers/list`}>
+            <MenuItem href={`/${locale}/customers/list`}>
               {dictionary["navigation"].list}
             </MenuItem>
             <MenuItem
-              href={`/${locale}/apps/ecommerce/customers/details/879861`}
+              href={`/${locale}/customers/details/879861`}
               exactMatch={false}
-              activeUrl="/apps/ecommerce/customers/details"
+              activeUrl="/customers/details"
             >
               {dictionary["navigation"].details}
             </MenuItem>
           </SubMenu>
 
           <MenuItem
-            href={`/${locale}/apps/ecommerce/manage-reviews`}
+            href={`/${locale}/manage-reviews`}
             icon={<i className="ri-file-word-line" />}
             exactMatch={false}
-            activeUrl="/apps/ecommerce/manage-reviews"
+            activeUrl="/manage-reviews"
           >
             {dictionary["navigation"].manageReviews}
           </MenuItem>
 
           <MenuItem
-            href={`/${locale}/apps/ecommerce/referrals`}
+            href={`/${locale}/referrals`}
             icon={<i className="ri-external-link-line" />}
             exactMatch={false}
-            activeUrl="/apps/ecommerce/referrals"
+            activeUrl="/referrals"
           >
             {dictionary["navigation"].referrals}
           </MenuItem>
 
           <MenuItem
-            href={`/${locale}/apps/ecommerce/settings`}
+            href={`/${locale}/settings`}
             icon={<i className="ri-settings-3-line" />}
             exactMatch={false}
-            activeUrl="/apps/ecommerce/settings"
+            activeUrl="/settings"
           >
             {dictionary["navigation"].settings}
           </MenuItem>
