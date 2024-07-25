@@ -11,7 +11,6 @@ import Typography from "@mui/material/Typography";
 import TextField from "@mui/material/TextField";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
-import Button from "@mui/material/Button";
 import Alert from "@mui/material/Alert";
 
 // Third-party Imports
@@ -24,6 +23,10 @@ import type { InferInput } from "valibot";
 import classnames from "classnames";
 
 // Type Imports
+import LoadingButton from "@mui/lab/LoadingButton";
+
+import { toast } from "react-toastify";
+
 import type { Mode } from "@core/types";
 import type { Locale } from "@/configs/i18n";
 
@@ -63,6 +66,7 @@ const Login = ({ mode }: { mode: Mode }) => {
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false);
   const [errorState, setErrorState] = useState<ErrorType | null>(null);
+  const [loading, setLoading] = useState(false);
 
   // Vars
   const darkImg = "/images/pages/auth-v2-mask-1-dark.png";
@@ -107,24 +111,33 @@ const Login = ({ mode }: { mode: Mode }) => {
   const handleClickShowPassword = () => setIsPasswordShown((show) => !show);
 
   const onSubmit: SubmitHandler<FormData> = async (data: FormData) => {
-    const res = await signIn("credentials", {
-      email: data.email,
-      password: data.password,
-      redirect: false,
-    });
+    setLoading(true);
 
-    if (res && res.ok && res.error === null) {
-      // Vars
-      const redirectURL = searchParams.get("redirectTo") ?? "/";
+    try {
+      const res = await signIn("credentials", {
+        email: data.email,
+        password: data.password,
+        redirect: false,
+      });
 
-      router.replace(getLocalizedUrl(redirectURL, locale as Locale));
-    } else {
-      if (res?.error) {
-        const error = await JSON.parse(res.error);
+      if (res && res.ok && res.error === null) {
+        // Vars
+        const redirectURL = searchParams.get("redirectTo") ?? "/";
 
-        setErrorState(error);
+        toast.success("Đăng nhập thành công");
+        router.replace(getLocalizedUrl(redirectURL, locale as Locale));
+      } else {
+        if (res?.error) {
+          const error = await JSON.parse(res.error);
+
+          setErrorState(error);
+        }
       }
+    } catch (error) {
+      toast.error("Sai thông tin đăng nhập");
     }
+
+    setLoading(false);
   };
 
   return (
@@ -242,9 +255,15 @@ const Login = ({ mode }: { mode: Mode }) => {
                 />
               )}
             />
-            <Button fullWidth variant="contained" type="submit">
+            <LoadingButton
+              loading={loading}
+              loadingPosition="start"
+              fullWidth
+              variant="contained"
+              type="submit"
+            >
               Log In
-            </Button>
+            </LoadingButton>
           </form>
         </div>
       </div>

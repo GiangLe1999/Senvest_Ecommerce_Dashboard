@@ -1,26 +1,30 @@
-'use client'
+"use client";
 
 // Next Imports
-import { redirect, usePathname } from 'next/navigation'
+import { redirect, usePathname } from "next/navigation";
 
 // Type Imports
-import type { Locale } from '@/configs/i18n'
+import type { Locale } from "@/configs/i18n";
 
 // Config Imports
-import themeConfig from '@/configs/themeConfig'
+import themeConfig from "@/configs/themeConfig";
 
 // Util Imports
-import { getLocalizedUrl } from '@/utils/i18n'
+import { getLocalizedUrl } from "@/utils/i18n";
 
 const AuthRedirect = ({ lang }: { lang: Locale }) => {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   // ℹ️ Bring me `lang`
-  const redirectUrl = `/${lang}/login?redirectTo=${pathname}`
-  const login = `/${lang}/login`
-  const homePage = getLocalizedUrl(themeConfig.homePageUrl, lang)
+  console.log(pathname);
 
-  return redirect(pathname === login ? login : pathname === homePage ? login : redirectUrl)
-}
+  const redirectUrl = `/${lang}/login?redirectTo=${pathname}`;
+  const login = `/${lang}/login`;
+  const homePage = getLocalizedUrl(themeConfig.homePageUrl, lang);
 
-export default AuthRedirect
+  return redirect(
+    pathname === login ? login : pathname === homePage ? login : redirectUrl,
+  );
+};
+
+export default AuthRedirect;

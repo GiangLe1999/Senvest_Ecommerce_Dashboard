@@ -55,8 +55,6 @@ const UserDropdown = () => {
   const { settings } = useSettings();
   const { lang: locale } = useParams();
 
-  console.log(session);
-
   const handleDropdownOpen = () => {
     !open ? setOpen(true) : setOpen(false);
   };
