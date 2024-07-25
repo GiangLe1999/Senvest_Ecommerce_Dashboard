@@ -54,9 +54,9 @@ export type Config = {
 }
 
 const themeConfig: Config = {
-  templateName: 'Materialize',
+  templateName: 'Senvest',
   homePageUrl: '/apps/ecommerce/dashboard',
-  settingsCookieName: 'materialize-mui-next-demo-1',
+  settingsCookieName: 'senvest-admin-settings',
   mode: 'system', // 'system', 'light', 'dark'
   skin: 'default', // 'default', 'bordered'
   semiDark: false, // true, false
