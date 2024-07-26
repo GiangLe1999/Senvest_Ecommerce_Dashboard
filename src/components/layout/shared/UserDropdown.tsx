@@ -141,7 +141,7 @@ const UserDropdown = () => {
                       >
                         {session?.user?.email || ""}
                       </Typography>
-                      <Typography variant="caption">Super admin</Typography>
+                      <Typography variant="caption">Senvest Admin</Typography>
                     </div>
                   </div>
                   <Divider className="mlb-1" />

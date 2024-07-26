@@ -29,7 +29,7 @@ const axiosInstance = () => {
       return response;
     },
     (error) => {
-      console.log(`error`, error);
+      console.log(`error`, error?.response?.data?.message);
     },
   );
 
