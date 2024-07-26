@@ -2,6 +2,8 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialProvider from "next-auth/providers/credentials";
 
+import axios from "axios";
+
 import axiosInstance from "@/configs/axios";
 
 export const authOptions: NextAuthOptions = {
@@ -52,24 +54,30 @@ export const authOptions: NextAuthOptions = {
         return token;
       }
 
-      const { data } = await axiosInstance.post(
-        "/refresh-token",
-        {},
-        {
-          headers: {
-            Authorization: `Refresh ${token.backendTokens.refreshToken}`,
+      try {
+        const { data } = await axios.post(
+          `${process.env.API_BASE_URL}/refresh-token`,
+          {},
+          {
+            headers: {
+              Authorization: `Refresh ${token.backendTokens.refreshToken}`,
+            },
           },
-        },
-      );
+        );
 
-      return {
-        ...token,
-        backendTokens: {
-          accessToken: data?.accessToken,
-          refreshToken: data?.refreshToken,
-          expiresIn: data?.expiresIn,
-        },
-      };
+        return {
+          ...token,
+          backendTokens: {
+            accessToken: data?.accessToken,
+            refreshToken: data?.refreshToken,
+            expiresIn: data?.expiresIn,
+          },
+        };
+      } catch (error) {
+        console.log(error);
+
+        return token;
+      }
     },
     async session({ session, token }) {
       session.user = token.user;
