@@ -22,37 +22,24 @@ import ScrollToTop from "@core/components/scroll-to-top";
 
 import AuthGuard from "@/hocs/AuthGuard";
 
-// Config Imports
-import { i18n } from "@configs/i18n";
-
 // Util Imports
-import { getDictionary } from "@/utils/getDictionary";
 import { getMode, getSystemMode } from "@core/utils/serverHelpers";
 
 const Layout = async ({
   children,
   params,
 }: ChildrenType & { params: { lang: Locale } }) => {
-  // Vars
-  const direction = i18n.langDirection[params.lang];
-  const dictionary = await getDictionary(params.lang);
   const mode = getMode();
   const systemMode = getSystemMode();
 
   return (
-    <Providers direction={direction}>
+    <Providers>
       <AuthGuard locale={params.lang}>
         <LayoutWrapper
           systemMode={systemMode}
           verticalLayout={
             <VerticalLayout
-              navigation={
-                <Navigation
-                  dictionary={dictionary}
-                  mode={mode}
-                  systemMode={systemMode}
-                />
-              }
+              navigation={<Navigation mode={mode} systemMode={systemMode} />}
               navbar={<Navbar />}
               footer={<VerticalFooter />}
             >
@@ -60,10 +47,7 @@ const Layout = async ({
             </VerticalLayout>
           }
           horizontalLayout={
-            <HorizontalLayout
-              header={<Header dictionary={dictionary} />}
-              footer={<HorizontalFooter />}
-            >
+            <HorizontalLayout header={<Header />} footer={<HorizontalFooter />}>
               {children}
             </HorizontalLayout>
           }
@@ -76,7 +60,7 @@ const Layout = async ({
             <i className="ri-arrow-up-line" />
           </Button>
         </ScrollToTop>
-        <Customizer dir={direction} />
+        <Customizer />
       </AuthGuard>
     </Providers>
   );

@@ -1,24 +1,23 @@
 // React Imports
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo } from "react";
 
 // Next Imports
-import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import Link from "next/link";
 
 // MUI Imports
-import Card from '@mui/material/Card'
-import CardContent from '@mui/material/CardContent'
-import Button from '@mui/material/Button'
-import Typography from '@mui/material/Typography'
-import Checkbox from '@mui/material/Checkbox'
-import Chip from '@mui/material/Chip'
-import TablePagination from '@mui/material/TablePagination'
-import TextField from '@mui/material/TextField'
-import type { TextFieldProps } from '@mui/material/TextField'
+import Card from "@mui/material/Card";
+import CardContent from "@mui/material/CardContent";
+import Button from "@mui/material/Button";
+import Typography from "@mui/material/Typography";
+import Checkbox from "@mui/material/Checkbox";
+import Chip from "@mui/material/Chip";
+import TablePagination from "@mui/material/TablePagination";
+import TextField from "@mui/material/TextField";
+import type { TextFieldProps } from "@mui/material/TextField";
 
 // Third-party Imports
-import classnames from 'classnames'
-import { rankItem } from '@tanstack/match-sorter-utils'
+import classnames from "classnames";
+import { rankItem } from "@tanstack/match-sorter-utils";
 import {
   createColumnHelper,
   flexRender,
@@ -29,75 +28,73 @@ import {
   getFacetedUniqueValues,
   getFacetedMinMaxValues,
   getPaginationRowModel,
-  getSortedRowModel
-} from '@tanstack/react-table'
-import type { ColumnDef, FilterFn } from '@tanstack/react-table'
-import type { RankingInfo } from '@tanstack/match-sorter-utils'
+  getSortedRowModel,
+} from "@tanstack/react-table";
+import type { ColumnDef, FilterFn } from "@tanstack/react-table";
+import type { RankingInfo } from "@tanstack/match-sorter-utils";
 
 // Type Imports
-import type { ThemeColor } from '@core/types'
-import type { OrderType } from '@/types/apps/ecommerceTypes'
-import type { Locale } from '@configs/i18n'
+import type { ThemeColor } from "@core/types";
+import type { OrderType } from "@/types/apps/ecommerceTypes";
 
 // Component Imports
-import CustomAvatar from '@core/components/mui/Avatar'
-import OptionMenu from '@core/components/option-menu'
+import CustomAvatar from "@core/components/mui/Avatar";
+import OptionMenu from "@core/components/option-menu";
 
 // Util Imports
-import { getInitials } from '@/utils/getInitials'
-import { getLocalizedUrl } from '@/utils/i18n'
+import { getInitials } from "@/utils/getInitials";
 
 // Style Imports
-import tableStyles from '@core/styles/table.module.css'
+import tableStyles from "@core/styles/table.module.css";
 
-declare module '@tanstack/table-core' {
+declare module "@tanstack/table-core" {
   interface FilterFns {
-    fuzzy: FilterFn<unknown>
+    fuzzy: FilterFn<unknown>;
   }
   interface FilterMeta {
-    itemRank: RankingInfo
+    itemRank: RankingInfo;
   }
 }
 
 type PayementStatusType = {
-  text: string
-  color: ThemeColor
-}
+  text: string;
+  color: ThemeColor;
+};
 
 type StatusChipColorType = {
-  color: ThemeColor
-}
+  color: ThemeColor;
+};
 
 export const paymentStatus: { [key: number]: PayementStatusType } = {
-  1: { text: 'Paid', color: 'success' },
-  2: { text: 'Pending', color: 'warning' },
-  3: { text: 'Cancelled', color: 'secondary' },
-  4: { text: 'Failed', color: 'error' }
-}
+  1: { text: "Paid", color: "success" },
+  2: { text: "Pending", color: "warning" },
+  3: { text: "Cancelled", color: "secondary" },
+  4: { text: "Failed", color: "error" },
+};
 
 export const statusChipColor: { [key: string]: StatusChipColorType } = {
-  Delivered: { color: 'success' },
-  'Out for Delivery': { color: 'primary' },
-  'Ready to Pickup': { color: 'info' },
-  Dispatched: { color: 'warning' }
-}
+  Delivered: { color: "success" },
+  "Out for Delivery": { color: "primary" },
+  "Ready to Pickup": { color: "info" },
+  Dispatched: { color: "warning" },
+};
 
 type ECommerceOrderTypeWithAction = OrderType & {
-  action?: string
-}
+  action?: string;
+};
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   // Rank the item
-  const itemRank = rankItem(row.getValue(columnId), value)
+  const itemRank = rankItem(row.getValue(columnId), value);
 
   // Store the itemRank info
   addMeta({
-    itemRank
-  })
+    itemRank,
+  });
 
   // Return if the item should be filtered in/out
-  return itemRank.passed
-}
+  return itemRank.passed;
+};
 
 const DebouncedInput = ({
   value: initialValue,
@@ -105,55 +102,59 @@ const DebouncedInput = ({
   debounce = 500,
   ...props
 }: {
-  value: string | number
-  onChange: (value: string | number) => void
-  debounce?: number
-} & Omit<TextFieldProps, 'onChange'>) => {
+  value: string | number;
+  onChange: (value: string | number) => void;
+  debounce?: number;
+} & Omit<TextFieldProps, "onChange">) => {
   // States
-  const [value, setValue] = useState(initialValue)
+  const [value, setValue] = useState(initialValue);
 
   useEffect(() => {
-    setValue(initialValue)
-  }, [initialValue])
+    setValue(initialValue);
+  }, [initialValue]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      onChange(value)
-    }, debounce)
+      onChange(value);
+    }, debounce);
 
-    return () => clearTimeout(timeout)
+    return () => clearTimeout(timeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value])
+  }, [value]);
 
-  return <TextField {...props} value={value} onChange={e => setValue(e.target.value)} size='small' />
-}
+  return (
+    <TextField
+      {...props}
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      size="small"
+    />
+  );
+};
 
 // Column Definitions
-const columnHelper = createColumnHelper<ECommerceOrderTypeWithAction>()
+const columnHelper = createColumnHelper<ECommerceOrderTypeWithAction>();
 
 const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
   // States
-  const [rowSelection, setRowSelection] = useState({})
-  const [data, setData] = useState(...[orderData])
-  const [globalFilter, setGlobalFilter] = useState('')
-
-  // Hooks
-  const { lang: locale } = useParams()
+  const [rowSelection, setRowSelection] = useState({});
+  const [data, setData] = useState(...[orderData]);
+  const [globalFilter, setGlobalFilter] = useState("");
 
   // Vars
-  const paypal = '/images/apps/ecommerce/paypal.png'
-  const mastercard = '/images/apps/ecommerce/mastercard.png'
+  const paypal = "/images/apps/ecommerce/paypal.png";
+  const mastercard = "/images/apps/ecommerce/mastercard.png";
 
   const columns = useMemo<ColumnDef<ECommerceOrderTypeWithAction, any>[]>(
     () => [
       {
-        id: 'select',
+        id: "select",
         header: ({ table }) => (
           <Checkbox
             {...{
               checked: table.getIsAllRowsSelected(),
               indeterminate: table.getIsSomeRowsSelected(),
-              onChange: table.getToggleAllRowsSelectedHandler()
+              onChange: table.getToggleAllRowsSelectedHandler(),
             }}
           />
         ),
@@ -163,137 +164,151 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
               checked: row.getIsSelected(),
               disabled: !row.getCanSelect(),
               indeterminate: row.getIsSomeSelected(),
-              onChange: row.getToggleSelectedHandler()
+              onChange: row.getToggleSelectedHandler(),
             }}
           />
-        )
+        ),
       },
-      columnHelper.accessor('order', {
-        header: 'Order',
+      columnHelper.accessor("order", {
+        header: "Order",
         cell: ({ row }) => (
           <Typography
             component={Link}
-            href={getLocalizedUrl(`/apps/ecommerce/orders/details/${row.original.order}`, locale as Locale)}
-            color='primary'
+            href={`/apps/ecommerce/orders/details/${row.original.order}`}
+            color="primary"
           >{`#${row.original.order}`}</Typography>
-        )
+        ),
       }),
-      columnHelper.accessor('date', {
-        header: 'Date',
+      columnHelper.accessor("date", {
+        header: "Date",
         cell: ({ row }) => (
           <Typography>{`${new Date(row.original.date).toDateString()}, ${row.original.time}`}</Typography>
-        )
+        ),
       }),
-      columnHelper.accessor('customer', {
-        header: 'Customers',
+      columnHelper.accessor("customer", {
+        header: "Customers",
         cell: ({ row }) => (
-          <div className='flex items-center gap-3'>
-            {getAvatar({ avatar: row.original.avatar, customer: row.original.customer })}
-            <div className='flex flex-col'>
+          <div className="flex items-center gap-3">
+            {getAvatar({
+              avatar: row.original.avatar,
+              customer: row.original.customer,
+            })}
+            <div className="flex flex-col">
               <Typography
                 component={Link}
-                href={getLocalizedUrl('/apps/ecommerce/customers/details/879861', locale as Locale)}
-                color='text.primary'
-                className='font-medium hover:text-primary'
+                href={"/apps/ecommerce/customers/details/879861"}
+                color="text.primary"
+                className="font-medium hover:text-primary"
               >
                 {row.original.customer}
               </Typography>
-              <Typography variant='body2'>{row.original.email}</Typography>
+              <Typography variant="body2">{row.original.email}</Typography>
             </div>
           </div>
-        )
+        ),
       }),
-      columnHelper.accessor('payment', {
-        header: 'Payment',
+      columnHelper.accessor("payment", {
+        header: "Payment",
         cell: ({ row }) => (
-          <div className='flex items-center gap-1'>
+          <div className="flex items-center gap-1">
             <i
               className={classnames(
-                'ri-circle-fill bs-2.5 is-2.5',
-                `text-${paymentStatus[row.original.payment].color}`
+                "ri-circle-fill bs-2.5 is-2.5",
+                `text-${paymentStatus[row.original.payment].color}`,
               )}
             />
-            <Typography color={`${paymentStatus[row.original.payment].color}.main`} className='font-medium'>
+            <Typography
+              color={`${paymentStatus[row.original.payment].color}.main`}
+              className="font-medium"
+            >
               {paymentStatus[row.original.payment].text}
             </Typography>
           </div>
-        )
+        ),
       }),
-      columnHelper.accessor('status', {
-        header: 'Status',
+      columnHelper.accessor("status", {
+        header: "Status",
         cell: ({ row }) => (
           <Chip
             label={row.original.status}
             color={statusChipColor[row.original.status].color}
-            variant='tonal'
-            size='small'
+            variant="tonal"
+            size="small"
           />
-        )
+        ),
       }),
-      columnHelper.accessor('method', {
-        header: 'Method',
+      columnHelper.accessor("method", {
+        header: "Method",
         cell: ({ row }) => (
-          <div className='flex items-center'>
-            <div className='flex justify-center items-center bg-[#F6F8FA] rounded-sm is-[29px] bs-[18px]'>
+          <div className="flex items-center">
+            <div className="flex justify-center items-center bg-[#F6F8FA] rounded-sm is-[29px] bs-[18px]">
               <img
-                src={row.original.method === 'mastercard' ? mastercard : paypal}
-                height={row.original.method === 'mastercard' ? 11 : 14}
-                className='rounded-xs'
+                src={row.original.method === "mastercard" ? mastercard : paypal}
+                height={row.original.method === "mastercard" ? 11 : 14}
+                className="rounded-xs"
               />
             </div>
             <Typography>
-              ...{row.original.method === 'mastercard' ? row.original.methodNumber : '@gmail.com'}
+              ...
+              {row.original.method === "mastercard"
+                ? row.original.methodNumber
+                : "@gmail.com"}
             </Typography>
           </div>
-        )
+        ),
       }),
-      columnHelper.accessor('action', {
-        header: 'Action',
+      columnHelper.accessor("action", {
+        header: "Action",
         cell: ({ row }) => (
-          <div className='flex items-center'>
+          <div className="flex items-center">
             <OptionMenu
-              iconButtonProps={{ size: 'medium' }}
-              iconClassName='text-[22px]'
+              iconButtonProps={{ size: "medium" }}
+              iconClassName="text-[22px]"
               options={[
                 {
-                  text: 'View',
-                  icon: 'ri-eye-line',
-                  href: getLocalizedUrl(`/apps/ecommerce/orders/details/${row.original.order}`, locale as Locale),
-                  linkProps: { className: 'flex items-center gap-2 is-full plb-2 pli-4' }
+                  text: "View",
+                  icon: "ri-eye-line",
+                  href: `/apps/ecommerce/orders/details/${row.original.order}`,
+                  linkProps: {
+                    className: "flex items-center gap-2 is-full plb-2 pli-4",
+                  },
                 },
                 {
-                  text: 'Delete',
-                  icon: 'ri-delete-bin-7-line text-[22px]',
+                  text: "Delete",
+                  icon: "ri-delete-bin-7-line text-[22px]",
                   menuItemProps: {
-                    onClick: () => setData(data?.filter(order => order.id !== row.original.id)),
-                    className: 'flex items-center gap-2 pli-4'
-                  }
-                }
+                    onClick: () =>
+                      setData(
+                        data?.filter((order) => order.id !== row.original.id),
+                      ),
+                    className: "flex items-center gap-2 pli-4",
+                  },
+                },
               ]}
             />
           </div>
         ),
-        enableSorting: false
-      })
+        enableSorting: false,
+      }),
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [data]
-  )
+    [data],
+  );
 
   const table = useReactTable({
     data: data as OrderType[],
     columns,
     filterFns: {
-      fuzzy: fuzzyFilter
+      fuzzy: fuzzyFilter,
     },
     state: {
       rowSelection,
-      globalFilter
+      globalFilter,
     },
     initialState: {
       pagination: {
-        pageSize: 10
-      }
+        pageSize: 10,
+      },
     },
     enableRowSelection: true, //enable row selection for all rows
     // enableRowSelection: row => row.original.age > 18, // or enable row selection conditionally per row
@@ -306,57 +321,68 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
     getPaginationRowModel: getPaginationRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues()
-  })
+    getFacetedMinMaxValues: getFacetedMinMaxValues(),
+  });
 
-  const getAvatar = (params: Pick<OrderType, 'avatar' | 'customer'>) => {
-    const { avatar, customer } = params
+  const getAvatar = (params: Pick<OrderType, "avatar" | "customer">) => {
+    const { avatar, customer } = params;
 
     if (avatar) {
-      return <CustomAvatar src={avatar} skin='light' size={34} />
+      return <CustomAvatar src={avatar} skin="light" size={34} />;
     } else {
       return (
-        <CustomAvatar skin='light' size={34}>
+        <CustomAvatar skin="light" size={34}>
           {getInitials(customer as string)}
         </CustomAvatar>
-      )
+      );
     }
-  }
+  };
 
   return (
     <Card>
-      <CardContent className='flex justify-between items-center gap-4'>
+      <CardContent className="flex justify-between items-center gap-4">
         <DebouncedInput
-          value={globalFilter ?? ''}
-          onChange={value => setGlobalFilter(String(value))}
-          placeholder='Search Order'
-          className='sm:is-auto'
+          value={globalFilter ?? ""}
+          onChange={(value) => setGlobalFilter(String(value))}
+          placeholder="Search Order"
+          className="sm:is-auto"
         />
-        <Button variant='outlined' color='secondary' startIcon={<i className='ri-upload-2-line' />}>
+        <Button
+          variant="outlined"
+          color="secondary"
+          startIcon={<i className="ri-upload-2-line" />}
+        >
           Export
         </Button>
       </CardContent>
-      <div className='overflow-x-auto'>
+      <div className="overflow-x-auto">
         <table className={tableStyles.table}>
           <thead>
-            {table.getHeaderGroups().map(headerGroup => (
+            {table.getHeaderGroups().map((headerGroup) => (
               <tr key={headerGroup.id}>
-                {headerGroup.headers.map(header => (
+                {headerGroup.headers.map((header) => (
                   <th key={header.id}>
                     {header.isPlaceholder ? null : (
                       <>
                         <div
                           className={classnames({
-                            'flex items-center': header.column.getIsSorted(),
-                            'cursor-pointer select-none': header.column.getCanSort()
+                            "flex items-center": header.column.getIsSorted(),
+                            "cursor-pointer select-none":
+                              header.column.getCanSort(),
                           })}
                           onClick={header.column.getToggleSortingHandler()}
                         >
-                          {flexRender(header.column.columnDef.header, header.getContext())}
+                          {flexRender(
+                            header.column.columnDef.header,
+                            header.getContext(),
+                          )}
                           {{
-                            asc: <i className='ri-arrow-up-s-line text-xl' />,
-                            desc: <i className='ri-arrow-down-s-line text-xl' />
-                          }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
+                            asc: <i className="ri-arrow-up-s-line text-xl" />,
+                            desc: (
+                              <i className="ri-arrow-down-s-line text-xl" />
+                            ),
+                          }[header.column.getIsSorted() as "asc" | "desc"] ??
+                            null}
                         </div>
                       </>
                     )}
@@ -368,7 +394,10 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
           {table.getFilteredRowModel().rows.length === 0 ? (
             <tbody>
               <tr>
-                <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
+                <td
+                  colSpan={table.getVisibleFlatColumns().length}
+                  className="text-center"
+                >
                   No data available
                 </td>
               </tr>
@@ -378,14 +407,22 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
               {table
                 .getRowModel()
                 .rows.slice(0, table.getState().pagination.pageSize)
-                .map(row => {
+                .map((row) => {
                   return (
-                    <tr key={row.id} className={classnames({ selected: row.getIsSelected() })}>
-                      {row.getVisibleCells().map(cell => (
-                        <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                    <tr
+                      key={row.id}
+                      className={classnames({ selected: row.getIsSelected() })}
+                    >
+                      {row.getVisibleCells().map((cell) => (
+                        <td key={cell.id}>
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext(),
+                          )}
+                        </td>
                       ))}
                     </tr>
-                  )
+                  );
                 })}
             </tbody>
           )}
@@ -393,21 +430,21 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
       </div>
       <TablePagination
         rowsPerPageOptions={[10, 25, 50, 100]}
-        component='div'
-        className='border-bs'
+        component="div"
+        className="border-bs"
         count={table.getFilteredRowModel().rows.length}
         rowsPerPage={table.getState().pagination.pageSize}
         page={table.getState().pagination.pageIndex}
         SelectProps={{
-          inputProps: { 'aria-label': 'rows per page' }
+          inputProps: { "aria-label": "rows per page" },
         }}
         onPageChange={(_, page) => {
-          table.setPageIndex(page)
+          table.setPageIndex(page);
         }}
-        onRowsPerPageChange={e => table.setPageSize(Number(e.target.value))}
+        onRowsPerPageChange={(e) => table.setPageSize(Number(e.target.value))}
       />
     </Card>
-  )
-}
+  );
+};
 
-export default OrderListTable
+export default OrderListTable;

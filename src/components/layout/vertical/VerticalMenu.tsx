@@ -1,6 +1,3 @@
-// Next Imports
-import { useParams } from "next/navigation";
-
 // MUI Imports
 import { useTheme } from "@mui/material/styles";
 
@@ -8,13 +5,10 @@ import { useTheme } from "@mui/material/styles";
 import PerfectScrollbar from "react-perfect-scrollbar";
 
 // Type Imports
-import type { getDictionary } from "@/utils/getDictionary";
 import type { VerticalMenuContextProps } from "@menu/components/vertical-menu/Menu";
 
 // Component Imports
 import { Menu, SubMenu, MenuItem, MenuSection } from "@menu/vertical-menu";
-
-// import { GenerateVerticalMenu } from '@components/GenerateMenu'
 
 // Hook Imports
 import useVerticalNav from "@menu/hooks/useVerticalNav";
@@ -26,16 +20,12 @@ import StyledVerticalNavExpandIcon from "@menu/styles/vertical/StyledVerticalNav
 import menuItemStyles from "@core/styles/vertical/menuItemStyles";
 import menuSectionStyles from "@core/styles/vertical/menuSectionStyles";
 
-// Menu Data Imports
-// import menuData from '@/data/navigation/verticalMenuData'
-
 type RenderExpandIconProps = {
   open?: boolean;
   transitionDuration?: VerticalMenuContextProps["transitionDuration"];
 };
 
 type Props = {
-  dictionary: Awaited<ReturnType<typeof getDictionary>>;
   scrollMenu: (container: any, isPerfectScrollbar: boolean) => void;
 };
 
@@ -51,16 +41,14 @@ const RenderExpandIcon = ({
   </StyledVerticalNavExpandIcon>
 );
 
-const VerticalMenu = ({ dictionary, scrollMenu }: Props) => {
+const VerticalMenu = ({ scrollMenu }: Props) => {
   // Hooks
   const theme = useTheme();
   const verticalNavOptions = useVerticalNav();
-  const params = useParams();
   const { isBreakpointReached } = useVerticalNav();
 
   // Vars
   const { transitionDuration } = verticalNavOptions;
-  const { lang: locale } = params;
 
   const ScrollWrapper = isBreakpointReached ? "div" : PerfectScrollbar;
 
@@ -92,100 +80,81 @@ const VerticalMenu = ({ dictionary, scrollMenu }: Props) => {
         renderExpandedMenuItemIcon={{ icon: <i className="ri-circle-fill" /> }}
         menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
       >
-        <MenuSection label={dictionary["navigation"].appsPages}>
+        <MenuSection label="Admin Dashboard">
           <MenuItem
-            href={`/${locale}/dashboard`}
+            href={`/dashboard`}
             icon={<i className="ri-dashboard-line" />}
             exactMatch={false}
             activeUrl="/dashboard"
           >
-            {dictionary["navigation"].dashboard}
+            Dashboard
           </MenuItem>
 
           <SubMenu
-            label={dictionary["navigation"].products}
+            label="Products"
             icon={<i className="ri-shopping-bag-3-line" />}
           >
-            <MenuItem href={`/${locale}/products/list`}>
-              {dictionary["navigation"].list}
-            </MenuItem>
-            <MenuItem href={`/${locale}/products/add`}>
-              {dictionary["navigation"].add}
-            </MenuItem>
-            <MenuItem href={`/${locale}/products/category`}>
-              {dictionary["navigation"].category}
-            </MenuItem>
+            <MenuItem href={`/products/list`}>List</MenuItem>
+            <MenuItem href={`/products/add`}>Add</MenuItem>
+            <MenuItem href={`/products/category`}>Category</MenuItem>
           </SubMenu>
 
           <SubMenu
-            label={dictionary["navigation"].orders}
+            label="Orders"
             icon={<i className="ri-secure-payment-fill" />}
           >
-            <MenuItem href={`/${locale}/orders/list`}>
-              {dictionary["navigation"].list}
-            </MenuItem>
+            <MenuItem href={`/orders/list`}>List</MenuItem>
             <MenuItem
-              href={`/${locale}/orders/details/5434`}
+              href={`/orders/details/5434`}
               exactMatch={false}
               activeUrl="/orders/details"
             >
-              {dictionary["navigation"].details}
+              Details
             </MenuItem>
           </SubMenu>
 
           <SubMenu
-            label={dictionary["navigation"].customers}
+            label="Customers"
             icon={<i className="ri-account-pin-circle-line" />}
           >
-            <MenuItem href={`/${locale}/customers/list`}>
-              {dictionary["navigation"].list}
-            </MenuItem>
+            <MenuItem href={`/customers/list`}>List</MenuItem>
             <MenuItem
-              href={`/${locale}/customers/details/879861`}
+              href={`/customers/details/879861`}
               exactMatch={false}
               activeUrl="/customers/details"
             >
-              {dictionary["navigation"].details}
+              Details
             </MenuItem>
           </SubMenu>
 
           <MenuItem
-            href={`/${locale}/manage-reviews`}
+            href={`/manage-reviews`}
             icon={<i className="ri-file-word-line" />}
             exactMatch={false}
             activeUrl="/manage-reviews"
           >
-            {dictionary["navigation"].manageReviews}
+            Reviews
           </MenuItem>
 
           <MenuItem
-            href={`/${locale}/referrals`}
+            href={`/referrals`}
             icon={<i className="ri-external-link-line" />}
             exactMatch={false}
             activeUrl="/referrals"
           >
-            {dictionary["navigation"].referrals}
+            Referrals
           </MenuItem>
 
           <MenuItem
-            href={`/${locale}/settings`}
+            href={`/settings`}
             icon={<i className="ri-settings-3-line" />}
             exactMatch={false}
             activeUrl="/settings"
           >
-            {dictionary["navigation"].settings}
+            Settings
           </MenuItem>
         </MenuSection>
       </Menu>
-      {/* <Menu
-        popoutMenuOffset={{ mainAxis: 17 }}
-        menuItemStyles={menuItemStyles(verticalNavOptions, theme)}
-        renderExpandIcon={({ open }) => <RenderExpandIcon open={open} transitionDuration={transitionDuration} />}
-        renderExpandedMenuItemIcon={{ icon: <i className='ri-circle-fill' /> }}
-        menuSectionStyles={menuSectionStyles(verticalNavOptions, theme)}
-      >
-        <GenerateVerticalMenu menuData={menuData(dictionary, params)} />
-      </Menu> */}
     </ScrollWrapper>
   );
 };

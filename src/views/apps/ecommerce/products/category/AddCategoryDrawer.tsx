@@ -102,6 +102,7 @@ const AddCategoryDrawer = (props: Props) => {
           ...categoryData,
         ]);
       } else {
+        console.log;
         toast.error(result?.error);
       }
     } catch (error) {
@@ -168,7 +169,7 @@ const AddCategoryDrawer = (props: Props) => {
                 {...field}
                 fullWidth
                 label="Vietnamese name"
-                placeholder="Đồ lưu niệm"
+                placeholder="Vietnamese name"
                 {...(errors.vi_name && {
                   error: true,
                   helperText: "This field is required.",
@@ -185,7 +186,7 @@ const AddCategoryDrawer = (props: Props) => {
                 {...field}
                 fullWidth
                 label="English name"
-                placeholder="Souvenir"
+                placeholder="English name"
                 {...(errors.en_name && {
                   error: true,
                   helperText: "This field is required.",

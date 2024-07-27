@@ -1,29 +1,28 @@
-'use client'
+"use client";
 
 // React Imports
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from "react";
 
 // Next Imports
-import Link from 'next/link'
-import { useParams } from 'next/navigation'
+import Link from "next/link";
 
 // MUI Imports
-import Card from '@mui/material/Card'
-import Button from '@mui/material/Button'
-import Checkbox from '@mui/material/Checkbox'
-import Chip from '@mui/material/Chip'
-import FormControl from '@mui/material/FormControl'
-import MenuItem from '@mui/material/MenuItem'
-import Rating from '@mui/material/Rating'
-import Select from '@mui/material/Select'
-import TablePagination from '@mui/material/TablePagination'
-import TextField from '@mui/material/TextField'
-import Typography from '@mui/material/Typography'
-import type { TextFieldProps } from '@mui/material/TextField'
+import Card from "@mui/material/Card";
+import Button from "@mui/material/Button";
+import Checkbox from "@mui/material/Checkbox";
+import Chip from "@mui/material/Chip";
+import FormControl from "@mui/material/FormControl";
+import MenuItem from "@mui/material/MenuItem";
+import Rating from "@mui/material/Rating";
+import Select from "@mui/material/Select";
+import TablePagination from "@mui/material/TablePagination";
+import TextField from "@mui/material/TextField";
+import Typography from "@mui/material/Typography";
+import type { TextFieldProps } from "@mui/material/TextField";
 
 // Third-party Imports
-import classnames from 'classnames'
-import { rankItem } from '@tanstack/match-sorter-utils'
+import classnames from "classnames";
+import { rankItem } from "@tanstack/match-sorter-utils";
 import {
   createColumnHelper,
   flexRender,
@@ -34,50 +33,46 @@ import {
   getFacetedUniqueValues,
   getFacetedMinMaxValues,
   getPaginationRowModel,
-  getSortedRowModel
-} from '@tanstack/react-table'
-import type { ColumnDef, FilterFn } from '@tanstack/react-table'
-import type { RankingInfo } from '@tanstack/match-sorter-utils'
+  getSortedRowModel,
+} from "@tanstack/react-table";
+import type { ColumnDef, FilterFn } from "@tanstack/react-table";
+import type { RankingInfo } from "@tanstack/match-sorter-utils";
 
 // Type Imports
-import type { ReviewType } from '@/types/apps/ecommerceTypes'
-import type { Locale } from '@configs/i18n'
+import type { ReviewType } from "@/types/apps/ecommerceTypes";
 
 // Component Imports
-import CustomAvatar from '@core/components/mui/Avatar'
-import OptionMenu from '@core/components/option-menu'
-
-// Util Imports
-import { getLocalizedUrl } from '@/utils/i18n'
+import CustomAvatar from "@core/components/mui/Avatar";
+import OptionMenu from "@core/components/option-menu";
 
 // Style Imports
-import tableStyles from '@core/styles/table.module.css'
+import tableStyles from "@core/styles/table.module.css";
 
-declare module '@tanstack/table-core' {
+declare module "@tanstack/table-core" {
   interface FilterFns {
-    fuzzy: FilterFn<unknown>
+    fuzzy: FilterFn<unknown>;
   }
   interface FilterMeta {
-    itemRank: RankingInfo
+    itemRank: RankingInfo;
   }
 }
 
 type ReviewWithActionsType = ReviewType & {
-  actions?: string
-}
+  actions?: string;
+};
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   // Rank the item
-  const itemRank = rankItem(row.getValue(columnId), value)
+  const itemRank = rankItem(row.getValue(columnId), value);
 
   // Store the itemRank info
   addMeta({
-    itemRank
-  })
+    itemRank,
+  });
 
   // Return if the item should be filtered in/out
-  return itemRank.passed
-}
+  return itemRank.passed;
+};
 
 const DebouncedInput = ({
   value: initialValue,
@@ -85,53 +80,61 @@ const DebouncedInput = ({
   debounce = 500,
   ...props
 }: {
-  value: string | number
-  onChange: (value: string | number) => void
-  debounce?: number
-} & Omit<TextFieldProps, 'onChange'>) => {
+  value: string | number;
+  onChange: (value: string | number) => void;
+  debounce?: number;
+} & Omit<TextFieldProps, "onChange">) => {
   // States
-  const [value, setValue] = useState(initialValue)
+  const [value, setValue] = useState(initialValue);
 
   useEffect(() => {
-    setValue(initialValue)
-  }, [initialValue])
+    setValue(initialValue);
+  }, [initialValue]);
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      onChange(value)
-    }, debounce)
+      onChange(value);
+    }, debounce);
 
-    return () => clearTimeout(timeout)
+    return () => clearTimeout(timeout);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value])
+  }, [value]);
 
-  return <TextField {...props} value={value} onChange={e => setValue(e.target.value)} size='small' />
-}
+  return (
+    <TextField
+      {...props}
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+      size="small"
+    />
+  );
+};
 
 // Column Definitions
-const columnHelper = createColumnHelper<ReviewWithActionsType>()
+const columnHelper = createColumnHelper<ReviewWithActionsType>();
 
-const ManageReviewsTable = ({ reviewsData }: { reviewsData?: ReviewType[] }) => {
+const ManageReviewsTable = ({
+  reviewsData,
+}: {
+  reviewsData?: ReviewType[];
+}) => {
   // States
-  const [status, setStatus] = useState<ReviewType['status']>('All')
-  const [rowSelection, setRowSelection] = useState({})
-  const [allData, setAllData] = useState(...[reviewsData])
-  const [data, setData] = useState(allData)
-  const [globalFilter, setGlobalFilter] = useState('')
-
-  // Hooks
-  const { lang: locale } = useParams()
+  const [status, setStatus] = useState<ReviewType["status"]>("All");
+  const [rowSelection, setRowSelection] = useState({});
+  const [allData, setAllData] = useState(...[reviewsData]);
+  const [data, setData] = useState(allData);
+  const [globalFilter, setGlobalFilter] = useState("");
 
   const columns = useMemo<ColumnDef<ReviewWithActionsType, any>[]>(
     () => [
       {
-        id: 'select',
+        id: "select",
         header: ({ table }) => (
           <Checkbox
             {...{
               checked: table.getIsAllRowsSelected(),
               indeterminate: table.getIsSomeRowsSelected(),
-              onChange: table.getToggleAllRowsSelectedHandler()
+              onChange: table.getToggleAllRowsSelectedHandler(),
             }}
           />
         ),
@@ -141,142 +144,156 @@ const ManageReviewsTable = ({ reviewsData }: { reviewsData?: ReviewType[] }) => 
               checked: row.getIsSelected(),
               disabled: !row.getCanSelect(),
               indeterminate: row.getIsSomeSelected(),
-              onChange: row.getToggleSelectedHandler()
+              onChange: row.getToggleSelectedHandler(),
             }}
           />
-        )
+        ),
       },
-      columnHelper.accessor('product', {
-        header: 'Product',
+      columnHelper.accessor("product", {
+        header: "Product",
         cell: ({ row }) => (
-          <div className='flex items-center gap-3'>
-            <img src={row.original.productImage} width={38} height={38} className='rounded-md bg-actionHover' />
-            <div className='flex flex-col'>
-              <Typography className='font-medium' color='text.primary'>
+          <div className="flex items-center gap-3">
+            <img
+              src={row.original.productImage}
+              width={38}
+              height={38}
+              className="rounded-md bg-actionHover"
+            />
+            <div className="flex flex-col">
+              <Typography className="font-medium" color="text.primary">
                 {row.original.product}
               </Typography>
-              <Typography variant='body2' className='text-wrap'>
+              <Typography variant="body2" className="text-wrap">
                 {row.original.companyName}
               </Typography>
             </div>
           </div>
-        )
+        ),
       }),
-      columnHelper.accessor('reviewer', {
-        header: 'Reviewer',
+      columnHelper.accessor("reviewer", {
+        header: "Reviewer",
         cell: ({ row }) => (
-          <div className='flex items-center gap-3'>
+          <div className="flex items-center gap-3">
             <CustomAvatar src={row.original.avatar} size={34} />
             <div>
               <Typography
                 component={Link}
-                href={getLocalizedUrl('/apps/ecommerce/customers/details/879861', locale as Locale)}
-                color='primary'
-                className='font-medium'
+                href={"/apps/ecommerce/customers/details/879861"}
+                color="primary"
+                className="font-medium"
               >
                 {row.original.reviewer}
               </Typography>
-              <Typography variant='body2'>{row.original.email}</Typography>
+              <Typography variant="body2">{row.original.email}</Typography>
             </div>
           </div>
-        )
+        ),
       }),
-      columnHelper.accessor('head', {
-        header: 'Review',
+      columnHelper.accessor("head", {
+        header: "Review",
         sortingFn: (rowA, rowB) => rowA.original.review - rowB.original.review,
         cell: ({ row }) => (
-          <div className='flex flex-col gap-1'>
+          <div className="flex flex-col gap-1">
             <Rating
-              name='product-review'
+              name="product-review"
               readOnly
               value={row.original.review}
-              emptyIcon={<i className='ri-star-fill' />}
+              emptyIcon={<i className="ri-star-fill" />}
             />
-            <Typography className='font-medium' color='text.primary'>
+            <Typography className="font-medium" color="text.primary">
               {row.original.head}
             </Typography>
-            <Typography variant='body2' className='text-wrap'>
+            <Typography variant="body2" className="text-wrap">
               {row.original.para}
             </Typography>
           </div>
-        )
+        ),
       }),
-      columnHelper.accessor('date', {
-        header: 'Date',
+      columnHelper.accessor("date", {
+        header: "Date",
         sortingFn: (rowA, rowB) => {
-          const dateA = new Date(rowA.original.date)
-          const dateB = new Date(rowB.original.date)
+          const dateA = new Date(rowA.original.date);
+          const dateB = new Date(rowB.original.date);
 
-          return dateA.getTime() - dateB.getTime()
+          return dateA.getTime() - dateB.getTime();
         },
         cell: ({ row }) => {
-          const date = new Date(row.original.date).toLocaleDateString('en-US', {
-            month: 'short',
-            day: '2-digit',
-            year: 'numeric'
-          })
+          const date = new Date(row.original.date).toLocaleDateString("en-US", {
+            month: "short",
+            day: "2-digit",
+            year: "numeric",
+          });
 
-          return <Typography>{date}</Typography>
-        }
+          return <Typography>{date}</Typography>;
+        },
       }),
-      columnHelper.accessor('status', {
-        header: 'Status',
+      columnHelper.accessor("status", {
+        header: "Status",
         cell: ({ row }) => (
-          <div className='flex items-center gap-3'>
+          <div className="flex items-center gap-3">
             <Chip
               label={row.original.status}
-              variant='tonal'
-              color={row.original.status === 'Published' ? 'success' : 'warning'}
-              size='small'
+              variant="tonal"
+              color={
+                row.original.status === "Published" ? "success" : "warning"
+              }
+              size="small"
             />
           </div>
-        )
+        ),
       }),
-      columnHelper.accessor('actions', {
-        header: 'Actions',
+      columnHelper.accessor("actions", {
+        header: "Actions",
         cell: ({ row }) => (
           <OptionMenu
-            iconButtonProps={{ size: 'medium' }}
-            iconClassName='text-textSecondary text-[22px]'
+            iconButtonProps={{ size: "medium" }}
+            iconClassName="text-textSecondary text-[22px]"
             options={[
               {
-                text: 'View',
-                icon: 'ri-eye-line',
-                href: getLocalizedUrl('/apps/ecommerce/orders/details/5434', locale as Locale),
-                linkProps: { className: 'flex items-center gap-2 is-full plb-1.5 pli-4' }
+                text: "View",
+                icon: "ri-eye-line",
+                href: "/apps/ecommerce/orders/details/5434",
+                linkProps: {
+                  className: "flex items-center gap-2 is-full plb-1.5 pli-4",
+                },
               },
               {
-                text: 'Delete',
-                icon: 'ri-delete-bin-7-line',
+                text: "Delete",
+                icon: "ri-delete-bin-7-line",
                 menuItemProps: {
-                  onClick: () => setAllData(allData?.filter(review => review.id !== row.original.id)),
-                  className: 'flex items-center pli-4'
-                }
-              }
+                  onClick: () =>
+                    setAllData(
+                      allData?.filter(
+                        (review) => review.id !== row.original.id,
+                      ),
+                    ),
+                  className: "flex items-center pli-4",
+                },
+              },
             ]}
           />
         ),
-        enableSorting: false
-      })
+        enableSorting: false,
+      }),
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [data]
-  )
+    [data],
+  );
 
   const table = useReactTable({
     data: data as ReviewType[],
     columns,
     filterFns: {
-      fuzzy: fuzzyFilter
+      fuzzy: fuzzyFilter,
     },
     state: {
       rowSelection,
-      globalFilter
+      globalFilter,
     },
     initialState: {
       pagination: {
-        pageSize: 10
-      }
+        pageSize: 10,
+      },
     },
     enableRowSelection: true, //enable row selection for all rows
     // enableRowSelection: row => row.original.age > 18, // or enable row selection conditionally per row
@@ -289,69 +306,84 @@ const ManageReviewsTable = ({ reviewsData }: { reviewsData?: ReviewType[] }) => 
     getPaginationRowModel: getPaginationRowModel(),
     getFacetedRowModel: getFacetedRowModel(),
     getFacetedUniqueValues: getFacetedUniqueValues(),
-    getFacetedMinMaxValues: getFacetedMinMaxValues()
-  })
+    getFacetedMinMaxValues: getFacetedMinMaxValues(),
+  });
 
   useEffect(() => {
-    const filteredData = allData?.filter(review => {
-      if (status !== 'All' && review.status !== status) return false
+    const filteredData = allData?.filter((review) => {
+      if (status !== "All" && review.status !== status) return false;
 
-      return true
-    })
+      return true;
+    });
 
-    setData(filteredData)
-  }, [status, allData, setData])
+    setData(filteredData);
+  }, [status, allData, setData]);
 
   return (
     <>
       <Card>
-        <div className='flex justify-between flex-col items-start sm:flex-row sm:items-center gap-y-4 p-5'>
+        <div className="flex justify-between flex-col items-start sm:flex-row sm:items-center gap-y-4 p-5">
           <DebouncedInput
-            value={globalFilter ?? ''}
-            onChange={value => setGlobalFilter(String(value))}
-            placeholder='Search Product'
-            className='is-full sm:is-auto'
+            value={globalFilter ?? ""}
+            onChange={(value) => setGlobalFilter(String(value))}
+            placeholder="Search Product"
+            className="is-full sm:is-auto"
           />
-          <div className='flex flex-col sm:flex-row items-center gap-4 is-full sm:is-auto'>
-            <FormControl fullWidth size='small' className='sm:is-[140px] flex-auto is-full'>
+          <div className="flex flex-col sm:flex-row items-center gap-4 is-full sm:is-auto">
+            <FormControl
+              fullWidth
+              size="small"
+              className="sm:is-[140px] flex-auto is-full"
+            >
               <Select
                 fullWidth
-                id='select-status'
+                id="select-status"
                 value={status}
-                onChange={e => setStatus(e.target.value)}
-                labelId='status-select'
+                onChange={(e) => setStatus(e.target.value)}
+                labelId="status-select"
               >
-                <MenuItem value='All'>All</MenuItem>
-                <MenuItem value='Published'>Published</MenuItem>
-                <MenuItem value='Pending'>Pending</MenuItem>
+                <MenuItem value="All">All</MenuItem>
+                <MenuItem value="Published">Published</MenuItem>
+                <MenuItem value="Pending">Pending</MenuItem>
               </Select>
             </FormControl>
-            <Button variant='contained' className='is-full sm:is-auto' startIcon={<i className='ri-upload-2-line' />}>
+            <Button
+              variant="contained"
+              className="is-full sm:is-auto"
+              startIcon={<i className="ri-upload-2-line" />}
+            >
               Export
             </Button>
           </div>
         </div>
-        <div className='overflow-x-auto'>
+        <div className="overflow-x-auto">
           <table className={tableStyles.table}>
             <thead>
-              {table.getHeaderGroups().map(headerGroup => (
+              {table.getHeaderGroups().map((headerGroup) => (
                 <tr key={headerGroup.id}>
-                  {headerGroup.headers.map(header => (
+                  {headerGroup.headers.map((header) => (
                     <th key={header.id}>
                       {header.isPlaceholder ? null : (
                         <>
                           <div
                             className={classnames({
-                              'flex items-center': header.column.getIsSorted(),
-                              'cursor-pointer select-none': header.column.getCanSort()
+                              "flex items-center": header.column.getIsSorted(),
+                              "cursor-pointer select-none":
+                                header.column.getCanSort(),
                             })}
                             onClick={header.column.getToggleSortingHandler()}
                           >
-                            {flexRender(header.column.columnDef.header, header.getContext())}
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
                             {{
-                              asc: <i className='ri-arrow-up-s-line text-xl' />,
-                              desc: <i className='ri-arrow-down-s-line text-xl' />
-                            }[header.column.getIsSorted() as 'asc' | 'desc'] ?? null}
+                              asc: <i className="ri-arrow-up-s-line text-xl" />,
+                              desc: (
+                                <i className="ri-arrow-down-s-line text-xl" />
+                              ),
+                            }[header.column.getIsSorted() as "asc" | "desc"] ??
+                              null}
                           </div>
                         </>
                       )}
@@ -363,7 +395,10 @@ const ManageReviewsTable = ({ reviewsData }: { reviewsData?: ReviewType[] }) => 
             {table.getFilteredRowModel().rows.length === 0 ? (
               <tbody>
                 <tr>
-                  <td colSpan={table.getVisibleFlatColumns().length} className='text-center'>
+                  <td
+                    colSpan={table.getVisibleFlatColumns().length}
+                    className="text-center"
+                  >
                     No data available
                   </td>
                 </tr>
@@ -373,14 +408,24 @@ const ManageReviewsTable = ({ reviewsData }: { reviewsData?: ReviewType[] }) => 
                 {table
                   .getRowModel()
                   .rows.slice(0, table.getState().pagination.pageSize)
-                  .map(row => {
+                  .map((row) => {
                     return (
-                      <tr key={row.id} className={classnames({ selected: row.getIsSelected() })}>
-                        {row.getVisibleCells().map(cell => (
-                          <td key={cell.id}>{flexRender(cell.column.columnDef.cell, cell.getContext())}</td>
+                      <tr
+                        key={row.id}
+                        className={classnames({
+                          selected: row.getIsSelected(),
+                        })}
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <td key={cell.id}>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
+                          </td>
                         ))}
                       </tr>
-                    )
+                    );
                   })}
               </tbody>
             )}
@@ -388,19 +433,19 @@ const ManageReviewsTable = ({ reviewsData }: { reviewsData?: ReviewType[] }) => 
         </div>
         <TablePagination
           rowsPerPageOptions={[10, 25, 50]}
-          component='div'
-          className='border-bs'
+          component="div"
+          className="border-bs"
           count={table.getFilteredRowModel().rows.length}
           rowsPerPage={table.getState().pagination.pageSize}
           page={table.getState().pagination.pageIndex}
           onPageChange={(_, page) => {
-            table.setPageIndex(page)
+            table.setPageIndex(page);
           }}
-          onRowsPerPageChange={e => table.setPageSize(Number(e.target.value))}
+          onRowsPerPageChange={(e) => table.setPageSize(Number(e.target.value))}
         />
       </Card>
     </>
-  )
-}
+  );
+};
 
-export default ManageReviewsTable
+export default ManageReviewsTable;

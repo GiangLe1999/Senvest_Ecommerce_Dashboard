@@ -4,7 +4,7 @@
 import { useState } from "react";
 
 // Next Imports
-import { useParams, useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 // MUI Imports
 import Typography from "@mui/material/Typography";
@@ -28,7 +28,6 @@ import LoadingButton from "@mui/lab/LoadingButton";
 import { toast } from "react-toastify";
 
 import type { Mode } from "@core/types";
-import type { Locale } from "@/configs/i18n";
 
 // Component Imports
 import Logo from "@components/layout/shared/Logo";
@@ -39,9 +38,6 @@ import themeConfig from "@configs/themeConfig";
 // Hook Imports
 import { useImageVariant } from "@core/hooks/useImageVariant";
 import { useSettings } from "@core/hooks/useSettings";
-
-// Util Imports
-import { getLocalizedUrl } from "@/utils/i18n";
 
 type ErrorType = {
   message: string[];
@@ -83,7 +79,6 @@ const Login = ({ mode }: { mode: Mode }) => {
   // Hooks
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { lang: locale } = useParams();
   const { settings } = useSettings();
 
   const {
@@ -125,7 +120,7 @@ const Login = ({ mode }: { mode: Mode }) => {
         const redirectURL = searchParams.get("redirectTo") ?? "/";
 
         toast.success("Đăng nhập thành công");
-        router.replace(getLocalizedUrl(redirectURL, locale as Locale));
+        router.replace(redirectURL);
       } else {
         if (res?.error) {
           const error = await JSON.parse(res.error);

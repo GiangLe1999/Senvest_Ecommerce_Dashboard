@@ -1,64 +1,66 @@
-'use client'
+"use client";
 
 // React Imports
-import { useMemo } from 'react'
+import { useMemo } from "react";
 
 // MUI Imports
-import { deepmerge } from '@mui/utils'
+import { deepmerge } from "@mui/utils";
 import {
   Experimental_CssVarsProvider as CssVarsProvider,
   experimental_extendTheme as extendTheme,
   lighten,
-  darken
-} from '@mui/material/styles'
-import { AppRouterCacheProvider } from '@mui/material-nextjs/v14-appRouter'
-import CssBaseline from '@mui/material/CssBaseline'
-import type {} from '@mui/material/themeCssVarsAugmentation' //! Do not remove this import otherwise you will get type errors while making a production build
-import type {} from '@mui/lab/themeAugmentation' //! Do not remove this import otherwise you will get type errors while making a production build
+  darken,
+} from "@mui/material/styles";
+import { AppRouterCacheProvider } from "@mui/material-nextjs/v14-appRouter";
+import CssBaseline from "@mui/material/CssBaseline";
+import type {} from "@mui/material/themeCssVarsAugmentation"; //! Do not remove this import otherwise you will get type errors while making a production build
+import type {} from "@mui/lab/themeAugmentation"; //! Do not remove this import otherwise you will get type errors while making a production build
 
 // Third-party Imports
-import { useMedia } from 'react-use'
-import stylisRTLPlugin from 'stylis-plugin-rtl'
+import { useMedia } from "react-use";
 
 // Type Imports
-import type { ChildrenType, Direction, SystemMode } from '@core/types'
+import type { ChildrenType, SystemMode } from "@core/types";
 
 // Component Imports
-import ModeChanger from './ModeChanger'
+import ModeChanger from "./ModeChanger";
 
 // Config Imports
-import themeConfig from '@configs/themeConfig'
+import themeConfig from "@configs/themeConfig";
 
 // Hook Imports
-import { useSettings } from '@core/hooks/useSettings'
+import { useSettings } from "@core/hooks/useSettings";
 
 // Core Theme Imports
-import defaultCoreTheme from '@core/theme'
+import defaultCoreTheme from "@core/theme";
 
 type Props = ChildrenType & {
-  direction: Direction
-  systemMode: SystemMode
-}
+  systemMode: SystemMode;
+};
 
 const ThemeProvider = (props: Props) => {
   // Props
-  const { children, direction, systemMode } = props
+  const { children, systemMode } = props;
 
   // Hooks
-  const { settings } = useSettings()
-  const isDark = useMedia('(prefers-color-scheme: dark)', systemMode === 'dark')
+  const { settings } = useSettings();
+
+  const isDark = useMedia(
+    "(prefers-color-scheme: dark)",
+    systemMode === "dark",
+  );
 
   // Vars
-  const isServer = typeof window === 'undefined'
-  let currentMode: SystemMode
+  const isServer = typeof window === "undefined";
+  let currentMode: SystemMode;
 
   if (isServer) {
-    currentMode = systemMode
+    currentMode = systemMode;
   } else {
-    if (settings.mode === 'system') {
-      currentMode = isDark ? 'dark' : 'light'
+    if (settings.mode === "system") {
+      currentMode = isDark ? "dark" : "light";
     } else {
-      currentMode = settings.mode as SystemMode
+      currentMode = settings.mode as SystemMode;
     }
   }
 
@@ -71,43 +73,42 @@ const ThemeProvider = (props: Props) => {
             primary: {
               main: settings.primaryColor,
               light: lighten(settings.primaryColor as string, 0.2),
-              dark: darken(settings.primaryColor as string, 0.1)
-            }
-          }
+              dark: darken(settings.primaryColor as string, 0.1),
+            },
+          },
         },
         dark: {
           palette: {
             primary: {
               main: settings.primaryColor,
               light: lighten(settings.primaryColor as string, 0.2),
-              dark: darken(settings.primaryColor as string, 0.1)
-            }
-          }
-        }
-      }
-    }
+              dark: darken(settings.primaryColor as string, 0.1),
+            },
+          },
+        },
+      },
+    };
 
-    const coreTheme = deepmerge(defaultCoreTheme(settings, currentMode, direction), newColorScheme)
+    const coreTheme = deepmerge(
+      defaultCoreTheme(settings, currentMode),
+      newColorScheme,
+    );
 
-    return extendTheme(coreTheme)
+    return extendTheme(coreTheme);
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [settings.primaryColor, settings.skin, currentMode])
+  }, [settings.primaryColor, settings.skin, currentMode]);
 
   return (
     <AppRouterCacheProvider
       options={{
         prepend: true,
-        ...(direction === 'rtl' && {
-          key: 'rtl',
-          stylisPlugins: [stylisRTLPlugin]
-        })
       }}
     >
       <CssVarsProvider
         theme={theme}
         defaultMode={systemMode}
-        modeStorageKey={`${themeConfig.templateName.toLowerCase().split(' ').join('-')}-mui-template-mode`}
+        modeStorageKey={`${themeConfig.templateName.toLowerCase().split(" ").join("-")}-mui-template-mode`}
       >
         <>
           <ModeChanger systemMode={systemMode} />
@@ -116,7 +117,7 @@ const ThemeProvider = (props: Props) => {
         </>
       </CssVarsProvider>
     </AppRouterCacheProvider>
-  )
-}
+  );
+};
 
-export default ThemeProvider
+export default ThemeProvider;
