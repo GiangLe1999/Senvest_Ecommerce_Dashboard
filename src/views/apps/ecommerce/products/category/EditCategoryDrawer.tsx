@@ -154,7 +154,7 @@ const EditCategoryDrawer = (props: Props) => {
             image: newCategory?.image || "",
             description: {
               en: newCategory?.description?.en,
-              vi: newCategory?.description?.en,
+              vi: newCategory?.description?.vi,
             },
             status: newCategory?.status,
           };
