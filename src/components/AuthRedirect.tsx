@@ -3,17 +3,11 @@
 // Next Imports
 import { redirect, usePathname } from "next/navigation";
 
-// Type Imports
-import type { Locale } from "@/configs/i18n";
-
-const AuthRedirect = ({ lang }: { lang: Locale }) => {
+const AuthRedirect = () => {
   const pathname = usePathname();
 
-  // ℹ️ Bring me `lang`
-  console.log(pathname);
-
-  const redirectUrl = `/${lang}/login?redirectTo=${pathname}`;
-  const login = `/${lang}/login`;
+  const redirectUrl = `/login?redirectTo=${pathname}`;
+  const login = "/login";
   const homePage = "/";
 
   return redirect(
