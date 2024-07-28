@@ -119,7 +119,7 @@ const Login = ({ mode }: { mode: Mode }) => {
         // Vars
         const redirectURL = searchParams.get("redirectTo") ?? "/";
 
-        toast.success("Đăng nhập thành công");
+        toast.success("Login successfully");
         router.replace(redirectURL);
       } else {
         if (res?.error) {
@@ -129,7 +129,7 @@ const Login = ({ mode }: { mode: Mode }) => {
         }
       }
     } catch (error) {
-      toast.error("Sai thông tin đăng nhập");
+      toast.error("Wrong email or password");
     }
 
     setLoading(false);

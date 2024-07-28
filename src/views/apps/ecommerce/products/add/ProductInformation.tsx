@@ -1,6 +1,6 @@
 "use client";
 
-import type { Dispatch, FC, SetStateAction } from "react";
+import type { FC } from "react";
 
 // MUI Imports
 import Grid from "@mui/material/Grid";
@@ -10,7 +10,12 @@ import CardContent from "@mui/material/CardContent";
 import TextField from "@mui/material/TextField";
 
 // Third-party Imports
-import { Controller, type Control } from "react-hook-form";
+import {
+  type UseFormSetValue,
+  type UseFormWatch,
+  type Control,
+  Controller,
+} from "react-hook-form";
 
 // Style Imports
 import "@/libs/styles/tiptapEditor.css";
@@ -20,33 +25,22 @@ import ProductDescriptionEditor from "./ProductDescriptionEditor";
 interface Props {
   control: Control<AddProductFormValues, any>;
   errors: any;
-  description: { vi: string; en: string };
-  setDescription: Dispatch<
-    SetStateAction<{
-      vi: string;
-      en: string;
-    }>
-  >;
+  setValue: UseFormSetValue<AddProductFormValues>;
+  watch: UseFormWatch<AddProductFormValues>;
 }
 
 const ProductInformation: FC<Props> = ({
   control,
   errors,
-  description,
-  setDescription,
+  setValue,
+  watch,
 }) => {
   const updateViDescription = (html: string) => {
-    setDescription((prev) => ({
-      ...prev,
-      vi: html,
-    }));
+    setValue("vi_description", html);
   };
 
   const updateEnDescription = (html: string) => {
-    setDescription((prev) => ({
-      ...prev,
-      en: html,
-    }));
+    setValue("en_description", html);
   };
 
   return (
@@ -58,13 +52,12 @@ const ProductInformation: FC<Props> = ({
             <Controller
               name="vi_name"
               control={control}
-              rules={{ required: true }}
               render={({ field }) => (
                 <TextField
                   {...field}
                   fullWidth
-                  label="Vietnamese name"
-                  placeholder="Vietnamese name"
+                  label="Vietnamese Name"
+                  placeholder="Vietnamese Name"
                   {...(errors.vi_name && {
                     error: true,
                     helperText: "This field is required.",
@@ -77,13 +70,12 @@ const ProductInformation: FC<Props> = ({
             <Controller
               name="en_name"
               control={control}
-              rules={{ required: true }}
               render={({ field }) => (
                 <TextField
                   {...field}
                   fullWidth
-                  label="English name"
-                  placeholder="English name"
+                  label="English Name"
+                  placeholder="English Name"
                   {...(errors.en_name && {
                     error: true,
                     helperText: "This field is required.",
@@ -97,13 +89,15 @@ const ProductInformation: FC<Props> = ({
         <Grid container spacing={10}>
           <ProductDescriptionEditor
             onUpdate={updateViDescription}
-            label="Vietnamese Description (Optional)"
-            value={description.vi}
+            label="Vietnamese Description"
+            value={watch("vi_description")}
+            error={errors.vi_description}
           />
           <ProductDescriptionEditor
             onUpdate={updateEnDescription}
-            label="English Description (Optional)"
-            value={description.en}
+            label="English Description"
+            value={watch("en_description")}
+            error={errors.en_description}
           />
         </Grid>
       </CardContent>

@@ -7,6 +7,21 @@ import { authOptions } from "@/libs/auth";
 const baseURL =
   process.env.API_BASE_URL || "http://localhost:8000/api/v1/admins";
 
+const publicBaseURL =
+  process.env.NEXT_PUBLIC_API_BASE_URL || "http://localhost:8000/api/v1";
+
+const publicAxiosInstanceFunc = () => {
+  const defaultOptions = {
+    baseURL: publicBaseURL,
+  };
+
+  const instance = axios.create(defaultOptions);
+
+  return instance;
+};
+
+export const publicAxiosInstance = publicAxiosInstanceFunc();
+
 const axiosInstance = () => {
   const defaultOptions = {
     baseURL,
@@ -29,7 +44,7 @@ const axiosInstance = () => {
       return response;
     },
     (error) => {
-      console.log(`error`, error?.response?.data?.message);
+      console.log(error.response.data);
     },
   );
 

@@ -1,6 +1,6 @@
 import ProductAddForm from "@/views/apps/ecommerce/products/add/ProductAddForm";
 
-const ECommerceProductsAdd = () => {
+const ECommerceProductsAdd = async () => {
   return <ProductAddForm />;
 };
 

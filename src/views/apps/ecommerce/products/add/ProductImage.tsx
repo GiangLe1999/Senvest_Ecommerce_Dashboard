@@ -130,7 +130,7 @@ const ProductImage: FC<Props> = ({ files, setFiles }) => {
           {files.length ? (
             <>
               <List>{fileList}</List>
-              <div className="buttons">
+              <div className="mt-5 text-right">
                 <Button
                   color="error"
                   variant="outlined"
@@ -138,7 +138,6 @@ const ProductImage: FC<Props> = ({ files, setFiles }) => {
                 >
                   Remove All
                 </Button>
-                <Button variant="contained">Upload Files</Button>
               </div>
             </>
           ) : null}

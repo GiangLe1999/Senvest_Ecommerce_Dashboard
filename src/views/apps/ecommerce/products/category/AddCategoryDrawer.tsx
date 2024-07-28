@@ -88,7 +88,7 @@ const AddCategoryDrawer = (props: Props) => {
       const result = await createCategory(formData);
 
       if (result.ok) {
-        toast.success("Tạo danh mục thành công");
+        toast.success("Create category successfully");
 
         setData([
           {
@@ -106,7 +106,7 @@ const AddCategoryDrawer = (props: Props) => {
         toast.error(result?.error);
       }
     } catch (error) {
-      toast.error("Tạo danh mục thất bại");
+      toast.error("Something went wrong");
     }
 
     setLoading(false);
@@ -282,7 +282,6 @@ const AddCategoryDrawer = (props: Props) => {
             >
               <MenuItem value="Published">Published</MenuItem>
               <MenuItem value="Inactive">Inactive</MenuItem>
-              <MenuItem value="Scheduled">Scheduled</MenuItem>
             </Select>
           </FormControl>
           <div className="grid grid-cols-2 gap-4">

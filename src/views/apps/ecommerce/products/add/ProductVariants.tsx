@@ -1,7 +1,7 @@
 "use client";
 
 // React Imports
-import type { Dispatch, FC, SetStateAction, SyntheticEvent } from "react";
+import type { FC } from "react";
 
 // MUI Imports
 import Grid from "@mui/material/Grid";
@@ -10,46 +10,51 @@ import CardHeader from "@mui/material/CardHeader";
 import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 
-// Components Imports
-import { toast } from "react-toastify";
+import type {
+  Control,
+  FieldArrayWithId,
+  FieldErrors,
+  UseFieldArrayAppend,
+  UseFieldArrayRemove,
+} from "react-hook-form";
 
-import { defaultVariant, type Variant } from "./ProductAddForm";
+import type { AddProductFormValues } from "./ProductAddForm";
+import { defaultVariant } from "./ProductAddForm";
+
 import ProductVariant from "./ProductVariant";
 
 interface Props {
-  variants: Variant[];
-  setVariants: Dispatch<SetStateAction<Variant[]>>;
+  append: UseFieldArrayAppend<AddProductFormValues, "variants">;
+  remove: UseFieldArrayRemove;
+  control: Control<AddProductFormValues, any>;
+  errors: FieldErrors<AddProductFormValues>;
+  fields: FieldArrayWithId<AddProductFormValues, "variants", "id">[];
 }
 
-const ProductVariants: FC<Props> = ({ variants, setVariants }) => {
-  const deleteForm = (e: SyntheticEvent, index: number) => {
-    e.preventDefault();
-
-    if (variants.length > 1) {
-      setVariants(variants.filter((variant, i) => i !== index));
-    } else {
-      toast.error("At least one variant is required");
-    }
-  };
-
+const ProductVariants: FC<Props> = ({
+  fields,
+  append,
+  remove,
+  control,
+  errors,
+}) => {
   const addNewVariant = () => {
-    setVariants([...variants, defaultVariant]);
+    append(defaultVariant);
   };
-
-  console.log(variants);
 
   return (
     <Card>
       <CardHeader title="Variants" />
       <CardContent>
         <Grid container spacing={6}>
-          {Array.from(Array(variants?.length).keys()).map((item, index) => (
+          {fields.map((field, index) => (
             <ProductVariant
-              key={index}
+              key={field.id}
               index={index}
-              deleteForm={deleteForm}
-              setVariants={setVariants}
-              variant={variants[index]}
+              remove={remove}
+              control={control}
+              errors={errors}
+              fieldsLength={fields.length}
             />
           ))}
           <Grid item xs={12}>

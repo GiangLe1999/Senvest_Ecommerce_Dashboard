@@ -1,7 +1,13 @@
-import type { FC } from "react";
+import { useEffect, type FC } from "react";
 
 // Third-party Imports
-import { Card, CardContent, Divider, Grid, Typography } from "@mui/material";
+import {
+  Card,
+  CardContent,
+  Divider,
+  FormHelperText,
+  Grid,
+} from "@mui/material";
 import classnames from "classnames";
 import type { Editor } from "@tiptap/core";
 import { EditorContent, useEditor } from "@tiptap/react";
@@ -125,18 +131,20 @@ interface Props {
   onUpdate: (html: string) => void;
   label: string;
   value: string;
+  error: any;
 }
 
 const ProductDescriptionEditor: FC<Props> = ({
   onUpdate,
   label,
   value,
+  error,
 }): JSX.Element => {
   const editor = useEditor({
     extensions: [
       StarterKit,
       Placeholder.configure({
-        placeholder: "Write something here...",
+        placeholder: label,
       }),
       TextAlign.configure({
         types: ["heading", "paragraph"],
@@ -155,19 +163,30 @@ const ProductDescriptionEditor: FC<Props> = ({
     },
   });
 
+  useEffect(() => {
+    if (editor && value !== editor.getHTML()) {
+      editor.commands.setContent(value);
+    }
+  }, [value, editor]);
+
   return (
     <Grid item xs={6}>
-      <Typography className="mbe-1">{label}</Typography>
-      <Card className="p-0 border shadow-none">
+      <Card
+        className={`p-0 border border-[#686A83] hover:border-[#9FA0B8] shadow-none ${error && "border-error"}`}
+      >
         <CardContent className="p-0">
           <EditorToolbar editor={editor} />
           <Divider className="mli-5" />
           <EditorContent
             editor={editor}
-            className="bs-[135px] overflow-y-auto flex "
+            className="bs-[135px] overflow-y-auto flex"
           />
         </CardContent>
       </Card>
+
+      {error && (
+        <FormHelperText className="text-error">{error.message}</FormHelperText>
+      )}
     </Grid>
   );
 };
