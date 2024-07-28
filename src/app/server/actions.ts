@@ -93,6 +93,14 @@ export const updateCategory = async (formData: FormData) => {
   return data;
 };
 
+export const deleteCategory = async (_id: string) => {
+  const { data } = await axiosInstance.delete(
+    `/admin-categories/delete/${_id}`,
+  );
+
+  return data;
+};
+
 // Products
 export const createProduct = async (formData: FormData) => {
   const { data } = await axiosInstance.post(

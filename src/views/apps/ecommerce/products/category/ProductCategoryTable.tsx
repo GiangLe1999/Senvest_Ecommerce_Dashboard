@@ -40,6 +40,7 @@ import OptionMenu from "@core/components/option-menu";
 import tableStyles from "@core/styles/table.module.css";
 import EditCategoryDrawer from "./EditCategoryDrawer";
 import type { LocalizedString } from "@/entities/common.entity";
+import DeleteCategoryDialog from "./DeleteCategoryDialog";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -125,6 +126,9 @@ const ProductCategoryTable: FC<Props> = ({ categories }) => {
   const [addCategoryOpen, setAddCategoryOpen] = useState(false);
   const [editCategoryOpen, setEditCategoryOpen] = useState(false);
   const [editedCategory, setEditedCategory] = useState<categoryType>();
+  const [deleteCategoryOpen, setDeleteCategoryOpen] = useState(false);
+  const [deletedCategoryId, setEditedCategoryId] = useState<string>();
+
   const [rowSelection, setRowSelection] = useState({});
   const [data, setData] = useState(...[categories]);
 
@@ -213,12 +217,10 @@ const ProductCategoryTable: FC<Props> = ({ categories }) => {
                   text: "Delete",
                   icon: "ri-delete-bin-7-line",
                   menuItemProps: {
-                    onClick: () =>
-                      setData(
-                        data.filter(
-                          (category: any) => category._id !== row.original._id,
-                        ),
-                      ),
+                    onClick: () => {
+                      setDeleteCategoryOpen(true);
+                      setEditedCategoryId(row.original._id);
+                    },
                   },
                 },
                 { text: "Duplicate", icon: "ri-stack-line" },
@@ -392,6 +394,13 @@ const ProductCategoryTable: FC<Props> = ({ categories }) => {
         originalCategory={editedCategory}
         setData={setData}
         handleClose={() => setEditCategoryOpen(!editCategoryOpen)}
+      />
+
+      <DeleteCategoryDialog
+        open={deleteCategoryOpen}
+        setOpen={setDeleteCategoryOpen}
+        deletedCategoryId={deletedCategoryId}
+        setData={setData}
       />
     </>
   );
