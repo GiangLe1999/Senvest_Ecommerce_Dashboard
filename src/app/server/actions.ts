@@ -1,6 +1,6 @@
 "use server";
 
-import axiosInstance, { publicAxiosInstance } from "@/configs/axios";
+import axiosInstance from "@/configs/axios";
 
 // Data Imports
 import { db as eCommerceData } from "@/fake-db/apps/ecommerce";
@@ -69,14 +69,28 @@ export const createCategory = async (formData: FormData) => {
   return data;
 };
 
-export const getCategories = async () => {
+export const getAdminCategories = async () => {
   try {
-    const data = await publicAxiosInstance("/categories");
+    const { data } = await axiosInstance("/admin-categories");
 
     return data;
   } catch (error) {
     console.log(error);
   }
+};
+
+export const updateCategory = async (formData: FormData) => {
+  const { data } = await axiosInstance.put(
+    "/admin-categories/update",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    },
+  );
+
+  return data;
 };
 
 // Products

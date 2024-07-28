@@ -1,6 +1,6 @@
 // React Imports
-import { useState, useRef } from "react";
-import type { ChangeEvent } from "react";
+import { useState, useRef, useEffect } from "react";
+import type { ChangeEvent, Dispatch, SetStateAction } from "react";
 
 // MUI Imports
 import Button from "@mui/material/Button";
@@ -24,13 +24,14 @@ import { toast } from "react-toastify";
 import LoadingButton from "@mui/lab/LoadingButton";
 
 import type { categoryType } from "./ProductCategoryTable";
-import { createCategory } from "@/app/server/actions";
+import { getChangedFields } from "@/utils/getChangedFields";
+import { updateCategory } from "@/app/server/actions";
 
 type Props = {
+  originalCategory: categoryType | undefined;
   open: boolean;
   handleClose: () => void;
-  categoryData: categoryType[];
-  setData: (data: categoryType[]) => void;
+  setData: Dispatch<SetStateAction<categoryType[]>>;
 };
 
 type FormValues = {
@@ -40,9 +41,9 @@ type FormValues = {
   en_description: string;
 };
 
-const AddCategoryDrawer = (props: Props) => {
+const EditCategoryDrawer = (props: Props) => {
   // Props
-  const { open, handleClose, categoryData, setData } = props;
+  const { open, handleClose, setData, originalCategory } = props;
 
   // States
   const [fileName, setFileName] = useState("");
@@ -59,52 +60,107 @@ const AddCategoryDrawer = (props: Props) => {
     reset: resetForm,
     handleSubmit,
     formState: { errors },
+    setValue,
   } = useForm<FormValues>({
     defaultValues: {
-      vi_name: "",
-      en_name: "",
-      vi_description: "",
-      en_description: "",
+      vi_name: originalCategory?.name?.vi || "",
+      en_name: originalCategory?.name?.en || "",
+      vi_description: originalCategory?.description?.vi || "",
+      en_description: originalCategory?.description?.en || "",
     },
   });
 
   // Handle Form Submit
   const handleFormSubmit = async (formValues: FormValues) => {
+    const formattedOriginalCategory = {
+      en_name: originalCategory?.name?.en || "",
+      vi_name: originalCategory?.name?.vi || "",
+      en_description: originalCategory?.description?.en || "",
+      vi_description: originalCategory?.description?.vi || "",
+      status: originalCategory?.status || "Published",
+      image: originalCategory?.image || "",
+    };
+
+    const formattedFormValues = {
+      en_name: formValues.en_name,
+      vi_name: formValues.vi_name,
+      en_description: formValues.en_description,
+      vi_description: formValues.vi_description,
+      status: status || "Published",
+      image: fileName || "",
+    };
+
+    const changedFields = getChangedFields({
+      initialFormData: formattedOriginalCategory,
+      currentFormData: formattedFormValues,
+    });
+
+    if (Object.keys(changedFields).length === 0) {
+      return toast.error("No changes made to the category", {
+        position: "top-left",
+      });
+    }
+
     setLoading(true);
 
     const formData = new FormData();
 
-    if (file) {
+    formData.append("_id", originalCategory?._id || "");
+
+    if (changedFields.image && file) {
       formData.append("file", file);
     }
 
-    formData.append("name[en]", formValues.en_name);
-    formData.append("name[vi]", formValues.vi_name);
-    formData.append("description[en]", formValues.en_description);
-    formData.append("description[vi]", formValues.vi_description);
-    formData.append("status", status);
+    if (changedFields.en_name) {
+      formData.append("name[en]", formValues.en_name);
+    }
+
+    if (changedFields.vi_name) {
+      formData.append("name[vi]", formValues.vi_name);
+    }
+
+    if (changedFields.en_description) {
+      formData.append("description[en]", formValues.en_description);
+    }
+
+    if (changedFields.vi_description) {
+      formData.append("description[vi]", formValues.vi_description);
+    }
+
+    if (changedFields.status) {
+      formData.append("status", status);
+    }
 
     try {
-      const result = await createCategory(formData);
+      const result = await updateCategory(formData);
 
       if (result.ok) {
-        toast.success("Create category successfully");
+        toast.success("Update category successfully");
 
-        setData([
-          {
-            totalSales: 0,
-            totalProducts: 0,
-            name: { en: formValues.en_name, vi: formValues.vi_name },
-            description: {
-              en: formValues.en_description,
-              vi: formValues.vi_description,
+        setData((prev) => {
+          const newCategory = result?.category || {};
+          const newData = [...prev];
+
+          const index = newData.findIndex(
+            (category) => category._id === originalCategory?._id,
+          );
+
+          newData[index] = {
+            ...newData[index],
+            name: {
+              en: newCategory?.name?.en,
+              vi: newCategory?.name?.vi,
             },
-            image: result?.category?.image || "",
-            _id: result?.category?._id,
-            status,
-          },
-          ...categoryData,
-        ]);
+            image: newCategory?.image || "",
+            description: {
+              en: newCategory?.description?.en,
+              vi: newCategory?.description?.en,
+            },
+            status: newCategory?.status,
+          };
+
+          return newData;
+        });
       } else {
         console.log;
         toast.error(result?.error);
@@ -143,6 +199,17 @@ const AddCategoryDrawer = (props: Props) => {
     }
   };
 
+  useEffect(() => {
+    if (originalCategory) {
+      setValue("vi_name", originalCategory?.name?.vi || "");
+      setValue("en_name", originalCategory?.name?.en || "");
+      setValue("vi_description", originalCategory?.description?.vi || "");
+      setValue("en_description", originalCategory?.description?.en || "");
+      setFileName(originalCategory?.image || "");
+      setStatus(originalCategory?.status || "Published");
+    }
+  }, [originalCategory, setValue]);
+
   return (
     <Drawer
       open={open}
@@ -153,7 +220,7 @@ const AddCategoryDrawer = (props: Props) => {
       sx={{ "& .MuiDrawer-paper": { width: { xs: 300, sm: 400 } } }}
     >
       <div className="flex items-center justify-between pli-5 plb-4">
-        <Typography variant="h5">Add Category</Typography>
+        <Typography variant="h5">Edit Category</Typography>
         <IconButton size="small" onClick={handleReset}>
           <i className="ri-close-line text-2xl" />
         </IconButton>
@@ -261,13 +328,13 @@ const AddCategoryDrawer = (props: Props) => {
             <Button
               component="label"
               variant="outlined"
-              htmlFor="contained-button-file"
+              htmlFor="contained-button-update-file"
               className="min-is-fit"
             >
               Choose
               <input
                 hidden
-                id="contained-button-file"
+                id="contained-button-update-file"
                 type="file"
                 onChange={handleFileUpload}
                 ref={fileInputRef}
@@ -295,7 +362,7 @@ const AddCategoryDrawer = (props: Props) => {
               variant="contained"
               type="submit"
             >
-              Add
+              Update
             </LoadingButton>
             <Button
               variant="outlined"
@@ -312,4 +379,4 @@ const AddCategoryDrawer = (props: Props) => {
   );
 };
 
-export default AddCategoryDrawer;
+export default EditCategoryDrawer;

@@ -1,8 +1,11 @@
 // Component Imports
-import ProductCategoryTable from '@views/apps/ecommerce/products/category/ProductCategoryTable'
+import { getAdminCategories } from "@/app/server/actions";
+import ProductCategoryTable from "@views/apps/ecommerce/products/category/ProductCategoryTable";
 
-const eCommerceProductsCategory = () => {
-  return <ProductCategoryTable />
-}
+const eCommerceProductsCategory = async () => {
+  const { categories } = await getAdminCategories();
 
-export default eCommerceProductsCategory
+  return <ProductCategoryTable categories={categories} />;
+};
+
+export default eCommerceProductsCategory;
