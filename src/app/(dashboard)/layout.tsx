@@ -3,7 +3,6 @@ import Button from "@mui/material/Button";
 
 // Type Imports
 import type { ChildrenType } from "@core/types";
-import type { Locale } from "@configs/i18n";
 
 // Layout Imports
 import LayoutWrapper from "@layouts/LayoutWrapper";
@@ -25,16 +24,13 @@ import AuthGuard from "@/hocs/AuthGuard";
 // Util Imports
 import { getMode, getSystemMode } from "@core/utils/serverHelpers";
 
-const Layout = async ({
-  children,
-  params,
-}: ChildrenType & { params: { lang: Locale } }) => {
+const Layout = async ({ children }: ChildrenType) => {
   const mode = getMode();
   const systemMode = getSystemMode();
 
   return (
     <Providers>
-      <AuthGuard locale={params.lang}>
+      <AuthGuard>
         <LayoutWrapper
           systemMode={systemMode}
           verticalLayout={
