@@ -45,7 +45,6 @@ import type { ProductType } from "@/types/apps/ecommerceTypes";
 
 // Component Imports
 import TableFilters from "./TableFilters";
-import CustomAvatar from "@core/components/mui/Avatar";
 
 // Style Imports
 import tableStyles from "@core/styles/table.module.css";
@@ -189,13 +188,13 @@ const ProductListTable = ({ productData }: { productData?: ProductType[] }) => {
         header: "Category",
         cell: ({ row }) => (
           <div className="flex items-center gap-3">
-            <CustomAvatar skin="light" color="primary" size={30}>
-              <img
-                src={row.original?.category?.image}
-                alt={row.original?.category?.name.en}
-                className="object-contain"
-              />
-            </CustomAvatar>
+            <img
+              src={row.original?.category?.image}
+              alt={row.original?.category?.name.en}
+              className="rounded-full object-contain bg-actionHover"
+              width={30}
+              height={30}
+            />
             <Typography color="text.primary">
               {row.original?.category?.name.en}
             </Typography>
@@ -211,7 +210,9 @@ const ProductListTable = ({ productData }: { productData?: ProductType[] }) => {
       columnHelper.accessor("variants", {
         header: "Stock",
         cell: ({ row }) => (
-          <Typography>{row.original.variants?.[0].stock}</Typography>
+          <Typography>
+            {row.original.variants.reduce((a, b) => a + b.stock, 0)}
+          </Typography>
         ),
       }),
       columnHelper.accessor("status", {

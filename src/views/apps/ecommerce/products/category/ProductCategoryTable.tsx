@@ -33,13 +33,16 @@ import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import type { RankingInfo } from "@tanstack/match-sorter-utils";
 
 // Component Imports
+import { toast } from "react-toastify";
+
 import AddCategoryDrawer from "./AddCategoryDrawer";
 
 // Style Imports
 import tableStyles from "@core/styles/table.module.css";
 import EditCategoryDrawer from "./EditCategoryDrawer";
 import type { LocalizedString } from "@/entities/common.entity";
-import DeleteCategoryDialog from "./DeleteCategoryDialog";
+import DeleteConfirmDialog from "@/views/dashboards/ecommerce/DeleteConfirmDialog";
+import { deleteCategory } from "@/app/server/actions";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -127,6 +130,7 @@ const ProductCategoryTable: FC<Props> = ({ categories }) => {
   const [editedCategory, setEditedCategory] = useState<categoryType>();
   const [deleteCategoryOpen, setDeleteCategoryOpen] = useState(false);
   const [deletedCategoryId, setEditedCategoryId] = useState<string>();
+  const [deleteCategoryLoading, setDeleteCategoryLoading] = useState(false);
 
   const [rowSelection, setRowSelection] = useState({});
   const [data, setData] = useState(...[categories]);
@@ -254,6 +258,34 @@ const ProductCategoryTable: FC<Props> = ({ categories }) => {
     getFacetedUniqueValues: getFacetedUniqueValues(),
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
   });
+
+  const deleteCategoryHandler = async () => {
+    setDeleteCategoryLoading(true);
+
+    try {
+      if (deletedCategoryId) {
+        const result = await deleteCategory(deletedCategoryId);
+
+        if (result.ok) {
+          toast.success("Delete category successfully");
+
+          setData((prev) => {
+            return prev.filter(
+              (category) => category._id !== deletedCategoryId,
+            );
+          });
+        } else {
+          console.log;
+          toast.error(result?.error);
+        }
+      }
+    } catch (error) {
+      toast.error("Something went wrong");
+    }
+
+    setDeleteCategoryLoading(false);
+    setDeleteCategoryOpen(false);
+  };
 
   return (
     <>
@@ -388,11 +420,11 @@ const ProductCategoryTable: FC<Props> = ({ categories }) => {
         handleClose={() => setEditCategoryOpen(!editCategoryOpen)}
       />
 
-      <DeleteCategoryDialog
+      <DeleteConfirmDialog
         open={deleteCategoryOpen}
         setOpen={setDeleteCategoryOpen}
-        deletedCategoryId={deletedCategoryId}
-        setData={setData}
+        loading={deleteCategoryLoading}
+        onConfirmDelete={deleteCategoryHandler}
       />
     </>
   );
