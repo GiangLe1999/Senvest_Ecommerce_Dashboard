@@ -102,6 +102,16 @@ export const deleteCategory = async (_id: string) => {
 };
 
 // Products
+export const getAdminProducts = async () => {
+  try {
+    const { data } = await axiosInstance("/admin-products");
+
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const createProduct = async (formData: FormData) => {
   const { data } = await axiosInstance.post(
     "/admin-products/create",
@@ -112,6 +122,12 @@ export const createProduct = async (formData: FormData) => {
       },
     },
   );
+
+  return data;
+};
+
+export const deleteProduct = async (_id: string) => {
+  const { data } = await axiosInstance.delete(`/admin-products/delete/${_id}`);
 
   return data;
 };

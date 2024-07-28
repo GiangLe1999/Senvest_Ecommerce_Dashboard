@@ -14,7 +14,6 @@ import Chip from "@mui/material/Chip";
 import Checkbox from "@mui/material/Checkbox";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
-import Switch from "@mui/material/Switch";
 import TablePagination from "@mui/material/TablePagination";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
@@ -39,16 +38,19 @@ import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import type { RankingInfo } from "@tanstack/match-sorter-utils";
 
 // Type Imports
+import { toast } from "react-toastify";
+
 import type { ThemeColor } from "@core/types";
 import type { ProductType } from "@/types/apps/ecommerceTypes";
 
 // Component Imports
 import TableFilters from "./TableFilters";
 import CustomAvatar from "@core/components/mui/Avatar";
-import OptionMenu from "@core/components/option-menu";
 
 // Style Imports
 import tableStyles from "@core/styles/table.module.css";
+import DeleteConfirmDialog from "@/views/dashboards/ecommerce/DeleteConfirmDialog";
+import { deleteProduct } from "@/app/server/actions";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -61,13 +63,6 @@ declare module "@tanstack/table-core" {
 
 type ProductWithActionsType = ProductType & {
   actions?: string;
-};
-
-type ProductCategoryType = {
-  [key: string]: {
-    icon: string;
-    color: ThemeColor;
-  };
 };
 
 type productStatusType = {
@@ -126,18 +121,7 @@ const DebouncedInput = ({
   );
 };
 
-// Vars
-const productCategoryObj: ProductCategoryType = {
-  Accessories: { icon: "ri-headphone-line", color: "error" },
-  "Home Decor": { icon: "ri-home-6-line", color: "info" },
-  Electronics: { icon: "ri-computer-line", color: "primary" },
-  Shoes: { icon: "ri-footprint-line", color: "success" },
-  Office: { icon: "ri-briefcase-line", color: "warning" },
-  Games: { icon: "ri-gamepad-line", color: "secondary" },
-};
-
 const productStatusObj: productStatusType = {
-  Scheduled: { title: "Scheduled", color: "warning" },
   Published: { title: "Publish", color: "success" },
   Inactive: { title: "Inactive", color: "error" },
 };
@@ -147,8 +131,12 @@ const columnHelper = createColumnHelper<ProductWithActionsType>();
 
 const ProductListTable = ({ productData }: { productData?: ProductType[] }) => {
   // States
-  const [rowSelection, setRowSelection] = useState({});
   const [data, setData] = useState(...[productData]);
+  const [rowSelection, setRowSelection] = useState({});
+  const [deleteProductOpen, setDeleteProductOpen] = useState(false);
+  const [deletedProductId, setEditedProductId] = useState<string>();
+  const [deleteProductLoading, setDeleteProductLoading] = useState(false);
+
   const [filteredData, setFilteredData] = useState(data);
   const [globalFilter, setGlobalFilter] = useState("");
 
@@ -176,22 +164,22 @@ const ProductListTable = ({ productData }: { productData?: ProductType[] }) => {
           />
         ),
       },
-      columnHelper.accessor("productName", {
+      columnHelper.accessor("name.en", {
         header: "Product",
         cell: ({ row }) => (
           <div className="flex items-center gap-3">
             <img
-              src={row.original.image}
+              src={row.original.images[0]}
               width={38}
               height={38}
-              className="rounded-md bg-actionHover"
+              className="rounded-md bg-actionHover object-contain"
             />
             <div className="flex flex-col">
               <Typography className="font-medium" color="text.primary">
-                {row.original.productName}
+                {row.original.name.en}
               </Typography>
               <Typography variant="body2">
-                {row.original.productBrand}
+                {row.original.description.en}
               </Typography>
             </div>
           </div>
@@ -201,40 +189,30 @@ const ProductListTable = ({ productData }: { productData?: ProductType[] }) => {
         header: "Category",
         cell: ({ row }) => (
           <div className="flex items-center gap-3">
-            <CustomAvatar
-              skin="light"
-              color={productCategoryObj[row.original.category].color}
-              size={30}
-            >
-              <i
-                className={classnames(
-                  productCategoryObj[row.original.category].icon,
-                  "text-lg",
-                )}
+            <CustomAvatar skin="light" color="primary" size={30}>
+              <img
+                src={row.original?.category?.image}
+                alt={row.original?.category?.name.en}
+                className="object-contain"
               />
             </CustomAvatar>
             <Typography color="text.primary">
-              {row.original.category}
+              {row.original?.category?.name.en}
             </Typography>
           </div>
         ),
       }),
-      columnHelper.accessor("stock", {
-        header: "Stock",
-        cell: ({ row }) => <Switch defaultChecked={row.original.stock} />,
-        enableSorting: false,
-      }),
-      columnHelper.accessor("sku", {
-        header: "SKU",
-        cell: ({ row }) => <Typography>{row.original.sku}</Typography>,
-      }),
-      columnHelper.accessor("price", {
+      columnHelper.accessor("variants", {
         header: "Price",
-        cell: ({ row }) => <Typography>{row.original.price}</Typography>,
+        cell: ({ row }) => (
+          <Typography>{row.original.variants?.[0].price}</Typography>
+        ),
       }),
-      columnHelper.accessor("qty", {
-        header: "QTY",
-        cell: ({ row }) => <Typography>{row.original.qty}</Typography>,
+      columnHelper.accessor("variants", {
+        header: "Stock",
+        cell: ({ row }) => (
+          <Typography>{row.original.variants?.[0].stock}</Typography>
+        ),
       }),
       columnHelper.accessor("status", {
         header: "Status",
@@ -256,26 +234,15 @@ const ProductListTable = ({ productData }: { productData?: ProductType[] }) => {
             <IconButton size="small">
               <i className="ri-edit-box-line text-[22px] text-textSecondary" />
             </IconButton>
-            <OptionMenu
-              iconButtonProps={{ size: "medium" }}
-              iconClassName="text-textSecondary text-[22px]"
-              options={[
-                { text: "Download", icon: "ri-download-line" },
-                {
-                  text: "Delete",
-                  icon: "ri-delete-bin-7-line",
-                  menuItemProps: {
-                    onClick: () =>
-                      setData(
-                        data?.filter(
-                          (product) => product.id !== row.original.id,
-                        ),
-                      ),
-                  },
-                },
-                { text: "Duplicate", icon: "ri-stack-line" },
-              ]}
-            />
+            <IconButton
+              size="small"
+              onClick={() => {
+                setDeleteProductOpen(true);
+                setEditedProductId(row.original._id);
+              }}
+            >
+              <i className="ri-delete-bin-7-line text-[22px] text-textSecondary" />
+            </IconButton>
           </div>
         ),
         enableSorting: false,
@@ -314,6 +281,32 @@ const ProductListTable = ({ productData }: { productData?: ProductType[] }) => {
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
   });
 
+  const deleteProductHandler = async () => {
+    setDeleteProductLoading(true);
+
+    try {
+      if (deletedProductId) {
+        const result = await deleteProduct(deletedProductId);
+
+        if (result.ok) {
+          toast.success("Delete product successfully");
+
+          setData((prev) => {
+            return prev?.filter((product) => product._id !== deletedProductId);
+          });
+        } else {
+          console.log;
+          toast.error(result?.error);
+        }
+      }
+    } catch (error) {
+      toast.error("Something went wrong");
+    }
+
+    setDeleteProductLoading(false);
+    setDeleteProductOpen(false);
+  };
+
   return (
     <>
       <Card>
@@ -329,7 +322,7 @@ const ProductListTable = ({ productData }: { productData?: ProductType[] }) => {
           />
           <div className="flex flex-col sm:flex-row items-center gap-4 is-full sm:is-auto">
             <Button
-              color="secondary"
+              color="warning"
               className="is-full sm:is-auto"
               variant="outlined"
               startIcon={<i className="ri-upload-2-line" />}
@@ -339,7 +332,7 @@ const ProductListTable = ({ productData }: { productData?: ProductType[] }) => {
             <Button
               variant="contained"
               component={Link}
-              href={"/apps/ecommerce/products/add"}
+              href={"/products/add"}
               startIcon={<i className="ri-add-line" />}
               className="is-full sm:is-auto"
             >
@@ -435,6 +428,13 @@ const ProductListTable = ({ productData }: { productData?: ProductType[] }) => {
           onRowsPerPageChange={(e) => table.setPageSize(Number(e.target.value))}
         />
       </Card>
+
+      <DeleteConfirmDialog
+        open={deleteProductOpen}
+        setOpen={setDeleteProductOpen}
+        loading={deleteProductLoading}
+        onConfirmDelete={deleteProductHandler}
+      />
     </>
   );
 };

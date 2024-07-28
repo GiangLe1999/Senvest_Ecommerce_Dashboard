@@ -1,9 +1,6 @@
 "use client";
 
 // MUI Imports
-import type { Dispatch, SetStateAction } from "react";
-import { useState } from "react";
-
 import Dialog from "@mui/material/Dialog";
 import DialogTitle from "@mui/material/DialogTitle";
 import DialogContent from "@mui/material/DialogContent";
@@ -12,56 +9,21 @@ import Typography from "@mui/material/Typography";
 import { Grid } from "@mui/material";
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import { toast } from "react-toastify";
-
-import { deleteCategory } from "@/app/server/actions";
-import type { categoryType } from "./ProductCategoryTable";
-
 type Props = {
   open: boolean;
   setOpen: (open: boolean) => void;
-  deletedCategoryId: string | undefined;
-  setData: Dispatch<SetStateAction<categoryType[]>>;
+  loading: boolean;
+  onConfirmDelete: () => Promise<void>;
 };
 
-const DeleteCategoryDialog = ({
+const DeleteConfirmDialog = ({
   open,
   setOpen,
-  deletedCategoryId,
-  setData,
+  loading,
+  onConfirmDelete,
 }: Props) => {
-  const [loading, setLoading] = useState(false);
-
   const handleClose = () => {
     setOpen(false);
-  };
-
-  const confirmDeleteCategory = async () => {
-    setLoading(true);
-
-    try {
-      if (deletedCategoryId) {
-        const result = await deleteCategory(deletedCategoryId);
-
-        if (result.ok) {
-          toast.success("Delete category successfully");
-
-          setData((prev) => {
-            return prev.filter(
-              (category) => category._id !== deletedCategoryId,
-            );
-          });
-        } else {
-          console.log;
-          toast.error(result?.error);
-        }
-      }
-    } catch (error) {
-      toast.error("Something went wrong");
-    }
-
-    setLoading(false);
-    handleClose();
   };
 
   return (
@@ -76,7 +38,7 @@ const DeleteCategoryDialog = ({
         <DialogContent className="overflow-visible sm:px-12 px-6 pb-10 text-center">
           <Typography mb={2}>This process cannot be undone</Typography>
           <Typography mb={8}>
-            Do you really want to delete this category?
+            Do you really want to delete this document?
           </Typography>
 
           <Grid container spacing={5}>
@@ -98,7 +60,7 @@ const DeleteCategoryDialog = ({
                 loading={loading}
                 loadingPosition="start"
                 variant="contained"
-                onClick={confirmDeleteCategory}
+                onClick={onConfirmDelete}
                 color="error"
                 fullWidth
                 className="py-2.5 text-[17px]"
@@ -113,4 +75,4 @@ const DeleteCategoryDialog = ({
   );
 };
 
-export default DeleteCategoryDialog;
+export default DeleteConfirmDialog;

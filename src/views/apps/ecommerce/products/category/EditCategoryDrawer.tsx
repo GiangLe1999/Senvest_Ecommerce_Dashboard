@@ -32,6 +32,7 @@ type Props = {
   open: boolean;
   handleClose: () => void;
   setData: Dispatch<SetStateAction<categoryType[]>>;
+  setOpen: Dispatch<SetStateAction<boolean>>;
 };
 
 type FormValues = {
@@ -43,7 +44,7 @@ type FormValues = {
 
 const EditCategoryDrawer = (props: Props) => {
   // Props
-  const { open, handleClose, setData, originalCategory } = props;
+  const { open, setOpen, setData, originalCategory } = props;
 
   // States
   const [fileName, setFileName] = useState("");
@@ -57,7 +58,6 @@ const EditCategoryDrawer = (props: Props) => {
   // Hooks
   const {
     control,
-    reset: resetForm,
     handleSubmit,
     formState: { errors },
     setValue,
@@ -161,6 +161,7 @@ const EditCategoryDrawer = (props: Props) => {
 
           return newData;
         });
+        setOpen(false);
       } else {
         console.log;
         toast.error(result?.error);
@@ -170,21 +171,6 @@ const EditCategoryDrawer = (props: Props) => {
     }
 
     setLoading(false);
-    handleReset();
-  };
-
-  // Handle Form Reset
-  const handleReset = () => {
-    handleClose();
-    resetForm({
-      vi_name: "",
-      en_name: "",
-      vi_description: "",
-      en_description: "",
-    });
-    setFileName("");
-    setFile(null);
-    setStatus("Published");
   };
 
   // Handle File Upload
@@ -215,13 +201,13 @@ const EditCategoryDrawer = (props: Props) => {
       open={open}
       anchor="right"
       variant="temporary"
-      onClose={handleReset}
+      onClose={() => setOpen(false)}
       ModalProps={{ keepMounted: true }}
       sx={{ "& .MuiDrawer-paper": { width: { xs: 300, sm: 400 } } }}
     >
       <div className="flex items-center justify-between pli-5 plb-4">
         <Typography variant="h5">Edit Category</Typography>
-        <IconButton size="small" onClick={handleReset}>
+        <IconButton size="small" onClick={() => setOpen(false)}>
           <i className="ri-close-line text-2xl" />
         </IconButton>
       </div>
@@ -368,7 +354,7 @@ const EditCategoryDrawer = (props: Props) => {
               variant="outlined"
               color="error"
               type="reset"
-              onClick={handleReset}
+              onClick={() => setOpen(false)}
             >
               Discard
             </Button>

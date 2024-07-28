@@ -34,7 +34,6 @@ import type { RankingInfo } from "@tanstack/match-sorter-utils";
 
 // Component Imports
 import AddCategoryDrawer from "./AddCategoryDrawer";
-import OptionMenu from "@core/components/option-menu";
 
 // Style Imports
 import tableStyles from "@core/styles/table.module.css";
@@ -158,7 +157,7 @@ const ProductCategoryTable: FC<Props> = ({ categories }) => {
           />
         ),
       },
-      columnHelper.accessor("name", {
+      columnHelper.accessor("name.en", {
         header: "Categories",
         cell: ({ row }) => (
           <div className="flex items-center gap-3">
@@ -209,23 +208,15 @@ const ProductCategoryTable: FC<Props> = ({ categories }) => {
             >
               <i className="ri-edit-box-line text-[22px] text-textSecondary" />
             </IconButton>
-            <OptionMenu
-              iconButtonProps={{ size: "medium" }}
-              iconClassName="text-textSecondary text-[22px]"
-              options={[
-                {
-                  text: "Delete",
-                  icon: "ri-delete-bin-7-line",
-                  menuItemProps: {
-                    onClick: () => {
-                      setDeleteCategoryOpen(true);
-                      setEditedCategoryId(row.original._id);
-                    },
-                  },
-                },
-                { text: "Duplicate", icon: "ri-stack-line" },
-              ]}
-            />
+            <IconButton
+              size="small"
+              onClick={() => {
+                setDeleteCategoryOpen(true);
+                setEditedCategoryId(row.original._id);
+              }}
+            >
+              <i className="ri-delete-bin-7-line text-[22px] text-textSecondary" />
+            </IconButton>
           </div>
         ),
         enableSorting: false,
@@ -276,7 +267,7 @@ const ProductCategoryTable: FC<Props> = ({ categories }) => {
           />
           <div className="flex flex-col items-center gap-4 is-full sm:flex-row sm:is-auto">
             <Button
-              color="secondary"
+              color="warning"
               fullWidth
               variant="outlined"
               className="is-full sm:is-auto"
@@ -391,6 +382,7 @@ const ProductCategoryTable: FC<Props> = ({ categories }) => {
 
       <EditCategoryDrawer
         open={editCategoryOpen}
+        setOpen={setEditCategoryOpen}
         originalCategory={editedCategory}
         setData={setData}
         handleClose={() => setEditCategoryOpen(!editCategoryOpen)}
