@@ -1,31 +1,26 @@
 // Type Imports
-import type { ChildrenType } from '@core/types'
-import type { Locale } from '@configs/i18n'
+import type { ChildrenType } from "@core/types";
+import type { Locale } from "@configs/i18n";
 
 // Component Imports
-import Providers from '@components/Providers'
-import BlankLayout from '@layouts/BlankLayout'
-
-// Config Imports
-import { i18n } from '@configs/i18n'
+import Providers from "@components/Providers";
+import BlankLayout from "@layouts/BlankLayout";
 
 // Util Imports
-import { getSystemMode } from '@core/utils/serverHelpers'
+import { getSystemMode } from "@core/utils/serverHelpers";
 
 type Props = ChildrenType & {
-  params: { lang: Locale }
-}
+  params: { lang: Locale };
+};
 
-const Layout = ({ children, params }: Props) => {
-  // Vars
-  const direction = i18n.langDirection[params.lang]
-  const systemMode = getSystemMode()
+const Layout = ({ children }: Props) => {
+  const systemMode = getSystemMode();
 
   return (
-    <Providers direction={direction}>
+    <Providers>
       <BlankLayout systemMode={systemMode}>{children}</BlankLayout>
     </Providers>
-  )
-}
+  );
+};
 
-export default Layout
+export default Layout;
