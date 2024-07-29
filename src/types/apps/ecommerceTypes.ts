@@ -76,7 +76,6 @@ export type OrderType = {
 };
 
 export type ECommerceType = {
-  products: ProductType[];
   orderData: OrderType[];
   customerData: Customer[];
   reviews: ReviewType[];
