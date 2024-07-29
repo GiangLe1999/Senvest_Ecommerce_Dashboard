@@ -18,8 +18,8 @@ import type {
   UseFieldArrayRemove,
 } from "react-hook-form";
 
-import type { AddProductFormValues } from "./ProductAddForm";
-import { defaultVariant } from "./ProductAddForm";
+import type { AddProductFormValues } from "./ProductAddOrEditForm";
+import { defaultVariant } from "./ProductAddOrEditForm";
 
 import ProductVariant from "./ProductVariant";
 

@@ -21,7 +21,7 @@ import { Controller, type Control } from "react-hook-form";
 
 import { publicAxiosInstance } from "@/configs/axios";
 import type { Category } from "@/entities/category.entity";
-import type { AddProductFormValues } from "./ProductAddForm";
+import type { AddProductFormValues } from "./ProductAddOrEditForm";
 
 interface Props {
   control: Control<AddProductFormValues, any>;

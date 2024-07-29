@@ -1,47 +1,61 @@
 "use client";
 
-// React Imports
-import type { FC } from "react";
-import { useMemo, useState } from "react";
-
-// MUI Imports
-import Card from "@mui/material/Card";
-import Button from "@mui/material/Button";
-import Checkbox from "@mui/material/Checkbox";
-import IconButton from "@mui/material/IconButton";
-import TablePagination from "@mui/material/TablePagination";
-import Typography from "@mui/material/Typography";
+import { useMemo, useState, type FC } from "react";
 
 // Third-party Imports
 import classnames from "classnames";
-import { rankItem } from "@tanstack/match-sorter-utils";
+import classNames from "classnames";
+
+import { rankItem, type RankingInfo } from "@tanstack/match-sorter-utils";
 import {
   createColumnHelper,
   flexRender,
   getCoreRowModel,
-  useReactTable,
-  getFilteredRowModel,
+  getFacetedMinMaxValues,
   getFacetedRowModel,
   getFacetedUniqueValues,
-  getFacetedMinMaxValues,
+  getFilteredRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  useReactTable,
+  type ColumnDef,
+  type FilterFn,
 } from "@tanstack/react-table";
-import type { ColumnDef, FilterFn } from "@tanstack/react-table";
-import type { RankingInfo } from "@tanstack/match-sorter-utils";
-
-// Component Imports
+import {
+  Button,
+  Card,
+  Chip,
+  IconButton,
+  TablePagination,
+  Typography,
+} from "@mui/material";
 import { toast } from "react-toastify";
 
-import AddCategoryDrawer from "./AddCategoryDrawer";
+import { format, parseISO } from "date-fns";
+
+import { deleteBanner } from "@/app/server/actions";
+import DebouncedInput from "@/components/DebouncedInput";
 
 // Style Imports
 import tableStyles from "@core/styles/table.module.css";
-import EditCategoryDrawer from "./EditCategoryDrawer";
-import type { LocalizedString } from "@/entities/common.entity";
+import AddBannerDrawer from "./AddBannerDrawer";
+import type { ThemeColor } from "@/@core/types";
 import DeleteConfirmDialog from "@/views/dashboards/ecommerce/DeleteConfirmDialog";
-import { deleteCategory } from "@/app/server/actions";
-import DebouncedInput from "@/components/DebouncedInput";
+import EditBannerDrawer from "./EditBannerDrawer";
+
+type bannerStatusType = {
+  [key: string]: {
+    title: string;
+    color: ThemeColor;
+  };
+};
+
+const bannerStatusObj: bannerStatusType = {
+  Active: { title: "Active", color: "success" },
+  Inactive: { title: "Inactive", color: "error" },
+};
+
+interface Props {}
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -52,17 +66,16 @@ declare module "@tanstack/table-core" {
   }
 }
 
-export type categoryType = {
+export type bannerType = {
   _id: string;
-  name: LocalizedString;
-  description: LocalizedString;
-  totalProducts: number;
-  totalSales: number;
-  image?: string;
+  name: string;
+  image: string;
   status: string;
+  updatedAt: string;
+  order: string;
 };
 
-type CategoryWithActionsType = categoryType & {
+type BannerWithActionsType = bannerType & {
   actions?: string;
 };
 
@@ -80,52 +93,34 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 };
 
 // Column Definitions
-const columnHelper = createColumnHelper<CategoryWithActionsType>();
+const columnHelper = createColumnHelper<BannerWithActionsType>();
 
 interface Props {
-  categories: categoryType[];
+  banners: bannerType[];
 }
 
-const ProductCategoryTable: FC<Props> = ({ categories }) => {
+const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
   // States
-  const [addCategoryOpen, setAddCategoryOpen] = useState(false);
-  const [editCategoryOpen, setEditCategoryOpen] = useState(false);
-  const [editedCategory, setEditedCategory] = useState<categoryType>();
-  const [deleteCategoryOpen, setDeleteCategoryOpen] = useState(false);
-  const [deletedCategoryId, setEditedCategoryId] = useState<string>();
-  const [deleteCategoryLoading, setDeleteCategoryLoading] = useState(false);
+  const [addBannerOpen, setAddBannerOpen] = useState(false);
+  const [editBannerOpen, setEditBannerOpen] = useState(false);
+  const [editedBanner, setEditedBanner] = useState<bannerType>();
+  const [deleteBannerOpen, setDeleteBannerOpen] = useState(false);
+  const [deletedBannerId, setEditedBannerId] = useState<string>();
+  const [deleteBannerLoading, setDeleteBannerLoading] = useState(false);
 
-  const [rowSelection, setRowSelection] = useState({});
-  const [data, setData] = useState(...[categories]);
+  const [data, setData] = useState(...[banners]);
 
   const [globalFilter, setGlobalFilter] = useState("");
 
-  const columns = useMemo<ColumnDef<CategoryWithActionsType, any>[]>(
+  const columns = useMemo<ColumnDef<BannerWithActionsType, any>[]>(
     () => [
       {
-        id: "select",
-        header: ({ table }) => (
-          <Checkbox
-            {...{
-              checked: table.getIsAllRowsSelected(),
-              indeterminate: table.getIsSomeRowsSelected(),
-              onChange: table.getToggleAllRowsSelectedHandler(),
-            }}
-          />
-        ),
-        cell: ({ row }) => (
-          <Checkbox
-            {...{
-              checked: row.getIsSelected(),
-              disabled: !row.getCanSelect(),
-              indeterminate: row.getIsSomeSelected(),
-              onChange: row.getToggleSelectedHandler(),
-            }}
-          />
-        ),
+        id: "order",
+        header: "Order",
+        cell: ({ row }) => <Typography>{row.original.order}</Typography>,
       },
-      columnHelper.accessor("name.en", {
-        header: "Categories",
+      columnHelper.accessor("name", {
+        header: "Name",
         cell: ({ row }) => (
           <div className="flex items-center gap-3">
             <img
@@ -134,31 +129,33 @@ const ProductCategoryTable: FC<Props> = ({ categories }) => {
               height={38}
               className="rounded-md bg-actionHover object-contain"
             />
-            <div className="flex flex-col">
-              <Typography className="font-medium" color="text.primary">
-                {row.original.name.en}
-              </Typography>
-              <Typography variant="body2">
-                {row.original.description.en}
-              </Typography>
-            </div>
+            <Typography className="font-medium" color="text.primary">
+              {row.original.name}
+            </Typography>
           </div>
         ),
       }),
-      columnHelper.accessor("totalProducts", {
-        header: "Total Products",
+      columnHelper.accessor("status", {
+        header: "Status",
         cell: ({ row }) => (
-          <Typography>{row.original.totalProducts.toLocaleString()}</Typography>
+          <div className="flex items-center gap-3">
+            <Chip
+              label={bannerStatusObj[row.original.status]?.title}
+              variant="tonal"
+              color={bannerStatusObj[row.original.status]?.color}
+              size="small"
+            />
+          </div>
         ),
       }),
-      columnHelper.accessor("totalSales", {
-        header: "Total Earning",
+      columnHelper.accessor("updatedAt", {
+        header: "Update At",
         cell: ({ row }) => (
           <Typography>
-            {row.original.totalSales.toLocaleString("vi-VN", {
-              style: "currency",
-              currency: "VND",
-            })}
+            {format(
+              parseISO(row.original.updatedAt),
+              "hh:mm a - EEEE, dd/MM/yyyy",
+            )}
           </Typography>
         ),
       }),
@@ -169,8 +166,8 @@ const ProductCategoryTable: FC<Props> = ({ categories }) => {
             <IconButton
               size="small"
               onClick={() => {
-                setEditCategoryOpen(true);
-                setEditedCategory(row.original);
+                setEditBannerOpen(true);
+                setEditedBanner(row.original);
               }}
             >
               <i className="ri-edit-box-line text-[22px] text-textSecondary" />
@@ -178,8 +175,8 @@ const ProductCategoryTable: FC<Props> = ({ categories }) => {
             <IconButton
               size="small"
               onClick={() => {
-                setDeleteCategoryOpen(true);
-                setEditedCategoryId(row.original._id);
+                setDeleteBannerOpen(true);
+                setEditedBannerId(row.original._id);
               }}
             >
               <i className="ri-delete-bin-7-line text-[22px] text-textSecondary" />
@@ -194,13 +191,12 @@ const ProductCategoryTable: FC<Props> = ({ categories }) => {
   );
 
   const table = useReactTable({
-    data: data as categoryType[],
+    data: data as bannerType[],
     columns,
     filterFns: {
       fuzzy: fuzzyFilter,
     },
     state: {
-      rowSelection,
       globalFilter,
     },
     initialState: {
@@ -211,7 +207,6 @@ const ProductCategoryTable: FC<Props> = ({ categories }) => {
     enableRowSelection: true, //enable row selection for all rows
     // enableRowSelection: row => row.original.age > 18, // or enable row selection conditionally per row
     globalFilterFn: fuzzyFilter,
-    onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
     onGlobalFilterChange: setGlobalFilter,
     getFilteredRowModel: getFilteredRowModel(),
@@ -222,20 +217,18 @@ const ProductCategoryTable: FC<Props> = ({ categories }) => {
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
   });
 
-  const deleteCategoryHandler = async () => {
-    setDeleteCategoryLoading(true);
+  const deleteBannerHandler = async () => {
+    setDeleteBannerLoading(true);
 
     try {
-      if (deletedCategoryId) {
-        const result = await deleteCategory(deletedCategoryId);
+      if (deletedBannerId) {
+        const result = await deleteBanner(deletedBannerId);
 
         if (result.ok) {
-          toast.success("Delete category successfully");
+          toast.success("Delete banner successfully");
 
           setData((prev) => {
-            return prev.filter(
-              (category) => category._id !== deletedCategoryId,
-            );
+            return prev.filter((banner) => banner._id !== deletedBannerId);
           });
         } else {
           console.log;
@@ -246,8 +239,8 @@ const ProductCategoryTable: FC<Props> = ({ categories }) => {
       toast.error("Something went wrong");
     }
 
-    setDeleteCategoryLoading(false);
-    setDeleteCategoryOpen(false);
+    setDeleteBannerLoading(false);
+    setDeleteBannerOpen(false);
   };
 
   return (
@@ -262,21 +255,12 @@ const ProductCategoryTable: FC<Props> = ({ categories }) => {
           />
           <div className="flex flex-col items-center gap-4 is-full sm:flex-row sm:is-auto">
             <Button
-              color="warning"
-              fullWidth
-              variant="outlined"
-              className="is-full sm:is-auto"
-              startIcon={<i className="ri-upload-2-line" />}
-            >
-              Export
-            </Button>
-            <Button
               variant="contained"
               className="is-full sm:is-auto"
-              onClick={() => setAddCategoryOpen(!addCategoryOpen)}
+              onClick={() => setAddBannerOpen(!addBannerOpen)}
               startIcon={<i className="ri-add-line" />}
             >
-              Add Category
+              Add Banner
             </Button>
           </div>
         </div>
@@ -290,7 +274,7 @@ const ProductCategoryTable: FC<Props> = ({ categories }) => {
                       {header.isPlaceholder ? null : (
                         <>
                           <div
-                            className={classnames({
+                            className={classNames({
                               "flex items-center": header.column.getIsSorted(),
                               "cursor-pointer select-none":
                                 header.column.getCanSort(),
@@ -368,29 +352,29 @@ const ProductCategoryTable: FC<Props> = ({ categories }) => {
           onRowsPerPageChange={(e) => table.setPageSize(Number(e.target.value))}
         />
       </Card>
-      <AddCategoryDrawer
-        open={addCategoryOpen}
-        categoryData={data}
+      <AddBannerDrawer
+        open={addBannerOpen}
+        bannerData={banners}
         setData={setData}
-        handleClose={() => setAddCategoryOpen(!addCategoryOpen)}
+        handleClose={() => setAddBannerOpen(!addBannerOpen)}
       />
 
-      <EditCategoryDrawer
-        open={editCategoryOpen}
-        setOpen={setEditCategoryOpen}
-        originalCategory={editedCategory}
+      <EditBannerDrawer
+        open={editBannerOpen}
+        setOpen={setEditBannerOpen}
+        originalBanner={editedBanner}
         setData={setData}
-        handleClose={() => setEditCategoryOpen(!editCategoryOpen)}
+        handleClose={() => setEditBannerOpen(!editBannerOpen)}
       />
 
       <DeleteConfirmDialog
-        open={deleteCategoryOpen}
-        setOpen={setDeleteCategoryOpen}
-        loading={deleteCategoryLoading}
-        onConfirmDelete={deleteCategoryHandler}
+        open={deleteBannerOpen}
+        setOpen={setDeleteBannerOpen}
+        loading={deleteBannerLoading}
+        onConfirmDelete={deleteBannerHandler}
       />
     </>
   );
 };
 
-export default ProductCategoryTable;
+export default BannerListTable;

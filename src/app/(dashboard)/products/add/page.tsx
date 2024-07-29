@@ -1,7 +1,7 @@
-import ProductAddForm from "@/views/apps/ecommerce/products/add/ProductAddForm";
+import ProductAddOrEditForm from "@/views/apps/ecommerce/products/add/ProductAddOrEditForm";
 
 const ECommerceProductsAdd = async () => {
-  return <ProductAddForm />;
+  return <ProductAddOrEditForm />;
 };
 
 export default ECommerceProductsAdd;

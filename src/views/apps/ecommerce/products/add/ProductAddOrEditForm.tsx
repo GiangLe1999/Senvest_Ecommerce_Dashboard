@@ -78,7 +78,9 @@ interface Props {
   initialProductData?: Product;
 }
 
-const ProductAddForm: FC<Props> = ({ initialProductData }): JSX.Element => {
+const ProductAddOrEditForm: FC<Props> = ({
+  initialProductData,
+}): JSX.Element => {
   // State
   const [files, setFiles] = useState<File[]>([]);
   const [loading, setLoading] = useState(false);
@@ -220,6 +222,7 @@ const ProductAddForm: FC<Props> = ({ initialProductData }): JSX.Element => {
 
         if (result.ok) {
           toast.success("Update product successfully");
+          window.location.replace("/products/list");
         } else {
           console.log;
           toast.error(result?.error);
@@ -256,6 +259,7 @@ const ProductAddForm: FC<Props> = ({ initialProductData }): JSX.Element => {
 
         if (result.ok) {
           toast.success("Create product successfully");
+          window.location.replace("/products/list");
         } else {
           toast.error(result?.error);
         }
@@ -335,4 +339,4 @@ const ProductAddForm: FC<Props> = ({ initialProductData }): JSX.Element => {
   );
 };
 
-export default ProductAddForm;
+export default ProductAddOrEditForm;

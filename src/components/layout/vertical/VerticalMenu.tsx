@@ -94,15 +94,12 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             label="Products"
             icon={<i className="ri-shopping-bag-3-line" />}
           >
-            <MenuItem href={`/products/list`}>List</MenuItem>
-            <MenuItem href={`/products/add`}>Add</MenuItem>
-            <MenuItem href={`/products/category`}>Category</MenuItem>
+            <MenuItem href={`/products/list`}>Product List</MenuItem>
+            <MenuItem href={`/products/add`}>Add Product</MenuItem>
+            <MenuItem href={`/products/category`}>Category List</MenuItem>
           </SubMenu>
 
-          <SubMenu
-            label="Orders"
-            icon={<i className="ri-secure-payment-fill" />}
-          >
+          <SubMenu label="Orders" icon={<i className="ri-refund-2-line" />}>
             <MenuItem href={`/orders/list`}>List</MenuItem>
             <MenuItem
               href={`/orders/details/5434`}
@@ -129,7 +126,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
 
           <MenuItem
             href={`/manage-reviews`}
-            icon={<i className="ri-file-word-line" />}
+            icon={<i className="ri-message-2-line" />}
             exactMatch={false}
             activeUrl="/manage-reviews"
           >
@@ -137,21 +134,21 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           </MenuItem>
 
           <MenuItem
-            href={`/referrals`}
-            icon={<i className="ri-external-link-line" />}
+            href={`/manage-banners`}
+            icon={<i className="ri-file-image-line" />}
             exactMatch={false}
-            activeUrl="/referrals"
+            activeUrl="/manage-banners"
           >
-            Referrals
+            Banners
           </MenuItem>
 
           <MenuItem
-            href={`/settings`}
-            icon={<i className="ri-settings-3-line" />}
+            href={`/manage-slogan`}
+            icon={<i className="ri-slideshow-3-line" />}
             exactMatch={false}
-            activeUrl="/settings"
+            activeUrl="/manage-slogan"
           >
-            Settings
+            Slogan
           </MenuItem>
         </MenuSection>
       </Menu>

@@ -19,7 +19,7 @@ import {
 
 // Style Imports
 import "@/libs/styles/tiptapEditor.css";
-import type { AddProductFormValues } from "./ProductAddForm";
+import type { AddProductFormValues } from "./ProductAddOrEditForm";
 import ProductDescriptionEditor from "./ProductDescriptionEditor";
 
 interface Props {

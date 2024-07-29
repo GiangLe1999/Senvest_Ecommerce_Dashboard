@@ -151,3 +151,40 @@ export const deleteProduct = async (_id: string) => {
 
   return data;
 };
+
+// Banners
+export const getAdminBanners = async () => {
+  try {
+    const { data } = await axiosInstance("/admin-banners");
+
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const createBanner = async (formData: FormData) => {
+  const { data } = await axiosInstance.post("/admin-banners/create", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return data;
+};
+
+export const updateBanner = async (formData: FormData) => {
+  const { data } = await axiosInstance.put("/admin-banners/update", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return data;
+};
+
+export const deleteBanner = async (_id: string) => {
+  const { data } = await axiosInstance.delete(`/admin-banners/delete/${_id}`);
+
+  return data;
+};

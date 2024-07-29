@@ -1,6 +1,6 @@
 import type { NextPage } from "next";
 
-import ProductAddForm from "@/views/apps/ecommerce/products/add/ProductAddForm";
+import ProductAddOrEditForm from "@/views/apps/ecommerce/products/add/ProductAddOrEditForm";
 import { getAdminProduct } from "@/app/server/actions";
 
 interface Props {
@@ -12,7 +12,7 @@ interface Props {
 const ECommerceProductsUpdate: NextPage<Props> = async ({ params: { id } }) => {
   const data = await getAdminProduct(id);
 
-  return <ProductAddForm initialProductData={data?.product} />;
+  return <ProductAddOrEditForm initialProductData={data?.product} />;
 };
 
 export default ECommerceProductsUpdate;

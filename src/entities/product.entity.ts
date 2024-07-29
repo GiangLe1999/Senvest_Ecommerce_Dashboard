@@ -1,4 +1,4 @@
-import type { Variant } from "@/views/apps/ecommerce/products/add/ProductAddForm";
+import type { Variant } from "@/views/apps/ecommerce/products/add/ProductAddOrEditForm";
 import type { LocalizedString } from "./common.entity";
 import type { Category } from "./category.entity";
 

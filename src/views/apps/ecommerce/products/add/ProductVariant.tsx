@@ -13,7 +13,7 @@ import { Controller } from "react-hook-form";
 import { toast } from "react-toastify";
 
 import CustomIconButton from "@core/components/mui/IconButton";
-import type { AddProductFormValues } from "./ProductAddForm";
+import type { AddProductFormValues } from "./ProductAddOrEditForm";
 
 interface Props {
   index: number;
