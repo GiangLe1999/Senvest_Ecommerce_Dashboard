@@ -18,7 +18,7 @@
   --mui-mainColorChannels-shadow: var(--mui-mainColorChannels-lightShadow);
 }
 
-[data-mui-color-scheme='dark'] {
+[data-mui-color-scheme="dark"] {
   --backdrop-color: rgb(16 17 33 / 0.6);
   --mui-mainColorChannels-shadow: var(--mui-mainColorChannels-darkShadow);
 }
@@ -31,7 +31,7 @@
   margin: 0;
   border-width: 0;
   border-style: solid;
-  border-color: theme('borderColor.DEFAULT', currentColor);
+  border-color: theme("borderColor.DEFAULT", currentColor);
 }
 
 html {
@@ -112,12 +112,12 @@ ul:not([class]) {
   }
 }
 
-:where([class^='ri-']) {
+:where([class^="ri-"]) {
   font-size: 1.5rem;
 }
 
 /* Fix width issue for the input-otp component */
-input[autocomplete='one-time-code'][data-input-otp='true'] {
+input[autocomplete="one-time-code"][data-input-otp="true"] {
   inline-size: 100% !important;
 }
 
@@ -130,4 +130,86 @@ code {
   color: var(--mui-palette-info-main);
   background-color: rgb(var(--mui-palette-info-mainChannel) / 0.08);
   border: 0;
+}
+
+/* Loading keyframes */
+@keyframes text_713 {
+  0% {
+    letter-spacing: 1px;
+    transform: translateX(0px);
+  }
+
+  40% {
+    letter-spacing: 2px;
+    transform: translateX(26px);
+  }
+
+  80% {
+    letter-spacing: 1px;
+    transform: translateX(32px);
+  }
+
+  90% {
+    letter-spacing: 2px;
+    transform: translateX(0px);
+  }
+
+  100% {
+    letter-spacing: 1px;
+    transform: translateX(0px);
+  }
+}
+
+@keyframes loading_713 {
+  0% {
+    width: 16px;
+    transform: translateX(0px);
+  }
+
+  40% {
+    width: 100%;
+    transform: translateX(0px);
+  }
+
+  80% {
+    width: 16px;
+    transform: translateX(64px);
+  }
+
+  90% {
+    width: 100%;
+    transform: translateX(0px);
+  }
+
+  100% {
+    width: 16px;
+    transform: translateX(0px);
+  }
+}
+
+@keyframes loading2_713 {
+  0% {
+    transform: translateX(0px);
+    width: 16px;
+  }
+
+  40% {
+    transform: translateX(0%);
+    width: 80%;
+  }
+
+  80% {
+    width: 100%;
+    transform: translateX(0px);
+  }
+
+  90% {
+    width: 80%;
+    transform: translateX(15px);
+  }
+
+  100% {
+    transform: translateX(0px);
+    width: 16px;
+  }
 }

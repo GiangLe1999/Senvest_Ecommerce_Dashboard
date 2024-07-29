@@ -50,6 +50,7 @@ import TableFilters from "./TableFilters";
 import tableStyles from "@core/styles/table.module.css";
 import DeleteConfirmDialog from "@/views/dashboards/ecommerce/DeleteConfirmDialog";
 import { deleteProduct } from "@/app/server/actions";
+import { removeHTMLTags } from "@/utils/removeHTMLTags";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -177,9 +178,11 @@ const ProductListTable = ({ productData }: { productData?: ProductType[] }) => {
               <Typography className="font-medium" color="text.primary">
                 {row.original.name.en}
               </Typography>
-              <Typography variant="body2">
-                {row.original.description.en}
-              </Typography>
+              <div className="max-w-[300px]">
+                <Typography variant="body2" className="line-clamp-1">
+                  {removeHTMLTags(row.original.description.en)}
+                </Typography>
+              </div>
             </div>
           </div>
         ),
