@@ -9,14 +9,15 @@ import LoadingButton from "@mui/lab/LoadingButton";
 
 interface Props {
   loading: boolean;
+  isEdit: boolean;
 }
 
-const ProductAddHeader: FC<Props> = ({ loading }) => {
+const ProductAddHeader: FC<Props> = ({ loading, isEdit }) => {
   return (
     <div className="flex flex-wrap items-center justify-between gap-6">
       <div>
         <Typography variant="h4" className="mbe-1">
-          Add a new product
+          {isEdit ? "Edit existing product" : "Add a new product"}
         </Typography>
         <Typography>Orders placed across your store</Typography>
       </div>
@@ -30,7 +31,7 @@ const ProductAddHeader: FC<Props> = ({ loading }) => {
           variant="contained"
           type="submit"
         >
-          Publish Product
+          {isEdit ? "Update Product" : "Publish Product"}
         </LoadingButton>
       </div>
     </div>

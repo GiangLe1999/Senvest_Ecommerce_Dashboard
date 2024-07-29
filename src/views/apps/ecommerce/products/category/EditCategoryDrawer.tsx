@@ -96,6 +96,8 @@ const EditCategoryDrawer = (props: Props) => {
     });
 
     if (Object.keys(changedFields).length === 0) {
+      setLoading(false);
+
       return toast.error("No changes made to the category", {
         position: "top-left",
       });

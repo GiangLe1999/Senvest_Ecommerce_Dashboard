@@ -112,6 +112,16 @@ export const getAdminProducts = async () => {
   }
 };
 
+export const getAdminProduct = async (_id: string) => {
+  try {
+    const { data } = await axiosInstance.get(`/admin-products/${_id}`);
+
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 export const createProduct = async (formData: FormData) => {
   const { data } = await axiosInstance.post(
     "/admin-products/create",
@@ -122,6 +132,16 @@ export const createProduct = async (formData: FormData) => {
       },
     },
   );
+
+  return data;
+};
+
+export const updateProduct = async (formData: FormData) => {
+  const { data } = await axiosInstance.put("/admin-products/update", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
 
   return data;
 };

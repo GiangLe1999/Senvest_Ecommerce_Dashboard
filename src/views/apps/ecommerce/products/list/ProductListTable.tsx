@@ -235,9 +235,11 @@ const ProductListTable = ({ productData }: { productData?: ProductType[] }) => {
         header: "Actions",
         cell: ({ row }) => (
           <div className="flex items-center">
-            <IconButton size="small">
-              <i className="ri-edit-box-line text-[22px] text-textSecondary" />
-            </IconButton>
+            <Link href={`/products/update/${row.original._id}`}>
+              <IconButton size="small">
+                <i className="ri-edit-box-line text-[22px] text-textSecondary" />
+              </IconButton>
+            </Link>
             <IconButton
               size="small"
               onClick={() => {

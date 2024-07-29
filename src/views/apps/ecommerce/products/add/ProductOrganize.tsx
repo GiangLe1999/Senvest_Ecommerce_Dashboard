@@ -85,7 +85,7 @@ const ProductOrganize: FC<Props> = ({ control, errors }) => {
               name="status"
               control={control}
               render={({ field }) => (
-                <FormControl fullWidth>
+                <FormControl fullWidth error={!!errors.category}>
                   <InputLabel>Select Status</InputLabel>
                   <Select {...field} label="Select Status">
                     <MenuItem value="Published">Published</MenuItem>
