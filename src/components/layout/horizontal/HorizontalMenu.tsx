@@ -148,21 +148,21 @@ const HorizontalMenu = () => {
         </MenuItem>
 
         <MenuItem
-          href={`/referrals`}
-          icon={<i className="ri-external-link-line" />}
+          href={`/manage-banners`}
+          icon={<i className="ri-file-image-line" />}
           exactMatch={false}
-          activeUrl="/referrals"
+          activeUrl="/manage-banners"
         >
-          Referrals
+          Banners
         </MenuItem>
 
         <MenuItem
-          href={`/settings`}
-          icon={<i className="ri-settings-3-line" />}
+          href={`/manage-slogans`}
+          icon={<i className="ri-slideshow-3-line" />}
           exactMatch={false}
-          activeUrl="/settings"
+          activeUrl="/manage-slogans"
         >
-          Settings
+          Slogans
         </MenuItem>
       </Menu>
     </HorizontalNav>

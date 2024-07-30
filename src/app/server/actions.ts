@@ -188,3 +188,41 @@ export const deleteBanner = async (_id: string) => {
 
   return data;
 };
+
+// Slogans
+export const getAdminSlogans = async () => {
+  try {
+    const { data } = await axiosInstance("/admin-slogans");
+
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const createSlogan = async (formData: {
+  content: string;
+  status: string;
+  order: string;
+}) => {
+  const { data } = await axiosInstance.post("/admin-slogans/create", formData);
+
+  return data;
+};
+
+export const updateSlogan = async (formData: {
+  _id: string;
+  content?: string;
+  status?: string;
+  order?: string;
+}) => {
+  const { data } = await axiosInstance.put("/admin-slogans/update", formData);
+
+  return data;
+};
+
+export const deleteSlogan = async (_id: string) => {
+  const { data } = await axiosInstance.delete(`/admin-slogans/delete/${_id}`);
+
+  return data;
+};

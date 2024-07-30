@@ -143,12 +143,12 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
           </MenuItem>
 
           <MenuItem
-            href={`/manage-slogan`}
+            href={`/manage-slogans`}
             icon={<i className="ri-slideshow-3-line" />}
             exactMatch={false}
-            activeUrl="/manage-slogan"
+            activeUrl="/manage-slogans"
           >
-            Slogan
+            Slogans
           </MenuItem>
         </MenuSection>
       </Menu>

@@ -33,24 +33,24 @@ import { toast } from "react-toastify";
 
 import { format, parseISO } from "date-fns";
 
-import { deleteBanner } from "@/app/server/actions";
+import { deleteSlogan } from "@/app/server/actions";
 import DebouncedInput from "@/components/DebouncedInput";
 
 // Style Imports
 import tableStyles from "@core/styles/table.module.css";
-import AddBannerDrawer from "./AddBannerDrawer";
 import type { ThemeColor } from "@/@core/types";
 import DeleteConfirmDialog from "@/views/dashboards/ecommerce/DeleteConfirmDialog";
-import EditBannerDrawer from "./EditBannerDrawer";
+import AddSloganDrawer from "./AddSloganDrawer";
+import EditSloganDrawer from "./EditSloganDrawer";
 
-type bannerStatusType = {
+type sloganStatusType = {
   [key: string]: {
     title: string;
     color: ThemeColor;
   };
 };
 
-const bannerStatusObj: bannerStatusType = {
+const sloganStatusObj: sloganStatusType = {
   Active: { title: "Active", color: "success" },
   Inactive: { title: "Inactive", color: "error" },
 };
@@ -66,16 +66,15 @@ declare module "@tanstack/table-core" {
   }
 }
 
-export type bannerType = {
+export type sloganType = {
   _id: string;
-  name: string;
-  image: string;
+  content: string;
   status: string;
   updatedAt: string;
   order: string;
 };
 
-type BannerWithActionsType = bannerType & {
+type SloganWithActionsType = sloganType & {
   actions?: string;
 };
 
@@ -93,46 +92,38 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 };
 
 // Column Definitions
-const columnHelper = createColumnHelper<BannerWithActionsType>();
+const columnHelper = createColumnHelper<SloganWithActionsType>();
 
 interface Props {
-  banners: bannerType[];
+  slogans: sloganType[];
 }
 
-const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
+const SloganListTable: FC<Props> = ({ slogans }): JSX.Element => {
   // States
-  const [addBannerOpen, setAddBannerOpen] = useState(false);
-  const [editBannerOpen, setEditBannerOpen] = useState(false);
-  const [editedBanner, setEditedBanner] = useState<bannerType>();
-  const [deleteBannerOpen, setDeleteBannerOpen] = useState(false);
-  const [deletedBannerId, setDeletedBannerId] = useState<string>();
-  const [deleteBannerLoading, setDeleteBannerLoading] = useState(false);
+  const [addSloganOpen, setAddSloganOpen] = useState(false);
+  const [editSloganOpen, setEditSloganOpen] = useState(false);
+  const [editedSlogan, setEditedSlogan] = useState<sloganType>();
+  const [deleteSloganOpen, setDeleteSloganOpen] = useState(false);
+  const [deletedSloganId, setDeletedSloganId] = useState<string>();
+  const [deleteSloganLoading, setDeleteSloganLoading] = useState(false);
 
-  const [data, setData] = useState(...[banners]);
+  const [data, setData] = useState(...[slogans]);
 
   const [globalFilter, setGlobalFilter] = useState("");
 
-  const columns = useMemo<ColumnDef<BannerWithActionsType, any>[]>(
+  const columns = useMemo<ColumnDef<SloganWithActionsType, any>[]>(
     () => [
       {
         id: "order",
         header: "Order",
         cell: ({ row }) => <Typography>{row.original.order}</Typography>,
       },
-      columnHelper.accessor("name", {
-        header: "Name",
+      columnHelper.accessor("content", {
+        header: "Content",
         cell: ({ row }) => (
-          <div className="flex items-center gap-3">
-            <img
-              src={row.original.image}
-              width={38}
-              height={38}
-              className="rounded-md bg-actionHover object-contain"
-            />
-            <Typography className="font-medium" color="text.primary">
-              {row.original.name}
-            </Typography>
-          </div>
+          <Typography className="font-medium" color="text.primary">
+            {row.original.content}
+          </Typography>
         ),
       }),
       columnHelper.accessor("status", {
@@ -140,9 +131,9 @@ const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
         cell: ({ row }) => (
           <div className="flex items-center gap-3">
             <Chip
-              label={bannerStatusObj[row.original.status]?.title}
+              label={sloganStatusObj[row.original.status]?.title}
               variant="tonal"
-              color={bannerStatusObj[row.original.status]?.color}
+              color={sloganStatusObj[row.original.status]?.color}
               size="small"
             />
           </div>
@@ -166,8 +157,8 @@ const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
             <IconButton
               size="small"
               onClick={() => {
-                setEditBannerOpen(true);
-                setEditedBanner(row.original);
+                setEditSloganOpen(true);
+                setEditedSlogan(row.original);
               }}
             >
               <i className="ri-edit-box-line text-[22px] text-textSecondary" />
@@ -175,8 +166,8 @@ const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
             <IconButton
               size="small"
               onClick={() => {
-                setDeleteBannerOpen(true);
-                setDeletedBannerId(row.original._id);
+                setDeleteSloganOpen(true);
+                setDeletedSloganId(row.original._id);
               }}
             >
               <i className="ri-delete-bin-7-line text-[22px] text-textSecondary" />
@@ -191,7 +182,7 @@ const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
   );
 
   const table = useReactTable({
-    data: data as bannerType[],
+    data: data as sloganType[],
     columns,
     filterFns: {
       fuzzy: fuzzyFilter,
@@ -204,8 +195,7 @@ const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
         pageSize: 10,
       },
     },
-    enableRowSelection: true, //enable row selection for all rows
-    // enableRowSelection: row => row.original.age > 18, // or enable row selection conditionally per row
+    enableRowSelection: true,
     globalFilterFn: fuzzyFilter,
     getCoreRowModel: getCoreRowModel(),
     onGlobalFilterChange: setGlobalFilter,
@@ -217,18 +207,18 @@ const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
   });
 
-  const deleteBannerHandler = async () => {
-    setDeleteBannerLoading(true);
+  const deleteSloganHandler = async () => {
+    setDeleteSloganLoading(true);
 
     try {
-      if (deletedBannerId) {
-        const result = await deleteBanner(deletedBannerId);
+      if (deletedSloganId) {
+        const result = await deleteSlogan(deletedSloganId);
 
         if (result.ok) {
-          toast.success("Delete banner successfully");
+          toast.success("Delete slogan successfully");
 
           setData((prev) => {
-            return prev.filter((banner) => banner._id !== deletedBannerId);
+            return prev.filter((slogan) => slogan._id !== deletedSloganId);
           });
         } else {
           console.log;
@@ -239,8 +229,8 @@ const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
       toast.error("Something went wrong");
     }
 
-    setDeleteBannerLoading(false);
-    setDeleteBannerOpen(false);
+    setDeleteSloganLoading(false);
+    setDeleteSloganOpen(false);
   };
 
   return (
@@ -257,10 +247,10 @@ const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
             <Button
               variant="contained"
               className="is-full sm:is-auto"
-              onClick={() => setAddBannerOpen(!addBannerOpen)}
+              onClick={() => setAddSloganOpen(!addSloganOpen)}
               startIcon={<i className="ri-add-line" />}
             >
-              Add Banner
+              Add Slogan
             </Button>
           </div>
         </div>
@@ -300,7 +290,7 @@ const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
                 </tr>
               ))}
             </thead>
-            {table.getFilteredRowModel().rows.length === 0 ? (
+            {table?.getFilteredRowModel()?.rows?.length === 0 ? (
               <tbody>
                 <tr>
                   <td
@@ -352,29 +342,29 @@ const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
           onRowsPerPageChange={(e) => table.setPageSize(Number(e.target.value))}
         />
       </Card>
-      <AddBannerDrawer
-        open={addBannerOpen}
-        bannerData={banners}
+      <AddSloganDrawer
+        open={addSloganOpen}
+        sloganData={slogans}
         setData={setData}
-        handleClose={() => setAddBannerOpen(!addBannerOpen)}
+        handleClose={() => setAddSloganOpen(!addSloganOpen)}
       />
 
-      <EditBannerDrawer
-        open={editBannerOpen}
-        setOpen={setEditBannerOpen}
-        originalBanner={editedBanner}
+      <EditSloganDrawer
+        open={editSloganOpen}
+        setOpen={setEditSloganOpen}
+        originalSlogan={editedSlogan}
         setData={setData}
-        handleClose={() => setEditBannerOpen(!editBannerOpen)}
+        handleClose={() => setEditSloganOpen(!editSloganOpen)}
       />
 
       <DeleteConfirmDialog
-        open={deleteBannerOpen}
-        setOpen={setDeleteBannerOpen}
-        loading={deleteBannerLoading}
-        onConfirmDelete={deleteBannerHandler}
+        open={deleteSloganOpen}
+        setOpen={setDeleteSloganOpen}
+        loading={deleteSloganLoading}
+        onConfirmDelete={deleteSloganHandler}
       />
     </>
   );
 };
 
-export default BannerListTable;
+export default SloganListTable;
