@@ -1,4 +1,5 @@
 // React Imports
+import type { Dispatch, SetStateAction } from "react";
 import { useState } from "react";
 
 // MUI Imports
@@ -27,8 +28,7 @@ import type { sloganType } from "./SloganListTable";
 type Props = {
   open: boolean;
   handleClose: () => void;
-  sloganData: sloganType[];
-  setData: (data: sloganType[]) => void;
+  setData: Dispatch<SetStateAction<sloganType[]>>;
 };
 
 type FormValues = {
@@ -39,7 +39,7 @@ type FormValues = {
 
 const AddSloganDrawer = (props: Props) => {
   // Props
-  const { open, handleClose, sloganData, setData } = props;
+  const { open, handleClose, setData } = props;
 
   // States
   const [loading, setLoading] = useState(false);
@@ -68,7 +68,8 @@ const AddSloganDrawer = (props: Props) => {
       if (result.ok) {
         toast.success("Create slogan successfully");
 
-        setData([
+        setData((prev) => [
+          ...prev,
           {
             _id: result?.slogan?._id,
             content: result?.slogan?.content,
@@ -76,7 +77,6 @@ const AddSloganDrawer = (props: Props) => {
             updatedAt: result?.slogan?.updatedAt,
             order: result?.slogan?.order,
           },
-          ...sloganData,
         ]);
       } else {
         console.log;

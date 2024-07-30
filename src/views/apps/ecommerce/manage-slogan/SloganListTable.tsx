@@ -344,7 +344,6 @@ const SloganListTable: FC<Props> = ({ slogans }): JSX.Element => {
       </Card>
       <AddSloganDrawer
         open={addSloganOpen}
-        sloganData={slogans}
         setData={setData}
         handleClose={() => setAddSloganOpen(!addSloganOpen)}
       />

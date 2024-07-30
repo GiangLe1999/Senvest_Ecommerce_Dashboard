@@ -1,6 +1,6 @@
 // React Imports
 import { useState, useRef } from "react";
-import type { ChangeEvent } from "react";
+import type { ChangeEvent, Dispatch, SetStateAction } from "react";
 
 // MUI Imports
 import Button from "@mui/material/Button";
@@ -29,8 +29,7 @@ import type { bannerType } from "./BannerListTable";
 type Props = {
   open: boolean;
   handleClose: () => void;
-  bannerData: bannerType[];
-  setData: (data: bannerType[]) => void;
+  setData: Dispatch<SetStateAction<bannerType[]>>;
 };
 
 type FormValues = {
@@ -41,7 +40,7 @@ type FormValues = {
 
 const AddBannerDrawer = (props: Props) => {
   // Props
-  const { open, handleClose, bannerData, setData } = props;
+  const { open, handleClose, setData } = props;
 
   // States
   const [fileName, setFileName] = useState("");
@@ -91,7 +90,8 @@ const AddBannerDrawer = (props: Props) => {
       if (result.ok) {
         toast.success("Create banner successfully");
 
-        setData([
+        setData((prev) => [
+          ...prev,
           {
             _id: result?.banner?._id,
             name: result?.banner?.name,
@@ -100,7 +100,6 @@ const AddBannerDrawer = (props: Props) => {
             order: result?.banner?.order,
             image: result?.banner?.image,
           },
-          ...bannerData,
         ]);
       } else {
         console.log;

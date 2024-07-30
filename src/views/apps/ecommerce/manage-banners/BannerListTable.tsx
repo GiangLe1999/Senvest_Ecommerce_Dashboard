@@ -354,7 +354,6 @@ const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
       </Card>
       <AddBannerDrawer
         open={addBannerOpen}
-        bannerData={banners}
         setData={setData}
         handleClose={() => setAddBannerOpen(!addBannerOpen)}
       />
