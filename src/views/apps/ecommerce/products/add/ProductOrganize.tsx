@@ -85,12 +85,15 @@ const ProductOrganize: FC<Props> = ({ control, errors }) => {
               name="status"
               control={control}
               render={({ field }) => (
-                <FormControl fullWidth error={!!errors.category}>
+                <FormControl fullWidth error={!!errors.status}>
                   <InputLabel>Select Status</InputLabel>
                   <Select {...field} label="Select Status">
                     <MenuItem value="Published">Published</MenuItem>
                     <MenuItem value="Inactive">Inactive</MenuItem>
                   </Select>
+                  {errors.status && (
+                    <FormHelperText>{errors.status.message}</FormHelperText>
+                  )}
                 </FormControl>
               )}
             />

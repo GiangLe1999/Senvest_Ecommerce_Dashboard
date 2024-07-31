@@ -4,9 +4,7 @@
 import type { FC } from "react";
 
 // MUI Imports
-import Card from "@mui/material/Card";
-import CardHeader from "@mui/material/CardHeader";
-import CardContent from "@mui/material/CardContent";
+
 import Button from "@mui/material/Button";
 import IconButton from "@mui/material/IconButton";
 import List from "@mui/material/List";
@@ -19,10 +17,13 @@ import type { BoxProps } from "@mui/material/Box";
 import { useDropzone } from "react-dropzone";
 
 // Component Imports
+import type { UseFormSetValue } from "react-hook-form";
+
 import CustomAvatar from "@core/components/mui/Avatar";
 
 // Styled Component Imports
 import AppReactDropzone from "@/libs/styles/AppReactDropzone";
+import type { AddProductFormValues } from "./ProductAddOrEditForm";
 
 type FileProp = {
   name: string;
@@ -45,15 +46,19 @@ const Dropzone = styled(AppReactDropzone)<BoxProps>(({ theme }) => ({
 }));
 
 interface Props {
+  index: number;
   files: File[];
-  setFiles: React.Dispatch<React.SetStateAction<File[]>>;
+  setValue: UseFormSetValue<AddProductFormValues>;
 }
 
-const ProductImage: FC<Props> = ({ files, setFiles }) => {
+const ProductImage: FC<Props> = ({ index, files, setValue }) => {
   // Hooks
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: (acceptedFiles: File[]) => {
-      setFiles(acceptedFiles.map((file: File) => Object.assign(file)));
+      setValue(`variants.${index}.images`, [
+        ...files,
+        ...acceptedFiles.map((file: File) => Object.assign(file)),
+      ]);
     },
   });
 
@@ -79,7 +84,7 @@ const ProductImage: FC<Props> = ({ files, setFiles }) => {
       (i: FileProp) => i.name !== file.name,
     );
 
-    setFiles([...filtered]);
+    setValue(`variants.${index}.images`, [...filtered]);
   };
 
   const fileList = files.map((file: FileProp) => (
@@ -104,45 +109,42 @@ const ProductImage: FC<Props> = ({ files, setFiles }) => {
   ));
 
   const handleRemoveAllFiles = () => {
-    setFiles([]);
+    setValue(`variants.${index}.images`, []);
   };
 
   return (
     <Dropzone>
-      <Card>
-        <CardHeader title="Product Image" />
-        <CardContent>
-          <div {...getRootProps({ className: "dropzone" })}>
-            <input {...getInputProps()} />
-            <div className="flex items-center flex-col gap-2 text-center">
-              <CustomAvatar variant="rounded" skin="light" color="secondary">
-                <i className="ri-upload-2-line" />
-              </CustomAvatar>
-              <Typography variant="h4">
-                Drag and Drop Your Image Here.
-              </Typography>
-              <Typography color="text.disabled">or</Typography>
-              <Button variant="outlined" size="small">
-                Browse Image
-              </Button>
-            </div>
+      <div {...getRootProps({ className: "dropzone" })}>
+        <input {...getInputProps()} />
+        <div className="flex items-center flex-col gap-2 text-center">
+          <CustomAvatar variant="rounded" skin="light" color="secondary">
+            <i className="ri-upload-2-line" />
+          </CustomAvatar>
+          <Typography variant="h5">
+            Drag and Drop Variant Images Here
+          </Typography>
+          <Typography color="text.disabled" mb={2}>
+            or
+          </Typography>
+          <Button variant="outlined" size="small">
+            Browse Image
+          </Button>
+        </div>
+      </div>
+      {files.length ? (
+        <>
+          <List>{fileList}</List>
+          <div className="mt-5 text-right">
+            <Button
+              color="error"
+              variant="outlined"
+              onClick={handleRemoveAllFiles}
+            >
+              Remove All
+            </Button>
           </div>
-          {files.length ? (
-            <>
-              <List>{fileList}</List>
-              <div className="mt-5 text-right">
-                <Button
-                  color="error"
-                  variant="outlined"
-                  onClick={handleRemoveAllFiles}
-                >
-                  Remove All
-                </Button>
-              </div>
-            </>
-          ) : null}
-        </CardContent>
-      </Card>
+        </>
+      ) : null}
     </Dropzone>
   );
 };

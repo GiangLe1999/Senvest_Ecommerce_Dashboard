@@ -87,15 +87,10 @@ export const getAdminProduct = async (_id: string) => {
   }
 };
 
-export const createProduct = async (formData: FormData) => {
+export const createProduct = async (productData: any) => {
   const { data } = await axiosInstance.post(
     "/admin-products/create",
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    },
+    productData,
   );
 
   return data;
@@ -113,6 +108,21 @@ export const updateProduct = async (formData: FormData) => {
 
 export const deleteProduct = async (_id: string) => {
   const { data } = await axiosInstance.delete(`/admin-products/delete/${_id}`);
+
+  return data;
+};
+
+// Variant
+export const createVariant = async (formData: FormData) => {
+  const { data } = await axiosInstance.post(
+    "/admin-variants/create",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    },
+  );
 
   return data;
 };

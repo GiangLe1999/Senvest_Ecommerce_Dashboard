@@ -16,6 +16,8 @@ import type {
   FieldErrors,
   UseFieldArrayAppend,
   UseFieldArrayRemove,
+  UseFormSetValue,
+  UseFormWatch,
 } from "react-hook-form";
 
 import type { AddProductFormValues } from "./ProductAddOrEditForm";
@@ -29,6 +31,8 @@ interface Props {
   control: Control<AddProductFormValues, any>;
   errors: FieldErrors<AddProductFormValues>;
   fields: FieldArrayWithId<AddProductFormValues, "variants", "id">[];
+  setValue: UseFormSetValue<AddProductFormValues>;
+  watch: UseFormWatch<AddProductFormValues>;
 }
 
 const ProductVariants: FC<Props> = ({
@@ -37,6 +41,8 @@ const ProductVariants: FC<Props> = ({
   remove,
   control,
   errors,
+  setValue,
+  watch,
 }) => {
   const addNewVariant = () => {
     append(defaultVariant);
@@ -55,6 +61,8 @@ const ProductVariants: FC<Props> = ({
               control={control}
               errors={errors}
               fieldsLength={fields.length}
+              setValue={setValue}
+              watch={watch}
             />
           ))}
           <Grid item xs={12}>

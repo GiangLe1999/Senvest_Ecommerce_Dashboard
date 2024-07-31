@@ -31,7 +31,7 @@ const ProductAddHeader: FC<Props> = ({ loading, isEdit }) => {
           variant="contained"
           type="submit"
         >
-          {isEdit ? "Update Product" : "Publish Product"}
+          {isEdit ? "Update" : "Publish"}
         </LoadingButton>
       </div>
     </div>

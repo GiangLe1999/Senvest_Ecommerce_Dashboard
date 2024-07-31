@@ -169,7 +169,7 @@ const ProductListTable = ({ productData }: { productData?: ProductType[] }) => {
         cell: ({ row }) => (
           <div className="flex items-center gap-3">
             <img
-              src={row.original.images[0]}
+              src={row.original.variants[0].images[0]}
               width={38}
               height={38}
               className="rounded-md bg-actionHover object-contain"
@@ -214,7 +214,10 @@ const ProductListTable = ({ productData }: { productData?: ProductType[] }) => {
         header: "Stock",
         cell: ({ row }) => (
           <Typography>
-            {row.original.variants.reduce((a, b) => a + b.stock, 0)}
+            {row.original.variants.reduce(
+              (a, b) => Number(a) + Number(b.stock),
+              0,
+            )}
           </Typography>
         ),
       }),

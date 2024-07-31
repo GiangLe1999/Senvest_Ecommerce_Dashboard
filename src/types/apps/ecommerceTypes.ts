@@ -49,7 +49,6 @@ export type ProductType = {
   category: { name: LocalizedString; image?: string };
   price: string;
   status: string;
-  images: string[];
   totalQuantitySold: number;
   totalSales: number;
   variants: {
@@ -57,6 +56,9 @@ export type ProductType = {
     stock: number;
     price: number;
     discountedPrice?: number;
+    discountedFrom?: string;
+    discountedTo?: string;
+    images: string[];
   }[];
 };
 
