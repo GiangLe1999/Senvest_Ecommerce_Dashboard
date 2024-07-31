@@ -96,12 +96,11 @@ export const createProduct = async (productData: any) => {
   return data;
 };
 
-export const updateProduct = async (formData: FormData) => {
-  const { data } = await axiosInstance.put("/admin-products/update", formData, {
-    headers: {
-      "Content-Type": "multipart/form-data",
-    },
-  });
+export const updateProduct = async (updateData: any) => {
+  const { data } = await axiosInstance.put(
+    "/admin-products/update",
+    updateData,
+  );
 
   return data;
 };

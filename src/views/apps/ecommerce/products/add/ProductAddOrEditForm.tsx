@@ -15,6 +15,8 @@ import {
   nonEmpty,
   array,
   file,
+  optional,
+  date,
 } from "valibot";
 
 // Components Imports
@@ -37,14 +39,15 @@ import {
   extractFileNameFromCloudinaryUrl,
 } from "@/utils/createFileFromUrl";
 import { getChangedFields } from "@/utils/getChangedFields";
+import { createProductVariants } from "@/utils/createProductVariants";
 
 export type Variant = {
   fragrance: string;
   stock: string;
   price: string;
   discountedPrice?: string;
-  discountedFrom?: string;
-  discountedTo?: string;
+  discountedFrom?: Date;
+  discountedTo?: Date;
   images: File[];
 };
 
@@ -73,6 +76,9 @@ const variantSchema = object({
   stock: pipe(string(), minLength(1, "Variant stock quantity is required")),
   price: pipe(string(), minLength(1, "Variant base price is required")),
   images: pipe(array(file()), minLength(1, "Variant images cannot be empty")),
+  discountedPrice: optional(string()),
+  discountedFrom: optional(date()),
+  discountedTo: optional(date()),
 });
 
 const schema = object({
@@ -136,108 +142,135 @@ const ProductAddOrEditForm: FC<Props> = ({
       return toast.error("Please upload at least one image");
     }
 
-    const formData = new FormData();
-
-    setLoading(true);
-
-    if (isEdit) {
-      const formattedInitialProductData = {
-        ...initialProductData,
-        vi_name: initialProductData?.name.vi,
-        en_name: initialProductData?.name.en,
-        en_description: initialProductData?.description.en,
-        vi_description: initialProductData?.description.vi,
-        category: initialProductData?.category?._id,
-        files: initialProductData?.images?.map((url) =>
-          extractFileNameFromCloudinaryUrl(url),
-        ),
-
-        status: initialProductData?.status,
-
-        // Remove _id to compare
-        variants: initialProductData?.variants?.map((variant) => ({
-          fragrance: variant.fragrance,
-          stock: variant.stock,
-          price: variant.price,
-          discountedPrice: variant.discountedPrice,
-        })),
+    if (isEdit && initialProductData) {
+      const initialVariantsData = {
+        variants: initialProductData.variants.map((variant) => {
+          return {
+            fragrance: variant.fragrance,
+            stock: variant.stock,
+            price: variant.price,
+            ...(variant?.discountedPrice && {
+              discountedPrice: variant.discountedPrice,
+            }),
+            ...(variant?.discountedFrom && {
+              discountedFrom: new Date(variant.discountedFrom),
+            }),
+            ...(variant?.discountedTo && {
+              discountedTo: new Date(variant.discountedTo),
+            }),
+            images: variant.images.map((url) =>
+              extractFileNameFromCloudinaryUrl(url as any),
+            ),
+          };
+        }),
       };
 
-      const formattedFormValues = {
-        ...formValues,
-        variants: formValues.variants.map((item) => ({
-          ...item,
-          discountedPrice: item.discountedPrice ? item.discountedPrice : "0",
-        })),
+      const formattedVariantsFormValues = {
+        variants: formValues.variants.map((variant) => {
+          return {
+            ...variant,
+            images: variant.images.map((file) => file.name),
+          };
+        }),
       };
 
-      const changedFields = getChangedFields({
-        initialFormData: formattedInitialProductData,
-        currentFormData: formattedFormValues,
+      const changedVariants = getChangedFields({
+        initialFormData: initialVariantsData,
+        currentFormData: formattedVariantsFormValues,
       });
 
-      if (Object.keys(changedFields).length === 0) {
-        setLoading(false);
+      const formattedInitialProductData = {
+        name: {
+          vi: initialProductData?.name?.vi,
+          en: initialProductData?.name?.en,
+        },
+        description: {
+          vi: initialProductData?.description?.vi,
+          en: initialProductData?.description?.en,
+        },
+        category: initialProductData?.category._id,
+        status: initialProductData?.status,
+      };
 
+      const formattedProductFormValues = {
+        name: {
+          vi: formValues.vi_name,
+          en: formValues.en_name,
+        },
+        description: {
+          vi: formValues.vi_description,
+          en: formValues.en_description,
+        },
+        category: formValues.category,
+        status: formValues.status,
+      };
+
+      const productChangedFields = getChangedFields({
+        initialFormData: formattedInitialProductData,
+        currentFormData: formattedProductFormValues,
+      });
+
+      if (
+        Object.keys(productChangedFields).length === 0 &&
+        Object.keys(changedVariants).length === 0
+      ) {
         return toast.error("No changes made to the product");
       }
 
-      if (initialProductData?._id) {
-        formData.append("_id", initialProductData._id);
-      }
+      setLoading(true);
 
-      if (changedFields.en_name) {
-        formData.append("name[en]", formValues.en_name);
-      }
+      if (Object.keys(changedVariants).length > 0) {
+        try {
+          const newVariantIds = await createProductVariants(
+            formValues.variants,
+          );
 
-      if (changedFields.vi_name) {
-        formData.append("name[vi]", formValues.vi_name);
-      }
+          try {
+            const result = await updateProduct({
+              ...productChangedFields,
+              _id: initialProductData._id,
+              variants: newVariantIds,
+            });
 
-      if (changedFields.en_description) {
-        formData.append("description[en]", formValues.en_description);
-      }
+            if (result.ok) {
+              toast.success("Update product successfully");
+              setLoading(false);
+              window.location.replace("/products/list");
+            } else {
+              setLoading(false);
 
-      if (changedFields.vi_description) {
-        formData.append("description[vi]", formValues.vi_description);
-      }
+              return toast.error(result?.error);
+            }
+          } catch (error) {
+            setLoading(false);
+            console.log(error);
 
-      if (changedFields.category) {
-        formData.append("category", formValues.category);
-      }
+            return toast.error("Something went wrong");
+          }
+        } catch (error) {
+          setLoading(false);
+          console.log(error);
 
-      if (changedFields.status) {
-        formData.append("status", formValues.status);
-      }
-
-      if (changedFields.variants) {
-        formData.append(
-          "variants",
-          JSON.stringify(
-            formValues.variants.map((item) => ({
-              ...item,
-              discountedPrice: item.discountedPrice
-                ? Number(item.discountedPrice)
-                : 0,
-              price: Number(item.price),
-              stock: Number(item.stock),
-            })),
-          ),
-        );
-      }
-
-      try {
-        const result = await updateProduct(formData);
-
-        if (result.ok) {
-          toast.success("Update product successfully");
-          window.location.replace("/products/list");
-        } else {
-          console.log;
-          toast.error(result?.error);
+          return toast.error("Something went wrong");
         }
-      } catch (error) {
-        toast.error("Something went wrong");
+      } else {
+        try {
+          const result = await updateProduct({
+            ...productChangedFields,
+            _id: initialProductData._id,
+          });
+
+          if (result.ok) {
+            toast.success("Update product successfully");
+            window.location.replace("/products/list");
+          } else {
+            toast.error(result?.error);
+          }
+        } catch (error) {
+          console.log(error);
+
+          return toast.error("Something went wrong");
+        }
       }
     } else {
       const variants: string[] = [];
@@ -257,16 +290,17 @@ const ProductAddOrEditForm: FC<Props> = ({
           variantFormData.append("discountedPrice", variant.discountedPrice);
 
           if (!variant.discountedFrom || !variant.discountedTo) {
-            toast.error("Please provide discount duration");
-
-            return;
+            return toast.error("Please provide discount duration");
           }
 
-          variantFormData.append(
-            "discountedFrom",
-            String(variant.discountedFrom),
-          );
-          variantFormData.append("discountedTo", String(variant.discountedTo));
+          const discountedFromISO = new Date(
+            variant.discountedFrom,
+          ).toISOString();
+
+          const discountedToISO = new Date(variant.discountedTo).toISOString();
+
+          variantFormData.append("discountedFrom", discountedFromISO);
+          variantFormData.append("discountedTo", discountedToISO);
         }
 
         try {
@@ -301,12 +335,15 @@ const ProductAddOrEditForm: FC<Props> = ({
 
         if (result.ok) {
           toast.success("Create product successfully");
+
           window.location.replace("/products/list");
         } else {
           toast.error(result?.error);
         }
       } catch (error) {
-        toast.error("Something went wrong");
+        console.log(error);
+
+        return toast.error("Something went wrong");
       }
     }
 
@@ -330,6 +367,12 @@ const ProductAddOrEditForm: FC<Props> = ({
 
             return {
               ...variant,
+              ...(variant?.discountedFrom && {
+                discountedFrom: new Date(variant.discountedFrom),
+              }),
+              ...(variant?.discountedTo && {
+                discountedTo: new Date(variant.discountedTo),
+              }),
               images: files,
             };
           }),

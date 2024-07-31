@@ -21,7 +21,7 @@ const ProductAddHeader: FC<Props> = ({ loading, isEdit }) => {
         </Typography>
         <Typography>Orders placed across your store</Typography>
       </div>
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-wrap gap-4 w-fit">
         <Button variant="outlined" color="error">
           <Link href="/products/list">Discard</Link>
         </Button>
@@ -31,7 +31,7 @@ const ProductAddHeader: FC<Props> = ({ loading, isEdit }) => {
           variant="contained"
           type="submit"
         >
-          {isEdit ? "Update" : "Publish"}
+          {isEdit ? "Update Product" : "Publish Product"}
         </LoadingButton>
       </div>
     </div>

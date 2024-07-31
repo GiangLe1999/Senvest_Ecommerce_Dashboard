@@ -63,7 +63,7 @@ const ProductVariant: FC<Props> = ({
             />
             <Chip
               variant="tonal"
-              label="Remove Variant"
+              label={`Remove Variant ${index + 1}`}
               size="small"
               color="error"
               className="rounded-lg text-xs"
@@ -143,6 +143,7 @@ const ProductVariant: FC<Props> = ({
             index={index}
             files={watch(`variants.${index}.images`)}
             setValue={setValue}
+            error={errors.variants?.[index]?.images}
           />
         </Grid>
 

@@ -19,6 +19,8 @@ import { useDropzone } from "react-dropzone";
 // Component Imports
 import type { UseFormSetValue } from "react-hook-form";
 
+import { FormHelperText } from "@mui/material";
+
 import CustomAvatar from "@core/components/mui/Avatar";
 
 // Styled Component Imports
@@ -49,9 +51,10 @@ interface Props {
   index: number;
   files: File[];
   setValue: UseFormSetValue<AddProductFormValues>;
+  error: any;
 }
 
-const ProductImage: FC<Props> = ({ index, files, setValue }) => {
+const ProductImage: FC<Props> = ({ index, files, setValue, error }) => {
   // Hooks
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: (acceptedFiles: File[]) => {
@@ -131,6 +134,9 @@ const ProductImage: FC<Props> = ({ index, files, setValue }) => {
           </Button>
         </div>
       </div>
+
+      {error ? <FormHelperText error>{error?.message}</FormHelperText> : ""}
+
       {files.length ? (
         <>
           <List>{fileList}</List>
