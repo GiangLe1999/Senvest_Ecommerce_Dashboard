@@ -34,7 +34,8 @@ type Props = {
 type FormValues = {
   order: string;
   status: string;
-  content: string;
+  vi_content: string;
+  en_content: string;
 };
 
 const AddSloganDrawer = (props: Props) => {
@@ -54,7 +55,8 @@ const AddSloganDrawer = (props: Props) => {
     defaultValues: {
       order: "",
       status: "",
-      content: "",
+      vi_content: "",
+      en_content: "",
     },
   });
 
@@ -63,7 +65,14 @@ const AddSloganDrawer = (props: Props) => {
     setLoading(true);
 
     try {
-      const result = await createSlogan(formValues);
+      const result = await createSlogan({
+        content: {
+          vi: formValues.vi_content,
+          en: formValues.en_content,
+        },
+        status: formValues.status,
+        order: formValues.order,
+      });
 
       if (result.ok) {
         toast.success("Create slogan successfully");
@@ -94,7 +103,8 @@ const AddSloganDrawer = (props: Props) => {
   const handleReset = () => {
     handleClose();
     resetForm({
-      content: "",
+      vi_content: "",
+      en_content: "",
       status: "",
       order: "",
     });
@@ -122,16 +132,34 @@ const AddSloganDrawer = (props: Props) => {
           className="flex flex-col gap-5"
         >
           <Controller
-            name="content"
+            name="vi_content"
             control={control}
             rules={{ required: true }}
             render={({ field }) => (
               <TextField
                 {...field}
                 fullWidth
-                label="Content"
-                placeholder="Content"
-                {...(errors.content && {
+                label="Vietnamese Content"
+                placeholder="Vietnamese Content"
+                {...(errors.vi_content && {
+                  error: true,
+                  helperText: "This field is required.",
+                })}
+              />
+            )}
+          />
+
+          <Controller
+            name="en_content"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                fullWidth
+                label="English Content"
+                placeholder="English Content"
+                {...(errors.en_content && {
                   error: true,
                   helperText: "This field is required.",
                 })}

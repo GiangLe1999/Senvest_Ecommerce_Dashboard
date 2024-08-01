@@ -175,7 +175,10 @@ export const getAdminSlogans = async () => {
 };
 
 export const createSlogan = async (formData: {
-  content: string;
+  content: {
+    en: string;
+    vi: string;
+  };
   status: string;
   order: string;
 }) => {
@@ -186,7 +189,10 @@ export const createSlogan = async (formData: {
 
 export const updateSlogan = async (formData: {
   _id: string;
-  content?: string;
+  content?: {
+    en: string;
+    vi: string;
+  };
   status?: string;
   order?: string;
 }) => {

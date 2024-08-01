@@ -35,9 +35,10 @@ type Props = {
 };
 
 type FormValues = {
-  content: string;
-  status: string;
   order: string;
+  status: string;
+  vi_content: string;
+  en_content: string;
 };
 
 const EditSloganDrawer = (props: Props) => {
@@ -55,9 +56,10 @@ const EditSloganDrawer = (props: Props) => {
     setValue,
   } = useForm<FormValues>({
     defaultValues: {
-      content: "",
-      status: "",
       order: "",
+      status: "",
+      vi_content: "",
+      en_content: "",
     },
   });
 
@@ -65,7 +67,14 @@ const EditSloganDrawer = (props: Props) => {
   const handleFormSubmit = async (formValues: FormValues) => {
     const changedFields = getChangedFields({
       initialFormData: originalSlogan,
-      currentFormData: formValues,
+      currentFormData: {
+        content: {
+          vi: formValues.vi_content,
+          en: formValues.en_content,
+        },
+        status: formValues.status,
+        order: formValues.order,
+      },
     });
 
     if (Object.keys(changedFields).length === 0) {
@@ -122,7 +131,8 @@ const EditSloganDrawer = (props: Props) => {
 
   useEffect(() => {
     if (originalSlogan) {
-      setValue("content", originalSlogan?.content);
+      setValue("vi_content", originalSlogan?.content?.vi);
+      setValue("en_content", originalSlogan?.content?.en);
       setValue("status", originalSlogan?.status);
       setValue("order", originalSlogan?.order);
     }
@@ -150,16 +160,34 @@ const EditSloganDrawer = (props: Props) => {
           className="flex flex-col gap-5"
         >
           <Controller
-            name="content"
+            name="vi_content"
             control={control}
             rules={{ required: true }}
             render={({ field }) => (
               <TextField
                 {...field}
                 fullWidth
-                label="Content"
-                placeholder="Content"
-                {...(errors.content && {
+                label="Vietnamese Content"
+                placeholder="Vietnamese Content"
+                {...(errors.vi_content && {
+                  error: true,
+                  helperText: "This field is required.",
+                })}
+              />
+            )}
+          />
+
+          <Controller
+            name="en_content"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                fullWidth
+                label="English Content"
+                placeholder="English Content"
+                {...(errors.en_content && {
                   error: true,
                   helperText: "This field is required.",
                 })}

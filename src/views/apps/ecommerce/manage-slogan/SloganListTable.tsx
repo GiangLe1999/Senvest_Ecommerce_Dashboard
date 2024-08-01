@@ -31,8 +31,6 @@ import {
 } from "@mui/material";
 import { toast } from "react-toastify";
 
-import { format, parseISO } from "date-fns";
-
 import { deleteSlogan } from "@/app/server/actions";
 import DebouncedInput from "@/components/DebouncedInput";
 
@@ -68,7 +66,10 @@ declare module "@tanstack/table-core" {
 
 export type sloganType = {
   _id: string;
-  content: string;
+  content: {
+    en: string;
+    vi: string;
+  };
   status: string;
   updatedAt: string;
   order: string;
@@ -118,11 +119,19 @@ const SloganListTable: FC<Props> = ({ slogans }): JSX.Element => {
         header: "Order",
         cell: ({ row }) => <Typography>{row.original.order}</Typography>,
       },
-      columnHelper.accessor("content", {
-        header: "Content",
+      columnHelper.accessor("content.en", {
+        header: "English Content",
         cell: ({ row }) => (
           <Typography className="font-medium" color="text.primary">
-            {row.original.content}
+            {row.original.content.en}
+          </Typography>
+        ),
+      }),
+      columnHelper.accessor("content.vi", {
+        header: "Vietnamese Content",
+        cell: ({ row }) => (
+          <Typography className="font-medium" color="text.primary">
+            {row.original.content.vi}
           </Typography>
         ),
       }),
@@ -137,17 +146,6 @@ const SloganListTable: FC<Props> = ({ slogans }): JSX.Element => {
               size="small"
             />
           </div>
-        ),
-      }),
-      columnHelper.accessor("updatedAt", {
-        header: "Update At",
-        cell: ({ row }) => (
-          <Typography>
-            {format(
-              parseISO(row.original.updatedAt),
-              "hh:mm a - EEEE, dd/MM/yyyy",
-            )}
-          </Typography>
         ),
       }),
       columnHelper.accessor("actions", {
