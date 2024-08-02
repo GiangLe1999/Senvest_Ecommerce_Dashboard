@@ -39,6 +39,7 @@ type FormValues = {
   name: string;
   status: string;
   order: string;
+  link: string;
 };
 
 const EditBannerDrawer = (props: Props) => {
@@ -64,6 +65,7 @@ const EditBannerDrawer = (props: Props) => {
       name: "",
       status: "",
       order: "",
+      link: "",
     },
   });
 
@@ -74,6 +76,7 @@ const EditBannerDrawer = (props: Props) => {
       order: originalBanner?.order || "",
       status: originalBanner?.status,
       image: originalBanner?.image || "",
+      link: originalBanner?.link || "",
     };
 
     const formattedFormValues = {
@@ -81,6 +84,7 @@ const EditBannerDrawer = (props: Props) => {
       order: formValues.order,
       status: formValues.status,
       image: fileName,
+      link: formValues.link,
     };
 
     const changedFields = getChangedFields({
@@ -118,6 +122,10 @@ const EditBannerDrawer = (props: Props) => {
       formData.append("status", formValues.status);
     }
 
+    if (changedFields.link) {
+      formData.append("link", formValues.link);
+    }
+
     try {
       const result = await updateBanner(formData);
 
@@ -138,7 +146,7 @@ const EditBannerDrawer = (props: Props) => {
             image: newBanner?.image,
             order: newBanner?.order,
             status: newBanner?.status,
-            updatedAt: newBanner?.updatedAt,
+            link: newBanner?.link,
           };
 
           return newData;
@@ -171,6 +179,7 @@ const EditBannerDrawer = (props: Props) => {
       setValue("name", originalBanner?.name);
       setValue("status", originalBanner?.status);
       setValue("order", originalBanner?.order);
+      setValue("link", originalBanner?.link);
       setFileName(originalBanner?.image);
     }
   }, [originalBanner, setValue]);
@@ -207,6 +216,24 @@ const EditBannerDrawer = (props: Props) => {
                 label="Name"
                 placeholder="Name"
                 {...(errors.name && {
+                  error: true,
+                  helperText: "This field is required.",
+                })}
+              />
+            )}
+          />
+
+          <Controller
+            name="link"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                fullWidth
+                label="Link"
+                placeholder="link"
+                {...(errors.link && {
                   error: true,
                   helperText: "This field is required.",
                 })}

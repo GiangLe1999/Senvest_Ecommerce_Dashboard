@@ -122,17 +122,27 @@ const SloganListTable: FC<Props> = ({ slogans }): JSX.Element => {
       columnHelper.accessor("content.en", {
         header: "English Content",
         cell: ({ row }) => (
-          <Typography className="font-medium" color="text.primary">
-            {row.original.content.en}
-          </Typography>
+          <div className="max-w-[400px]">
+            <Typography
+              className="font-medium line-clamp-1"
+              color="text.primary"
+            >
+              {row.original.content.en}
+            </Typography>
+          </div>
         ),
       }),
       columnHelper.accessor("content.vi", {
         header: "Vietnamese Content",
         cell: ({ row }) => (
-          <Typography className="font-medium" color="text.primary">
-            {row.original.content.vi}
-          </Typography>
+          <div className="max-w-[400px]">
+            <Typography
+              className="font-medium line-clamp-1"
+              color="text.primary"
+            >
+              {row.original.content.vi}
+            </Typography>
+          </div>
         ),
       }),
       columnHelper.accessor("status", {

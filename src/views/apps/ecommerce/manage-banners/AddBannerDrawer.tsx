@@ -36,6 +36,7 @@ type FormValues = {
   name: string;
   status: string;
   order: string;
+  link: string;
 };
 
 const AddBannerDrawer = (props: Props) => {
@@ -61,6 +62,7 @@ const AddBannerDrawer = (props: Props) => {
       name: "",
       status: "",
       order: "",
+      link: "",
     },
   });
 
@@ -83,6 +85,7 @@ const AddBannerDrawer = (props: Props) => {
     formData.append("name", formValues.name);
     formData.append("status", formValues.status);
     formData.append("order", formValues.order);
+    formData.append("link", formValues.link);
 
     try {
       const result = await createBanner(formData);
@@ -96,7 +99,7 @@ const AddBannerDrawer = (props: Props) => {
             _id: result?.banner?._id,
             name: result?.banner?.name,
             status: result?.banner?.status,
-            updatedAt: result?.banner?.updatedAt,
+            link: result?.banner?.link,
             order: result?.banner?.order,
             image: result?.banner?.image,
           },
@@ -169,6 +172,24 @@ const AddBannerDrawer = (props: Props) => {
                 label="Name"
                 placeholder="Name"
                 {...(errors.name && {
+                  error: true,
+                  helperText: "This field is required.",
+                })}
+              />
+            )}
+          />
+
+          <Controller
+            name="link"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                fullWidth
+                label="Link"
+                placeholder="Link"
+                {...(errors.link && {
                   error: true,
                   helperText: "This field is required.",
                 })}

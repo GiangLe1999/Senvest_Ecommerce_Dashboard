@@ -31,8 +31,6 @@ import {
 } from "@mui/material";
 import { toast } from "react-toastify";
 
-import { format, parseISO } from "date-fns";
-
 import { deleteBanner } from "@/app/server/actions";
 import DebouncedInput from "@/components/DebouncedInput";
 
@@ -71,8 +69,8 @@ export type bannerType = {
   name: string;
   image: string;
   status: string;
-  updatedAt: string;
   order: string;
+  link: string;
 };
 
 type BannerWithActionsType = bannerType & {
@@ -148,15 +146,17 @@ const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
           </div>
         ),
       }),
-      columnHelper.accessor("updatedAt", {
-        header: "Update At",
+      columnHelper.accessor("link", {
+        header: "Link",
         cell: ({ row }) => (
-          <Typography>
-            {format(
-              parseISO(row.original.updatedAt),
-              "hh:mm a - EEEE, dd/MM/yyyy",
-            )}
-          </Typography>
+          <div className="max-w-[600px]">
+            <Typography
+              className="font-medium line-clamp-1"
+              color="text.primary"
+            >
+              {row.original.link}
+            </Typography>
+          </div>
         ),
       }),
       columnHelper.accessor("actions", {
