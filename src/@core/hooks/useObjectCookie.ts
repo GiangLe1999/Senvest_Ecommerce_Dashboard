@@ -3,7 +3,6 @@ import { useMemo } from "react";
 
 // Third-party Imports
 import { useCookie } from "react-use";
-import Cookies from "js-cookie";
 
 export const useObjectCookie = <T>(
   key: string,
@@ -19,11 +18,7 @@ export const useObjectCookie = <T>(
   );
 
   const updateValue = (newVal: T) => {
-    // Update the cookie with js-cookie to set a long expiration date
-    Cookies.set(key, JSON.stringify(newVal), { expires: 365 * 10 });
-
-    // Update the state managed by useCookie
-    updateCookie(JSON.stringify(newVal));
+    updateCookie(JSON.stringify(newVal), { expires: 365 * 10 });
   };
 
   return [value, updateValue];
