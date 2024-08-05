@@ -32,6 +32,8 @@ import {
   createProduct,
   createVariant,
   updateProduct,
+  updateProductVideos,
+  uploadProductVideos,
 } from "@/app/server/actions";
 import type { Product } from "@/entities/product.entity";
 import {
@@ -48,6 +50,7 @@ export type Variant = {
   discountedPrice?: string;
   discountedFrom?: Date;
   discountedTo?: Date;
+  video?: string[];
   images: File[];
 };
 
@@ -68,6 +71,7 @@ export type AddProductFormValues = {
   en_description: string;
   category: string;
   status: string;
+  videos: File[];
   variants: Variant[];
 };
 
@@ -92,6 +96,7 @@ const schema = object({
   en_description: pipe(string(), minLength(1, "This field is required")),
   category: pipe(string(), minLength(1, "This field is required")),
   status: pipe(string(), minLength(1, "This field is required")),
+  videos: optional(array(file())),
   variants: pipe(
     array(variantSchema),
     minLength(1, "Variants cannot be empty"),
@@ -127,6 +132,7 @@ const ProductAddOrEditForm: FC<Props> = ({
       en_description: "",
       category: "",
       status: "",
+      videos: [],
       variants: [defaultVariant],
     },
   });
@@ -190,6 +196,11 @@ const ProductAddOrEditForm: FC<Props> = ({
         },
         category: initialProductData?.category._id,
         status: initialProductData?.status,
+        ...(initialProductData?.videos && {
+          videos: initialProductData?.videos.map((url) =>
+            extractFileNameFromCloudinaryUrl(url as any),
+          ),
+        }),
       };
 
       const formattedProductFormValues = {
@@ -203,6 +214,9 @@ const ProductAddOrEditForm: FC<Props> = ({
         },
         category: formValues.category,
         status: formValues.status,
+        ...(formValues.videos && {
+          videos: formValues.videos.map((file) => file.name),
+        }),
       };
 
       const productChangedFields = getChangedFields({
@@ -221,6 +235,37 @@ const ProductAddOrEditForm: FC<Props> = ({
 
       if (Object.keys(changedVariants).length > 0) {
         try {
+          if (productChangedFields?.videos) {
+            const formData = new FormData();
+
+            if (formValues?.videos?.length > 0) {
+              formValues.videos.forEach((file) => {
+                formData.append("files", file);
+              });
+
+              formData.append("_id", initialProductData._id);
+
+              try {
+                const result = await updateProductVideos(formData);
+
+                if (!result.ok) {
+                  setLoading(false);
+
+                  return toast.error(result?.error);
+                }
+              } catch (error) {
+                console.log(error);
+                setLoading(false);
+
+                return toast.error("Something went wrong");
+              }
+            }
+          }
+
+          if (productChangedFields?.videos) {
+            delete productChangedFields.videos;
+          }
+
           const newVariantIds = await createProductVariants(
             formValues.variants,
           );
@@ -255,6 +300,37 @@ const ProductAddOrEditForm: FC<Props> = ({
         }
       } else {
         try {
+          if (productChangedFields?.videos) {
+            const formData = new FormData();
+
+            if (formValues?.videos?.length > 0) {
+              formValues.videos.forEach((file) => {
+                formData.append("files", file);
+              });
+
+              formData.append("_id", initialProductData._id);
+
+              try {
+                const result = await updateProductVideos(formData);
+
+                if (!result.ok) {
+                  setLoading(false);
+
+                  return toast.error(result?.error);
+                }
+              } catch (error) {
+                console.log(error);
+                setLoading(false);
+
+                return toast.error("Something went wrong");
+              }
+            }
+          }
+
+          if (productChangedFields?.videos) {
+            delete productChangedFields.videos;
+          }
+
           const result = await updateProduct({
             ...productChangedFields,
             _id: initialProductData._id,
@@ -264,15 +340,20 @@ const ProductAddOrEditForm: FC<Props> = ({
             toast.success("Update product successfully");
             window.location.replace("/products/list");
           } else {
-            toast.error(result?.error);
+            setLoading(false);
+
+            return toast.error(result?.error);
           }
         } catch (error) {
+          setLoading(false);
           console.log(error);
 
           return toast.error("Something went wrong");
         }
       }
     } else {
+      setLoading(true);
+
       const variants: string[] = [];
 
       for (const variant of formValues.variants) {
@@ -334,11 +415,33 @@ const ProductAddOrEditForm: FC<Props> = ({
         const result = await createProduct(productData);
 
         if (result.ok) {
-          toast.success("Create product successfully");
+          if (formValues?.videos.length > 0) {
+            const formData = new FormData();
 
-          window.location.replace("/products/list");
+            formValues.videos.forEach((file) => {
+              formData.append("files", file);
+            });
+
+            formData.append("_id", result.product._id);
+
+            try {
+              const uploadVideosResult = await uploadProductVideos(formData);
+
+              if (uploadVideosResult.ok) {
+                toast.success("Create product successfully");
+                window.location.replace("/products/list");
+              } else {
+                return toast.error(result?.error);
+              }
+            } catch (error) {
+              return toast.error(result?.error);
+            }
+          } else {
+            toast.success("Create product successfully");
+            window.location.replace("/products/list");
+          }
         } else {
-          toast.error(result?.error);
+          return toast.error(result?.error);
         }
       } catch (error) {
         console.log(error);
@@ -360,6 +463,12 @@ const ProductAddOrEditForm: FC<Props> = ({
         setValue("en_description", initialProductData?.description?.en);
         setValue("category", initialProductData?.category._id);
         setValue("status", initialProductData?.status);
+
+        if (initialProductData?.videos) {
+          createFilesFromUrls(initialProductData?.videos).then((files) => {
+            setValue("videos", files);
+          });
+        }
 
         const variantsWithFiles = await Promise.all(
           initialProductData.variants.map(async (variant) => {

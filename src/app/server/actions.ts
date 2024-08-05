@@ -96,6 +96,30 @@ export const createProduct = async (productData: any) => {
   return data;
 };
 
+export const uploadProductVideos = async (formData: FormData) => {
+  const { data } = await axiosInstance.post(
+    "/admin-products/videos",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    },
+  );
+
+  return data;
+};
+
+export const updateProductVideos = async (formData: FormData) => {
+  const { data } = await axiosInstance.put("/admin-products/videos", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
+    },
+  });
+
+  return data;
+};
+
 export const updateProduct = async (updateData: any) => {
   const { data } = await axiosInstance.put(
     "/admin-products/update",

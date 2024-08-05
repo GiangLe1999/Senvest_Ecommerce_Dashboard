@@ -12,4 +12,5 @@ export interface Product {
   status: string;
   category: Category;
   variants: Variant[];
+  videos?: string[];
 }

@@ -21,6 +21,7 @@ import {
 import "@/libs/styles/tiptapEditor.css";
 import type { AddProductFormValues } from "./ProductAddOrEditForm";
 import ProductDescriptionEditor from "./ProductDescriptionEditor";
+import ProductVideos from "./ProductVideos";
 
 interface Props {
   control: Control<AddProductFormValues, any>;
@@ -86,7 +87,7 @@ const ProductInformation: FC<Props> = ({
           </Grid>
         </Grid>
 
-        <Grid container spacing={10}>
+        <Grid container spacing={10} className="mbe-5">
           <ProductDescriptionEditor
             onUpdate={updateViDescription}
             label="Vietnamese Description"
@@ -100,6 +101,12 @@ const ProductInformation: FC<Props> = ({
             error={errors.en_description}
           />
         </Grid>
+
+        <ProductVideos
+          error={errors.videos}
+          setValue={setValue}
+          files={watch("videos")}
+        />
       </CardContent>
     </Card>
   );
