@@ -58,10 +58,10 @@ const ProductVideos: FC<Props> = ({ files, setValue, error }) => {
       "video/*": [],
     },
     onDrop: (acceptedFiles: File[]) => {
-      setValue(
-        "videos",
+      setValue("videos", [
+        ...(files as any),
         acceptedFiles.map((file: File) => Object.assign(file)),
-      );
+      ]);
     },
   });
 
