@@ -3,8 +3,6 @@ import { updateVariant } from "@/app/server/actions";
 export const updateProductVariant = async (variant: any) => {
     const variantFormData = new FormData();
 
-    console.log(variant);
-
     if (variant.images) {
       variant.images.forEach((file : any) => {
         variantFormData.append("files", file);
@@ -49,5 +47,4 @@ export const updateProductVariant = async (variant: any) => {
     } else {
       throw new Error(result.error);
     }
-
 };

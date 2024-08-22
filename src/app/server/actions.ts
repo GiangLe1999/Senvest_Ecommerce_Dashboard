@@ -135,6 +135,15 @@ export const deleteProduct = async (_id: string) => {
   return data;
 };
 
+
+export const removeProductVideos = async (_id: string) => {
+  const { data } = await axiosInstance.put(
+    "/admin-products/delete-videos",
+    {_id});
+
+  return data;
+};
+
 // Variant
 export const createVariant = async (formData: FormData) => {
   const { data } = await axiosInstance.post(
@@ -164,6 +173,7 @@ export const updateVariant = async (formData: FormData) => {
 
   return data;
 };
+
 
 // Banners
 export const getAdminBanners = async () => {

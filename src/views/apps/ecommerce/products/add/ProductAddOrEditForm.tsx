@@ -31,6 +31,7 @@ import ProductOrganize from "@views/apps/ecommerce/products/add/ProductOrganize"
 import {
   createProduct,
   createVariant,
+  removeProductVideos,
   updateProduct,
   updateProductVideos,
   uploadProductVideos,
@@ -272,6 +273,12 @@ const ProductAddOrEditForm: FC<Props> = ({
 
                 return toast.error("Something went wrong");
               }
+            } else {
+              try {
+                await removeProductVideos(initialProductData._id);
+              } catch (error) {
+                console.log("Error removing product videos");
+              }
             }
           }
 
@@ -292,7 +299,6 @@ const ProductAddOrEditForm: FC<Props> = ({
               console.error("Error updating variant");
             }
           });
-
 
           try {
             const result = await updateProduct({
@@ -346,6 +352,12 @@ const ProductAddOrEditForm: FC<Props> = ({
                 setLoading(false);
 
                 return toast.error("Something went wrong");
+              }
+            } else {
+              try {
+                await removeProductVideos(initialProductData._id);
+              } catch (error) {
+                console.log("Error removing product videos");
               }
             }
           }
