@@ -150,6 +150,21 @@ export const createVariant = async (formData: FormData) => {
   return data;
 };
 
+
+export const updateVariant = async (formData: FormData) => {
+  const { data } = await axiosInstance.put(
+    "/admin-variants/update",
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    },
+  );
+
+  return data;
+};
+
 // Banners
 export const getAdminBanners = async () => {
   try {

@@ -41,9 +41,10 @@ import {
   extractFileNameFromCloudinaryUrl,
 } from "@/utils/createFileFromUrl";
 import { getChangedFields } from "@/utils/getChangedFields";
-import { createProductVariants } from "@/utils/createProductVariants";
+import { updateProductVariant } from "@/utils/updateProductVariants";
 
 export type Variant = {
+  _id?: string;
   fragrance: string;
   stock: string;
   price: string;
@@ -76,6 +77,7 @@ export type AddProductFormValues = {
 };
 
 const variantSchema = object({
+  _id: optional(string()),
   fragrance: pipe(string(), minLength(1, "Variant fragrance is required")),
   stock: pipe(string(), minLength(1, "Variant stock quantity is required")),
   price: pipe(string(), minLength(1, "Variant base price is required")),
@@ -142,6 +144,7 @@ const ProductAddOrEditForm: FC<Props> = ({
     control,
   });
 
+
   // Handle Form Submit
   const handleFormSubmit = async (formValues: AddProductFormValues) => {
     if (formValues.variants.length === 0) {
@@ -152,6 +155,7 @@ const ProductAddOrEditForm: FC<Props> = ({
       const initialVariantsData = {
         variants: initialProductData.variants.map((variant) => {
           return {
+            _id: variant._id,
             fragrance: variant.fragrance,
             stock: variant.stock,
             price: variant.price,
@@ -159,10 +163,10 @@ const ProductAddOrEditForm: FC<Props> = ({
               discountedPrice: variant.discountedPrice,
             }),
             ...(variant?.discountedFrom && {
-              discountedFrom: new Date(variant.discountedFrom),
+              discountedFrom: new Date(variant.discountedFrom).toISOString(),
             }),
             ...(variant?.discountedTo && {
-              discountedTo: new Date(variant.discountedTo),
+              discountedTo: new Date(variant.discountedTo).toISOString(),
             }),
             images: variant.images.map((url) =>
               extractFileNameFromCloudinaryUrl(url as any),
@@ -175,10 +179,17 @@ const ProductAddOrEditForm: FC<Props> = ({
         variants: formValues.variants.map((variant) => {
           return {
             ...variant,
+            ...(variant?.discountedFrom && {
+              discountedFrom: new Date(variant.discountedFrom).toISOString(),
+            }),
+            ...(variant?.discountedTo && {
+              discountedTo: new Date(variant.discountedTo).toISOString(),
+            }),
             images: variant.images.map((file) => file.name),
           };
         }),
       };
+
 
       const changedVariants = getChangedFields({
         initialFormData: initialVariantsData,
@@ -203,6 +214,7 @@ const ProductAddOrEditForm: FC<Props> = ({
         }),
       };
 
+
       const formattedProductFormValues = {
         name: {
           vi: formValues.vi_name,
@@ -218,6 +230,7 @@ const ProductAddOrEditForm: FC<Props> = ({
           videos: formValues.videos.map((file) => file.name),
         }),
       };
+
 
       const productChangedFields = getChangedFields({
         initialFormData: formattedInitialProductData,
@@ -266,15 +279,25 @@ const ProductAddOrEditForm: FC<Props> = ({
             delete productChangedFields.videos;
           }
 
-          const newVariantIds = await createProductVariants(
-            formValues.variants,
+          const updateVariantsPromises = formValues.variants.map((variant: any) =>
+            updateProductVariant(
+              {_id: variant._id, ...variant},
+            )
           );
+
+          const updateVariantsResults = await Promise.all(updateVariantsPromises);
+
+          updateVariantsResults.forEach((result : any) => {
+            if (!result.ok) {
+              console.error("Error updating variant");
+            }
+          });
+
 
           try {
             const result = await updateProduct({
               ...productChangedFields,
               _id: initialProductData._id,
-              variants: newVariantIds,
             });
 
             if (result.ok) {
