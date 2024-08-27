@@ -39,14 +39,16 @@ import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import type { RankingInfo } from "@tanstack/match-sorter-utils";
 
 // Type Imports
+import { toast } from "react-toastify";
+
 import type { ReviewType } from "@/types/apps/ecommerceTypes";
 
 // Component Imports
-import CustomAvatar from "@core/components/mui/Avatar";
 import OptionMenu from "@core/components/option-menu";
 
 // Style Imports
 import tableStyles from "@core/styles/table.module.css";
+import { deleteReview, publishReview } from "@/app/server/actions";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -113,14 +115,16 @@ const DebouncedInput = ({
 // Column Definitions
 const columnHelper = createColumnHelper<ReviewWithActionsType>();
 
+
 const ManageReviewsTable = ({
   reviewsData,
 }: {
   reviewsData?: ReviewType[];
 }) => {
   // States
-  const [status, setStatus] = useState<ReviewType["status"]>("All");
+  const [status, setStatus] = useState<ReviewType["status"]>("Pending");
   const [rowSelection, setRowSelection] = useState({});
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [allData, setAllData] = useState(...[reviewsData]);
   const [data, setData] = useState(allData);
   const [globalFilter, setGlobalFilter] = useState("");
@@ -149,32 +153,30 @@ const ManageReviewsTable = ({
           />
         ),
       },
-      columnHelper.accessor("product", {
+      columnHelper.accessor("product.name.en", {
         header: "Product",
         cell: ({ row }) => (
           <div className="flex items-center gap-3">
             <img
-              src={row.original.productImage}
+              src={row.original.variant.images[0]}
               width={38}
               height={38}
               className="rounded-md bg-actionHover"
             />
             <div className="flex flex-col">
               <Typography className="font-medium" color="text.primary">
-                {row.original.product}
+                {row.original.product.name.en}
               </Typography>
               <Typography variant="body2" className="text-wrap">
-                {row.original.companyName}
+                {row.original.variant.fragrance}
               </Typography>
             </div>
           </div>
         ),
       }),
-      columnHelper.accessor("reviewer", {
+      columnHelper.accessor("email", {
         header: "Reviewer",
         cell: ({ row }) => (
-          <div className="flex items-center gap-3">
-            <CustomAvatar src={row.original.avatar} size={34} />
             <div>
               <Typography
                 component={Link}
@@ -182,43 +184,39 @@ const ManageReviewsTable = ({
                 color="primary"
                 className="font-medium"
               >
-                {row.original.reviewer}
+                {row.original.name}
               </Typography>
               <Typography variant="body2">{row.original.email}</Typography>
             </div>
-          </div>
         ),
       }),
-      columnHelper.accessor("head", {
+      columnHelper.accessor("rating", {
         header: "Review",
-        sortingFn: (rowA, rowB) => rowA.original.review - rowB.original.review,
+        sortingFn: (rowA, rowB) => rowA.original.rating - rowB.original.rating,
         cell: ({ row }) => (
           <div className="flex flex-col gap-1">
             <Rating
               name="product-review"
               readOnly
-              value={row.original.review}
+              value={row.original.rating}
               emptyIcon={<i className="ri-star-fill" />}
             />
-            <Typography className="font-medium" color="text.primary">
-              {row.original.head}
-            </Typography>
             <Typography variant="body2" className="text-wrap">
-              {row.original.para}
+              {row.original.comment}
             </Typography>
           </div>
         ),
       }),
-      columnHelper.accessor("date", {
+      columnHelper.accessor("createdAt", {
         header: "Date",
         sortingFn: (rowA, rowB) => {
-          const dateA = new Date(rowA.original.date);
-          const dateB = new Date(rowB.original.date);
+          const dateA = new Date(rowA.original.createdAt);
+          const dateB = new Date(rowB.original.createdAt);
 
           return dateA.getTime() - dateB.getTime();
         },
         cell: ({ row }) => {
-          const date = new Date(row.original.date).toLocaleDateString("en-US", {
+          const date = new Date(row.original.createdAt).toLocaleDateString("en-US", {
             month: "short",
             day: "2-digit",
             year: "numeric",
@@ -249,25 +247,55 @@ const ManageReviewsTable = ({
             iconButtonProps={{ size: "medium" }}
             iconClassName="text-textSecondary text-[22px]"
             options={[
-              {
-                text: "View",
-                icon: "ri-eye-line",
-                href: "/apps/ecommerce/orders/details/5434",
-                linkProps: {
-                  className: "flex items-center gap-2 is-full plb-1.5 pli-4",
+              ...row.original.status === "Pending" ? [{
+                text:"Publish",
+                icon: "ri-edit-line",
+                menuItemProps: {
+                  onClick: async () => {
+                    try {
+                      const res = await publishReview(
+                        {_id: row.original._id}
+                      )
+                      
+                      if (res.ok) {
+                        toast.success("Update review successfully")
+                        setTimeout(() => {
+                          window.location.reload()
+                        }, 1000)
+                      } else {
+                        toast.error(res?.error)
+                      }
+                    } catch (error) {
+                      toast.error("Something went wrong")
+                    }
+                  },
+                  className: "flex items-center",
                 },
-              },
+              }] : [],
               {
                 text: "Delete",
                 icon: "ri-delete-bin-7-line",
                 menuItemProps: {
-                  onClick: () =>
-                    setAllData(
-                      allData?.filter(
-                        (review) => review.id !== row.original.id,
-                      ),
-                    ),
-                  className: "flex items-center pli-4",
+                  onClick: async () =>
+                   {
+                    try {
+                      const res = await deleteReview(
+                        {_id: row.original._id}
+                      )
+                      
+                      if (res.ok) {
+                        toast.success("Delete review successfully")
+                        setTimeout(() => {
+                          window.location.reload()
+                        }, 1000)
+                      } else {
+                        toast.error(res?.error)
+                      }
+                    } catch (error) {
+                      toast.error("Something went wrong")
+                    }
+                   },
+                  className: "flex items-center",
                 },
               },
             ]}
@@ -311,7 +339,7 @@ const ManageReviewsTable = ({
 
   useEffect(() => {
     const filteredData = allData?.filter((review) => {
-      if (status !== "All" && review.status !== status) return false;
+      if (status !== "Pending" && review.status !== status) return false;
 
       return true;
     });
@@ -339,10 +367,9 @@ const ManageReviewsTable = ({
                 fullWidth
                 id="select-status"
                 value={status}
-                onChange={(e) => setStatus(e.target.value)}
+                onChange={(e) => setStatus(e.target.value as "Published" | "Pending")}
                 labelId="status-select"
               >
-                <MenuItem value="All">All</MenuItem>
                 <MenuItem value="Published">Published</MenuItem>
                 <MenuItem value="Pending">Pending</MenuItem>
               </Select>

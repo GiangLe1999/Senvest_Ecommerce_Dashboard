@@ -255,3 +255,36 @@ export const deleteSlogan = async (_id: string) => {
 
   return data;
 };
+
+
+// Reviews
+export const getTotalReviews = async () => {
+  try {
+    const { data } = await axiosInstance("/admin-reviews/total-reviews");
+
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const publishReview = async ({ _id }: { _id: string }) => {
+  try {
+    const { data } = await axiosInstance.put("/admin-reviews/publish-review", { _id });
+
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+
+export const deleteReview = async ({ _id }: { _id: string }) => {
+  try {
+    const { data } = await axiosInstance.delete("/admin-reviews/delete-review/" + _id);
+
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};

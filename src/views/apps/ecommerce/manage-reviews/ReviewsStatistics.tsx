@@ -1,6 +1,8 @@
 'use client'
 
 // Next Imports
+import type { FC } from 'react'
+
 import dynamic from 'next/dynamic'
 
 // MUI Imports
@@ -17,10 +19,16 @@ import type { ApexOptions } from 'apexcharts'
 // Styled Component Imports
 const AppReactApexCharts = dynamic(() => import('@/libs/styles/AppReactApexCharts'))
 
-// Vars
-const series = [{ data: [32, 52, 72, 94, 116, 94, 72] }]
 
-const ReviewsStatistics = () => {
+interface Props {
+  reviewsByDayOfWeek: any
+}
+
+const ReviewsStatistics : FC<Props> = ({reviewsByDayOfWeek}) => {
+
+  const series = [{ data:  reviewsByDayOfWeek.map((day : any) => day.value) }]
+  const newReviews = reviewsByDayOfWeek.reduce(( total : any, day : any ) => total + day.value, 0)
+
   // Hook
   const theme = useTheme()
 
@@ -69,7 +77,7 @@ const ReviewsStatistics = () => {
       }
     },
     xaxis: {
-      categories: ['M', 'T', 'W', 'T', 'F', 'S', 'S'],
+      categories: ['S', 'M', 'T', 'W', 'T', 'F', 'S'],
       axisTicks: { show: false },
       axisBorder: { show: false },
       tickPlacement: 'on',
@@ -103,14 +111,11 @@ const ReviewsStatistics = () => {
               <div className='flex flex-col gap-2'>
                 <Typography variant='h5'>Reviews statistics</Typography>
                 <div className='flex items-center gap-2'>
-                  <Typography>12 New reviews</Typography>
+                  <Typography>{newReviews} New reviews</Typography>
                   <Chip label='+8.4%' variant='tonal' size='small' color='success' />
                 </div>
               </div>
               <div className='flex flex-col gap-2'>
-                <Typography color='text.primary'>
-                  <span className='text-success'>87%</span> Positive reviews
-                </Typography>
                 <Typography variant='body2'>Weekly Report</Typography>
               </div>
             </div>

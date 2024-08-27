@@ -27,18 +27,15 @@ export type ReferralsType = {
 };
 
 export type ReviewType = {
-  id: number;
-  product: string;
-  companyName: string;
-  productImage: string;
-  reviewer: string;
+  _id: string;
+  product: {name: LocalizedString};
+  variant: {fragrance: string, images: string[]};
   email: string;
-  avatar: string;
-  date: string;
-  status: string;
-  review: number;
-  head: string;
-  para: string;
+  name: string;
+  status: "Pending" | "Published";
+  createdAt: string;
+  rating: number;
+  comment:string;
 };
 
 export type ProductType = {

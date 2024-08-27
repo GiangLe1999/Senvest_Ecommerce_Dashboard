@@ -7,22 +7,22 @@ import ReviewsStatistics from "@views/apps/ecommerce/manage-reviews/ReviewsStati
 import ManageReviewsTable from "@views/apps/ecommerce/manage-reviews/ManageReviewsTable";
 
 // Data Imports
-import { getEcommerceData } from "@/app/server/actions";
+import {  getTotalReviews } from "@/app/server/actions";
 
 const eCommerceManageReviews = async () => {
   // Vars
-  const data = await getEcommerceData();
+  const data = await getTotalReviews();
 
   return (
     <Grid container spacing={6}>
       <Grid item xs={12} md={6}>
-        <TotalReviews />
+        <TotalReviews totalReviews = {data.reviews} reviewsByDayOfWeek = {data.reviewsByDayOfWeek}/>
       </Grid>
       <Grid item xs={12} md={6}>
-        <ReviewsStatistics />
+        <ReviewsStatistics reviewsByDayOfWeek = {data.reviewsByDayOfWeek}/>
       </Grid>
       <Grid item xs={12}>
-        <ManageReviewsTable reviewsData={data?.reviews} />
+        <ManageReviewsTable reviewsData={data.reviewTable} />
       </Grid>
     </Grid>
   );
