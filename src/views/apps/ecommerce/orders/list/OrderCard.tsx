@@ -1,4 +1,6 @@
 // MUI Imports
+import type { FC } from 'react'
+
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Divider from '@mui/material/Divider'
@@ -14,39 +16,27 @@ import classnames from 'classnames'
 import CustomAvatar from '@core/components/mui/Avatar'
 
 // Vars
-const data = [
-  {
-    value: 56,
-    title: 'Pending Payment',
-    icon: 'ri-calendar-2-line'
-  },
-  {
-    value: 12689,
-    title: 'Completed',
-    icon: 'ri-check-double-line'
-  },
-  {
-    value: 124,
-    title: 'Refunded',
-    icon: 'ri-wallet-3-line'
-  },
-  {
-    value: 32,
-    title: 'Failed',
-    icon: 'ri-error-warning-line'
-  }
-]
+const icons = {
+    'pending': 'ri-calendar-2-line',
+    'paid': 'ri-check-double-line',
+    'refunded': 'ri-wallet-3-line',
+    'cancelled': 'ri-error-warning-line',}
 
-const OrderCard = () => {
+interface Props {
+  data: any
+}
+
+const OrderCard : FC<Props> = ({ data }) => {
   // Hooks
   const isBelowMdScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('md'))
   const isBelowSmScreen = useMediaQuery((theme: Theme) => theme.breakpoints.down('sm'))
+
 
   return (
     <Card>
       <CardContent>
         <Grid container spacing={6}>
-          {data.map((item, index) => (
+          {data?.map((item : any, index : number) => (
             <Grid
               item
               xs={12}
@@ -61,11 +51,11 @@ const OrderCard = () => {
             >
               <div className='flex justify-between'>
                 <div className='flex flex-col'>
-                  <Typography variant='h4'>{item.value.toLocaleString()}</Typography>
-                  <Typography>{item.title}</Typography>
+                  <Typography variant='h4'>{item.count}</Typography>
+                  <Typography className='capitalize'>{item.status}</Typography>
                 </div>
                 <CustomAvatar variant='rounded' size={42} skin='light'>
-                  <i className={classnames('text-[26px]', item.icon)} />
+                  <i className={classnames('text-[26px]', icons[item.status as keyof typeof icons  ] as any)} />
                 </CustomAvatar>
               </div>
               {isBelowMdScreen && !isBelowSmScreen && index < data.length - 2 && (

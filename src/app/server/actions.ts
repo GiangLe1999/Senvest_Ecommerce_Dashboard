@@ -288,3 +288,15 @@ export const deleteReview = async ({ _id }: { _id: string }) => {
     console.log(error);
   }
 };
+
+
+// Orders
+export const getOrders = async () => {
+  try {
+    const { data } = await axiosInstance("/admin-payments");
+
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};

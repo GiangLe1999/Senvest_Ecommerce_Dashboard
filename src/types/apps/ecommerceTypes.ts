@@ -59,19 +59,36 @@ export type ProductType = {
   }[];
 };
 
+export const enum StatusEnum {
+  pending = 'pending',
+  cancelled = 'cancelled',
+  paid = 'paid',
+  refunded = 'refunded',
+}
+
 export type OrderType = {
-  id: number;
-  order: string;
-  customer: string;
-  email: string;
-  avatar: string;
-  payment: number;
-  status: string;
-  spent: number;
-  method: string;
-  date: string;
-  time: string;
-  methodNumber: number;
+  _id: string;
+  orderCode: number,
+  status: StatusEnum,
+  amount: number,
+  items: {
+    _id: string,
+    variant_id: string,
+    quantity: number,
+  }[],
+  user?: any,
+  user_address?: any,
+  not_user_info?: {
+    name: string,
+    email: string,
+    phone: string,
+    address: string,
+    city: string,
+    province: string,
+    zip: string,
+  },
+  transactionDateTime?: Date,
+  createdAt: Date,
 };
 
 export type ECommerceType = {

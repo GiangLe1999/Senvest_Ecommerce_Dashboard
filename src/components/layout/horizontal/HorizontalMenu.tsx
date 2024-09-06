@@ -113,7 +113,16 @@ const HorizontalMenu = () => {
           <MenuItem href={`/products/category`}>Category</MenuItem>
         </SubMenu>
 
-        <SubMenu label="Orders" icon={<i className="ri-secure-payment-fill" />}>
+        <MenuItem
+         href={`/orders/list`}
+          icon={<i className="ri-refund-2-line" />}
+          exactMatch={false}
+          activeUrl="/dashboard"
+        >
+          Orders
+        </MenuItem>
+
+        {/* <SubMenu label="Orders" icon={<i className="ri-secure-payment-fill" />}>
           <MenuItem href={`/orders/list`}>List</MenuItem>
           <MenuItem
             href={`/orders/details/5434`}
@@ -122,7 +131,7 @@ const HorizontalMenu = () => {
           >
             Details
           </MenuItem>
-        </SubMenu>
+        </SubMenu> */}
 
         <SubMenu
           label="Customers"

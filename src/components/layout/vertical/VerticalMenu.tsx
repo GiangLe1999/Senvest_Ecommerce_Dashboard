@@ -99,7 +99,7 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             <MenuItem href={`/products/category`}>Category List</MenuItem>
           </SubMenu>
 
-          <SubMenu label="Orders" icon={<i className="ri-refund-2-line" />}>
+          {/* <SubMenu label="Orders" icon={<i className="ri-refund-2-line" />}>
             <MenuItem href={`/orders/list`}>List</MenuItem>
             <MenuItem
               href={`/orders/details/5434`}
@@ -108,7 +108,17 @@ const VerticalMenu = ({ scrollMenu }: Props) => {
             >
               Details
             </MenuItem>
-          </SubMenu>
+          </SubMenu> */}
+
+
+          <MenuItem
+            href={`/orders/list`}
+              icon={<i className="ri-refund-2-line" />}
+              exactMatch={false}
+              activeUrl="/dashboard"
+          >
+            Orders
+          </MenuItem>
 
           <SubMenu
             label="Customers"

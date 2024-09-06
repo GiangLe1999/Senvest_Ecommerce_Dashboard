@@ -10,7 +10,6 @@ import CardContent from "@mui/material/CardContent";
 import Button from "@mui/material/Button";
 import Typography from "@mui/material/Typography";
 import Checkbox from "@mui/material/Checkbox";
-import Chip from "@mui/material/Chip";
 import TablePagination from "@mui/material/TablePagination";
 import TextField from "@mui/material/TextField";
 import type { TextFieldProps } from "@mui/material/TextField";
@@ -38,11 +37,9 @@ import type { ThemeColor } from "@core/types";
 import type { OrderType } from "@/types/apps/ecommerceTypes";
 
 // Component Imports
-import CustomAvatar from "@core/components/mui/Avatar";
 import OptionMenu from "@core/components/option-menu";
 
 // Util Imports
-import { getInitials } from "@/utils/getInitials";
 
 // Style Imports
 import tableStyles from "@core/styles/table.module.css";
@@ -65,11 +62,11 @@ type StatusChipColorType = {
   color: ThemeColor;
 };
 
-export const paymentStatus: { [key: number]: PayementStatusType } = {
-  1: { text: "Paid", color: "success" },
-  2: { text: "Pending", color: "warning" },
-  3: { text: "Cancelled", color: "secondary" },
-  4: { text: "Failed", color: "error" },
+export const paymentStatus: { [key: string]: PayementStatusType } = {
+  paid: { text: "Paid", color: "success" },
+  pending: { text: "Pending", color: "warning" },
+  refunded: { text: "Refunded", color: "secondary" },
+  cancelled: { text: "Cancelled", color: "error" },
 };
 
 export const statusChipColor: { [key: string]: StatusChipColorType } = {
@@ -141,10 +138,6 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
   const [data, setData] = useState(...[orderData]);
   const [globalFilter, setGlobalFilter] = useState("");
 
-  // Vars
-  const paypal = "/images/apps/ecommerce/paypal.png";
-  const mastercard = "/images/apps/ecommerce/mastercard.png";
-
   const columns = useMemo<ColumnDef<ECommerceOrderTypeWithAction, any>[]>(
     () => [
       {
@@ -169,30 +162,25 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
           />
         ),
       },
-      columnHelper.accessor("order", {
+      columnHelper.accessor("orderCode", {
         header: "Order",
         cell: ({ row }) => (
           <Typography
             component={Link}
-            href={`/apps/ecommerce/orders/details/${row.original.order}`}
+            href={`/apps/ecommerce/orders/details/${row.original.orderCode}`}
             color="primary"
-          >{`#${row.original.order}`}</Typography>
+          >{`#${row.original.orderCode}`}</Typography>
         ),
       }),
-      columnHelper.accessor("date", {
+      columnHelper.accessor("createdAt", {
         header: "Date",
         cell: ({ row }) => (
-          <Typography>{`${new Date(row.original.date).toDateString()}, ${row.original.time}`}</Typography>
+          <Typography>{`${new Date(row.original.createdAt).toDateString()}`}</Typography>
         ),
       }),
-      columnHelper.accessor("customer", {
+      columnHelper.accessor("user", {
         header: "Customers",
         cell: ({ row }) => (
-          <div className="flex items-center gap-3">
-            {getAvatar({
-              avatar: row.original.avatar,
-              customer: row.original.customer,
-            })}
             <div className="flex flex-col">
               <Typography
                 component={Link}
@@ -200,61 +188,47 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
                 color="text.primary"
                 className="font-medium hover:text-primary"
               >
-                {row.original.customer}
+                {row.original?.user?.name || row.original?.not_user_info?.name}
               </Typography>
-              <Typography variant="body2">{row.original.email}</Typography>
-            </div>
+              <Typography variant="body2">{row.original?.user?.email || row.original?.not_user_info?.email}</Typography>
           </div>
         ),
       }),
-      columnHelper.accessor("payment", {
+      columnHelper.accessor("status", {
         header: "Payment",
         cell: ({ row }) => (
           <div className="flex items-center gap-1">
             <i
               className={classnames(
                 "ri-circle-fill bs-2.5 is-2.5",
-                `text-${paymentStatus[row.original.payment].color}`,
+                `text-${(paymentStatus[row.original.status as keyof typeof paymentStatus] as any).color}`,
               )}
             />
             <Typography
-              color={`${paymentStatus[row.original.payment].color}.main`}
+              color={`${(paymentStatus[row.original.status as keyof typeof paymentStatus] as any).color}.main`}
               className="font-medium"
             >
-              {paymentStatus[row.original.payment].text}
+              {(paymentStatus[row.original.status as keyof typeof paymentStatus] as any).text}
             </Typography>
           </div>
         ),
       }),
-      columnHelper.accessor("status", {
-        header: "Status",
+
+      // columnHelper.accessor("status", {
+      //   header: "Status",
+      //   cell: ({ row }) => (
+      //     <Chip
+      //       label={row.original.status}
+      //       color={statusChipColor[row.original.status].color}
+      //       variant="tonal"
+      //       size="small"
+      //     />
+      //   ),
+      // }),
+      columnHelper.accessor("amount", {
+        header: "Total Price",
         cell: ({ row }) => (
-          <Chip
-            label={row.original.status}
-            color={statusChipColor[row.original.status].color}
-            variant="tonal"
-            size="small"
-          />
-        ),
-      }),
-      columnHelper.accessor("method", {
-        header: "Method",
-        cell: ({ row }) => (
-          <div className="flex items-center">
-            <div className="flex justify-center items-center bg-[#F6F8FA] rounded-sm is-[29px] bs-[18px]">
-              <img
-                src={row.original.method === "mastercard" ? mastercard : paypal}
-                height={row.original.method === "mastercard" ? 11 : 14}
-                className="rounded-xs"
-              />
-            </div>
-            <Typography>
-              ...
-              {row.original.method === "mastercard"
-                ? row.original.methodNumber
-                : "@gmail.com"}
-            </Typography>
-          </div>
+          <Typography>{row.original.amount}</Typography>
         ),
       }),
       columnHelper.accessor("action", {
@@ -268,7 +242,7 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
                 {
                   text: "View",
                   icon: "ri-eye-line",
-                  href: `/apps/ecommerce/orders/details/${row.original.order}`,
+                  href: `/apps/ecommerce/orders/details/${row.original.orderCode}`,
                   linkProps: {
                     className: "flex items-center gap-2 is-full plb-2 pli-4",
                   },
@@ -279,7 +253,7 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
                   menuItemProps: {
                     onClick: () =>
                       setData(
-                        data?.filter((order) => order.id !== row.original.id),
+                        data?.filter((order) => order._id !== row.original._id),
                       ),
                     className: "flex items-center gap-2 pli-4",
                   },
@@ -324,19 +298,6 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
   });
 
-  const getAvatar = (params: Pick<OrderType, "avatar" | "customer">) => {
-    const { avatar, customer } = params;
-
-    if (avatar) {
-      return <CustomAvatar src={avatar} skin="light" size={34} />;
-    } else {
-      return (
-        <CustomAvatar skin="light" size={34}>
-          {getInitials(customer as string)}
-        </CustomAvatar>
-      );
-    }
-  };
 
   return (
     <Card>

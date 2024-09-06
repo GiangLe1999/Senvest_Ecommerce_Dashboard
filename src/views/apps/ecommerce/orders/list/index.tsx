@@ -4,20 +4,19 @@
 import Grid from '@mui/material/Grid'
 
 // Type Imports
-import type { OrderType } from '@/types/apps/ecommerceTypes'
 
 // Component Imports
 import OrderCard from './OrderCard'
 import OrderListTable from './OrderListTable'
 
-const OrderList = ({ orderData }: { orderData?: OrderType[] }) => {
+const OrderList = ({data} : {data: any}) => {
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
-        <OrderCard />
+        <OrderCard data = {data.statusSummary}/>
       </Grid>
       <Grid item xs={12}>
-        <OrderListTable orderData={orderData} />
+        <OrderListTable orderData={data.orders} />
       </Grid>
     </Grid>
   )
