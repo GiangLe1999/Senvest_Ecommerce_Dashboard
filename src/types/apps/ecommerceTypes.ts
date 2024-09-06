@@ -1,18 +1,15 @@
 import type { LocalizedString } from "@/entities/common.entity";
 
 export type Customer = {
-  id: number;
-  customer: string;
-  customerId: string;
+  _id: string;
   email: string;
-  country: string;
-  countryCode: string;
-  countryFlag?: string;
-  order: number;
-  totalSpent: number;
-  avatar: string;
-  status?: string;
-  contact?: string;
+  gender: string;
+  name: string;
+  date_of_birth?: Date;
+  receive_offers: boolean;
+  is_verified: boolean;
+  orders?: number;
+  total_spent?: number;
 };
 
 export type ReferralsType = {

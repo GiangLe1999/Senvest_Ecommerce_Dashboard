@@ -309,3 +309,16 @@ export const getOrderById = async (_id: string) => {
   } catch (error) {
     console.log(error);
   }}
+
+
+  // Users
+export const getAllUsers = async () => {
+    try {
+      const { data } = await axiosInstance(`/admin-users`);
+  
+      return data;
+    } catch (error) {
+      console.log(error);
+    }
+}
+  

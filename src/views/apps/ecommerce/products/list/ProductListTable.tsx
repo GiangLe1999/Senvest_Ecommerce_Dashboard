@@ -51,6 +51,7 @@ import tableStyles from "@core/styles/table.module.css";
 import DeleteConfirmDialog from "@/views/dashboards/ecommerce/DeleteConfirmDialog";
 import { deleteProduct } from "@/app/server/actions";
 import { removeHTMLTags } from "@/utils/removeHTMLTags";
+import { formatCurrencyVND, getPriceForVariant } from "@/libs/utils";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -207,7 +208,7 @@ const ProductListTable = ({ productData }: { productData?: ProductType[] }) => {
       columnHelper.accessor("variants", {
         header: "Price",
         cell: ({ row }) => (
-          <Typography>{row.original.variants?.[0].price}</Typography>
+          <Typography>{formatCurrencyVND(getPriceForVariant(row.original.variants[0]))}</Typography>
         ),
       }),
       columnHelper.accessor("variants", {
