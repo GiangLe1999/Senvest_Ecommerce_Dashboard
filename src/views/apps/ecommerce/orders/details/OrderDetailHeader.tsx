@@ -55,7 +55,7 @@ const OrderDetailHeader = ({ orderData}: { orderData?: OrderType }) => {
             size='small'
           />
         </div>
-        <Typography>{`${new Date(orderData?.createdAt ?? '').toDateString()}`}</Typography>
+        <Typography>{`${new Date(orderData?.createdAt ?? '').toDateString()} - ${new Date(orderData?.createdAt ?? '').toLocaleTimeString("vi-VN")}`}</Typography>
       </div>
       <OpenDialogOnElementClick
         element={Button}

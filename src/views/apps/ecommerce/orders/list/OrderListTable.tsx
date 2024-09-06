@@ -175,7 +175,7 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
       columnHelper.accessor("createdAt", {
         header: "Date",
         cell: ({ row }) => (
-          <Typography>{`${new Date(row.original.createdAt).toDateString()}`}</Typography>
+          <Typography>{`${new Date(row.original.createdAt).toDateString()} - ${new Date(row.original.createdAt ?? '').toLocaleTimeString("vi-VN")}`}</Typography>
         ),
       }),
       columnHelper.accessor("user", {
