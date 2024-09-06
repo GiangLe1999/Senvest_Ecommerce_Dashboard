@@ -1,6 +1,7 @@
 'use client'
 
 // React Imports
+import type { FC } from 'react';
 import { useState, useMemo } from 'react'
 
 // Next Imports
@@ -32,6 +33,8 @@ import type { ColumnDef, FilterFn } from '@tanstack/react-table'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
+import type { OrderType } from '@/types/apps/ecommerceTypes'
+import { formatCurrencyVND, getPriceForVariant } from '@/libs/utils';
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   // Rank the item
@@ -46,61 +49,19 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   return itemRank.passed
 }
 
-type dataType = {
-  productName: string
-  productImage: string
-  brand: string
-  price: number
-  quantity: number
-  total: number
-}
 
-const orderData: dataType[] = [
-  {
-    productName: 'OnePlus 7 Pro',
-    productImage: '/images/apps/ecommerce/product-21.png',
-    brand: 'OnePluse',
-    price: 799,
-    quantity: 1,
-    total: 799
-  },
-  {
-    productName: 'Magic Mouse',
-    productImage: '/images/apps/ecommerce/product-22.png',
-    brand: 'Google',
-    price: 89,
-    quantity: 1,
-    total: 89
-  },
-  {
-    productName: 'Wooden Chair',
-    productImage: '/images/apps/ecommerce/product-23.png',
-    brand: 'Insofar',
-    price: 289,
-    quantity: 2,
-    total: 578
-  },
-  {
-    productName: 'Air Jorden',
-    productImage: '/images/apps/ecommerce/product-24.png',
-    brand: 'Nike',
-    price: 299,
-    quantity: 2,
-    total: 598
-  }
-]
 
 // Column Definitions
-const columnHelper = createColumnHelper<dataType>()
+const columnHelper = createColumnHelper<any>()
 
-const OrderTable = () => {
+const OrderTable = ({orderData}: { orderData: OrderType }) => {
   // States
   const [rowSelection, setRowSelection] = useState({})
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [data, setData] = useState(...[orderData])
+  const [data, setData] = useState(...[orderData.items])
   const [globalFilter, setGlobalFilter] = useState('')
 
-  const columns = useMemo<ColumnDef<dataType, any>[]>(
+  const columns = useMemo<ColumnDef<any, any>[]>(
     () => [
       {
         id: 'select',
@@ -124,23 +85,22 @@ const OrderTable = () => {
           />
         )
       },
-      columnHelper.accessor('productName', {
+      columnHelper.accessor('_id.name.en', {
         header: 'Product',
         cell: ({ row }) => (
           <div className='flex items-center gap-3'>
-            <img src={row.original.productImage} alt={row.original.productName} height={34} />
+            <img src={row?.original?.variant_id?.images?.[0]} alt={row?.original?._id?.name?.en} height={34} />
             <div>
               <Typography color='text.primary' className='font-medium'>
-                {row.original.productName}
+                {row?.original?._id?.name?.en}
               </Typography>
-              <Typography variant='body2'>{row.original.brand}</Typography>
             </div>
           </div>
         )
       }),
-      columnHelper.accessor('price', {
+      columnHelper.accessor('variant_id', {
         header: 'Price',
-        cell: ({ row }) => <Typography>{`$${row.original.price}`}</Typography>
+        cell: ({ row }) => <Typography>{`${formatCurrencyVND(getPriceForVariant(row.original.variant_id || 0))}`}</Typography>
       }),
       columnHelper.accessor('quantity', {
         header: 'Qty',
@@ -148,7 +108,7 @@ const OrderTable = () => {
       }),
       columnHelper.accessor('total', {
         header: 'Total',
-        cell: ({ row }) => <Typography>{`$${row.original.total}`}</Typography>
+        cell: ({ row }) => <Typography>{`${formatCurrencyVND(getPriceForVariant((row.original.variant_id) as any * row.original.quantity)  || 0)}`}</Typography>
       })
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -156,7 +116,7 @@ const OrderTable = () => {
   )
 
   const table = useReactTable({
-    data: data as dataType[],
+    data: data as any[],
     columns,
     filterFns: {
       fuzzy: fuzzyFilter
@@ -245,7 +205,11 @@ const OrderTable = () => {
   )
 }
 
-const OrderDetailsCard = () => {
+interface Props {
+  orderData: OrderType
+}
+
+const OrderDetailsCard : FC<Props> = ({orderData}) => {
   return (
     <Card>
       <CardHeader
@@ -262,7 +226,7 @@ const OrderDetailsCard = () => {
           </Typography>
         }
       />
-      <OrderTable />
+      <OrderTable orderData={orderData} />
       <CardContent className='flex justify-end'>
         <div>
           <div className='flex items-center gap-12'>
@@ -270,7 +234,7 @@ const OrderDetailsCard = () => {
               Subtotal:
             </Typography>
             <Typography color='text.primary' className='font-medium'>
-              $2,093
+            {formatCurrencyVND(orderData.amount)}
             </Typography>
           </div>
           <div className='flex items-center gap-12'>
@@ -278,7 +242,7 @@ const OrderDetailsCard = () => {
               Shipping Fee:
             </Typography>
             <Typography color='text.primary' className='font-medium'>
-              $2
+              {formatCurrencyVND(0)}
             </Typography>
           </div>
           <div className='flex items-center gap-12'>
@@ -286,7 +250,7 @@ const OrderDetailsCard = () => {
               Tax:
             </Typography>
             <Typography color='text.primary' className='font-medium'>
-              $28
+            {formatCurrencyVND(0)}
             </Typography>
           </div>
           <div className='flex items-center gap-12'>
@@ -294,7 +258,7 @@ const OrderDetailsCard = () => {
               Total:
             </Typography>
             <Typography color='text.primary' className='font-medium'>
-              $2113
+            {formatCurrencyVND(orderData.amount)}
             </Typography>
           </div>
         </div>

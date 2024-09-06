@@ -72,8 +72,8 @@ export type OrderType = {
   status: StatusEnum,
   amount: number,
   items: {
-    _id: string,
-    variant_id: string,
+    _id: any,
+    variant_id: any,
     quantity: number,
   }[],
   user?: any,

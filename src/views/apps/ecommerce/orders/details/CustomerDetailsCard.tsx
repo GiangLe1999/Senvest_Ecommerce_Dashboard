@@ -14,19 +14,6 @@ import CustomAvatar from '@core/components/mui/Avatar'
 import EditUserInfo from '@components/dialogs/edit-user-info'
 import OpenDialogOnElementClick from '@components/dialogs/OpenDialogOnElementClick'
 
-// Util Imports
-import { getInitials } from '@/utils/getInitials'
-
-const getAvatar = (params: Pick<OrderType, 'avatar' | 'customer'>) => {
-  const { avatar, customer } = params
-
-  if (avatar) {
-    return <Avatar src={avatar} />
-  } else {
-    return <Avatar>{getInitials(customer as string)}</Avatar>
-  }
-}
-
 // Vars
 const userData = {
   firstName: 'Gabrielle',
@@ -55,12 +42,12 @@ const CustomerDetails = ({ orderData }: { orderData?: OrderType }) => {
       <CardContent className='flex flex-col gap-6'>
         <Typography variant='h5'>Customer details</Typography>
         <div className='flex items-center gap-3'>
-          {getAvatar({ avatar: orderData?.avatar ?? '', customer: orderData?.customer ?? '' })}
+        <Avatar src="" />
           <div className='flex flex-col'>
             <Typography color='text.primary' className='font-medium'>
-              {orderData?.customer}
+              {orderData?.user?.name || orderData?.not_user_info?.name}
             </Typography>
-            <Typography>Customer ID: #47389</Typography>
+            <Typography>Customer ID: # {orderData?.user?._id || "Unknown"}</Typography>
           </div>
         </div>
         <div className='flex items-center gap-3'>
@@ -68,7 +55,7 @@ const CustomerDetails = ({ orderData }: { orderData?: OrderType }) => {
             <i className='ri-shopping-cart-2-line' />
           </CustomAvatar>
           <Typography color='text.primary' className='font-medium'>
-            12 Orders
+            {orderData?.user?.orders || 0} Orders
           </Typography>
         </div>
         <div className='flex flex-col gap-1'>
@@ -83,8 +70,8 @@ const CustomerDetails = ({ orderData }: { orderData?: OrderType }) => {
               dialogProps={{ data: userData }}
             />
           </div>
-          <Typography>Email: {orderData?.email}</Typography>
-          <Typography>Mobile: +1 (609) 972-22-22</Typography>
+          <Typography>Email: {orderData?.user?.email || orderData?.not_user_info?.email}</Typography>
+          <Typography>Mobile: {orderData?.user_address?.phone || orderData?.not_user_info?.phone}</Typography>
         </div>
       </CardContent>
     </Card>

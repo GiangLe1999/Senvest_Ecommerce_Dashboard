@@ -1,4 +1,6 @@
 // MUI Imports
+import type { FC } from 'react'
+
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
@@ -10,6 +12,7 @@ import type { ThemeColor } from '@core/types'
 // Component Imports
 import AddAddress from '@components/dialogs/add-edit-address'
 import OpenDialogOnElementClick from '@components/dialogs/OpenDialogOnElementClick'
+import type { OrderType } from '@/types/apps/ecommerceTypes'
 
 // Vars
 const data = {
@@ -28,7 +31,11 @@ const data = {
   contact: '+1 (609) 972-22-22'
 }
 
-const BillingAddress = () => {
+interface Props {
+  orderData: OrderType
+}
+
+const BillingAddress : FC<Props> = ({orderData}) => {
   // Vars
   const typographyProps = (children: string, color: ThemeColor, className: string): TypographyProps => ({
     children,
@@ -50,15 +57,11 @@ const BillingAddress = () => {
             />
           </div>
           <div className='flex flex-col'>
-            <Typography>45 Roker Terrace</Typography>
-            <Typography>Latheronwheel</Typography>
-            <Typography>KW5 8NW, London</Typography>
-            <Typography>UK</Typography>
+          <Typography>{orderData?.user_address?.address || orderData?.not_user_info?.address}</Typography>
+          <Typography>{orderData?.user_address?.city || orderData?.not_user_info?.city}</Typography>
+          <Typography>{orderData?.user_address?.province || orderData?.not_user_info?.province}, {orderData?.user_address?.zip || orderData?.not_user_info?.zip}</Typography>
+          <Typography>Vietnam</Typography>
           </div>
-        </div>
-        <div className='flex flex-col gap-1'>
-          <Typography variant='h5'>Mastercard</Typography>
-          <Typography>Card Number: ******4291</Typography>
         </div>
       </CardContent>
     </Card>

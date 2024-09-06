@@ -16,12 +16,12 @@ const OrderDetails = ({ orderData, order }: { orderData?: OrderType; order: stri
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
-        <OrderDetailHeader orderData={orderData} order={order} />
+        <OrderDetailHeader orderData={orderData} />
       </Grid>
       <Grid item xs={12} md={8}>
         <Grid container spacing={6}>
           <Grid item xs={12}>
-            <OrderDetailsCard />
+            <OrderDetailsCard orderData={orderData as OrderType}/>
           </Grid>
           <Grid item xs={12}>
             <ShippingActivity order={order} />
@@ -34,10 +34,10 @@ const OrderDetails = ({ orderData, order }: { orderData?: OrderType; order: stri
             <CustomerDetails orderData={orderData} />
           </Grid>
           <Grid item xs={12}>
-            <ShippingAddress />
+            <ShippingAddress orderData={orderData as OrderType}/>
           </Grid>
           <Grid item xs={12}>
-            <BillingAddress />
+            <BillingAddress orderData={orderData as OrderType}/>
           </Grid>
         </Grid>
       </Grid>

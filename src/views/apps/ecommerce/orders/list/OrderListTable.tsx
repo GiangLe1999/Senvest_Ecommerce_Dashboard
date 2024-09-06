@@ -167,7 +167,7 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
         cell: ({ row }) => (
           <Typography
             component={Link}
-            href={`/apps/ecommerce/orders/details/${row.original.orderCode}`}
+            href={`/orders/details/${row.original._id}`}
             color="primary"
           >{`#${row.original.orderCode}`}</Typography>
         ),
@@ -184,7 +184,7 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
             <div className="flex flex-col">
               <Typography
                 component={Link}
-                href={"/apps/ecommerce/customers/details/879861"}
+                href={`/orders/details/${row.original._id}`}
                 color="text.primary"
                 className="font-medium hover:text-primary"
               >
@@ -242,7 +242,7 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
                 {
                   text: "View",
                   icon: "ri-eye-line",
-                  href: `/apps/ecommerce/orders/details/${row.original.orderCode}`,
+                  href: `/orders/details/${row.original._id}`,
                   linkProps: {
                     className: "flex items-center gap-2 is-full plb-2 pli-4",
                   },

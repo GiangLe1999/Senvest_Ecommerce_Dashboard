@@ -300,3 +300,12 @@ export const getOrders = async () => {
     console.log(error);
   }
 };
+
+export const getOrderById = async (_id: string) => {
+  try {
+    const { data } = await axiosInstance(`/admin-payments/${_id}`);
+
+    return data;
+  } catch (error) {
+    console.log(error);
+  }}
