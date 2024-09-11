@@ -11,7 +11,7 @@ import Grid from '@mui/material/Grid'
 import type { Customer } from '@/types/apps/ecommerceTypes'
 
 // Component Imports
-import CustomerDetailsHeader from './CustomerDetailsHeader'
+// import CustomerDetailsHeader from './CustomerDetailsHeader'
 import CustomerLeftOverview from './customer-left-overview'
 import CustomerRight from './customer-right'
 

@@ -88,25 +88,25 @@ const AddCustomerDrawer = (props: Props) => {
     }
   })
 
-  const onSubmit = (data: FormValidateType) => {
-    const newData: Customer = {
-      id: (customerData?.length && customerData?.length + 1) || 1,
-      customer: data.fullName,
-      customerId: customerData?.[Math.floor(Math.random() * 100) + 1].customerId ?? '1',
-      email: data.email,
-      country: `${country[data.country].country}`,
-      countryCode: 'st',
-      countryFlag: `/images/cards/${data.country}.png`,
-      order: Math.floor(Math.random() * 1000) + 1,
-      totalSpent: Math.random() * (10000 - 500 + 1) + 500,
-      avatar: `/images/avatars/${Math.floor(Math.random() * 8) + 1}.png`
-    }
+  // const onSubmit = (data: FormValidateType) => {
+  //   const newData: Customer = {
+  //     id: (customerData?.length && customerData?.length + 1) || 1,
+  //     customer: data.fullName,
+  //     customerId: customerData?.[Math.floor(Math.random() * 100) + 1].customerId ?? '1',
+  //     email: data.email,
+  //     country: `${country[data.country].country}`,
+  //     countryCode: 'st',
+  //     countryFlag: `/images/cards/${data.country}.png`,
+  //     order: Math.floor(Math.random() * 1000) + 1,
+  //     totalSpent: Math.random() * (10000 - 500 + 1) + 500,
+  //     avatar: `/images/avatars/${Math.floor(Math.random() * 8) + 1}.png`
+  //   }
 
-    setData([...(customerData ?? []), newData])
-    resetForm({ fullName: '', email: '', country: '' })
-    setFormData(initialData)
-    handleClose()
-  }
+  //   setData([...(customerData ?? []), newData])
+  //   resetForm({ fullName: '', email: '', country: '' })
+  //   setFormData(initialData)
+  //   handleClose()
+  // }
 
   const handleReset = () => {
     handleClose()
@@ -132,7 +132,10 @@ const AddCustomerDrawer = (props: Props) => {
       <Divider />
       <PerfectScrollbar options={{ wheelPropagation: false, suppressScrollX: true }}>
         <div className='p-5'>
-          <form onSubmit={handleSubmit(data => onSubmit(data))} className='flex flex-col gap-5'>
+          <form 
+
+          // onSubmit={handleSubmit(data => onSubmit(data))}
+           className='flex flex-col gap-5'>
             <Typography color='text.primary' className='font-medium'>
               Basic Information
             </Typography>
