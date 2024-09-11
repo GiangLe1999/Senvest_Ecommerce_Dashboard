@@ -135,7 +135,7 @@ const columnHelper = createColumnHelper<ECommerceOrderTypeWithAction>();
 const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
   // States
   const [rowSelection, setRowSelection] = useState({});
-  /* eslint-disable @typescript-eslint/no-unused-vars */
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [data, setData] = useState(...[orderData]);
   const [globalFilter, setGlobalFilter] = useState("");
 
