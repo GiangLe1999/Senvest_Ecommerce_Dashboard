@@ -10,6 +10,7 @@ export type Customer = {
   is_verified: boolean;
   orders?: number;
   total_spent?: number;
+  createdAt: Date;
 };
 
 export type ReferralsType = {

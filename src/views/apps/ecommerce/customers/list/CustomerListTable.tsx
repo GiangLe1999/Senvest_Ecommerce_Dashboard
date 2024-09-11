@@ -168,7 +168,7 @@ const CustomerListTable = ({ customerData }: { customerData?: Customer[] }) => {
               <Typography
                 component={Link}
                 color='text.primary'
-                href={`/apps/ecommerce/customers/details/`}
+                href={`/customers/details/${row.original._id}`}
                 className='font-medium hover:text-primary'
               >
                 {row.original.name}

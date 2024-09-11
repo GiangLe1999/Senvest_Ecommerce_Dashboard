@@ -31,11 +31,11 @@ const tabContentList = (): { [key: string]: ReactElement } => ({
   notifications: <NotificationsTab />
 })
 
-const CustomerDetails = ({ customerData, customerId }: { customerData?: Customer; customerId: string }) => {
+const CustomerDetails = ({ customerData, customerId, customerAddresses, customerOrders }: { customerData?: Customer; customerId: string, customerAddresses: any[], customerOrders: any[] }) => {
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
-        <CustomerDetailsHeader customerId={customerId} />
+        <CustomerDetailsHeader customerData={customerData} customerId={customerId} />
       </Grid>
       <Grid item xs={12} md={4}>
         <CustomerLeftOverview customerData={customerData} />

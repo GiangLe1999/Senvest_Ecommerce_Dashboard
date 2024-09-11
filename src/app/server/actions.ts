@@ -308,7 +308,7 @@ export const getOrderById = async (_id: string) => {
     return data;
   } catch (error) {
     console.log(error);
-  }}
+}}
 
 
   // Users
@@ -322,3 +322,12 @@ export const getAllUsers = async () => {
     }
 }
   
+
+export const getUserById = async (_id: string) => {
+  try {
+    const { data } = await axiosInstance(`/admin-users/${_id}`);
+
+    return data;
+  } catch (error) {
+    console.log(error);
+}}

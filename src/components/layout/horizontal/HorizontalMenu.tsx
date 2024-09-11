@@ -117,7 +117,7 @@ const HorizontalMenu = () => {
          href={`/orders/list`}
           icon={<i className="ri-refund-2-line" />}
           exactMatch={false}
-          activeUrl="/dashboard"
+          activeUrl="/orders"
         >
           Orders
         </MenuItem>
