@@ -69,6 +69,7 @@ const initialData = {
 
 const AddCustomerDrawer = (props: Props) => {
   // Props
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const { open, handleClose, setData, customerData } = props
 
   // States
@@ -78,6 +79,7 @@ const AddCustomerDrawer = (props: Props) => {
   const {
     control,
     reset: resetForm,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     handleSubmit,
     formState: { errors }
   } = useForm<FormValidateType>({

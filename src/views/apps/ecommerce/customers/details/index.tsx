@@ -31,6 +31,7 @@ const tabContentList = (): { [key: string]: ReactElement } => ({
   notifications: <NotificationsTab />
 })
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const CustomerDetails = ({ customerData, customerId, customerAddresses, customerOrders }: { customerData?: Customer; customerId: string, customerAddresses: any[], customerOrders: any[] }) => {
   return (
     <Grid container spacing={6}>
