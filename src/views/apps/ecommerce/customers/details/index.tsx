@@ -35,7 +35,7 @@ const CustomerDetails = ({ customerData, customerId, customerAddresses, customer
   return (
     <Grid container spacing={6}>
       <Grid item xs={12}>
-        <CustomerDetailsHeader customerData={customerData} customerId={customerId} />
+        {/* <CustomerDetailsHeader customerData={customerData} customerId={customerId} /> */}
       </Grid>
       <Grid item xs={12} md={4}>
         <CustomerLeftOverview customerData={customerData} />
