@@ -4,14 +4,15 @@
 import { useState, useEffect, useMemo } from 'react'
 
 // Next Imports
-import Link from 'next/link'
-import { useParams } from 'next/navigation'
+// import Link from 'next/link'
+// import { useParams } from 'next/navigation'
 
 // MUI Imports
 import Card from '@mui/material/Card'
 import CardContent from '@mui/material/CardContent'
 import Typography from '@mui/material/Typography'
-import Chip from '@mui/material/Chip'
+
+// import Chip from '@mui/material/Chip'
 import TextField from '@mui/material/TextField'
 import TablePagination from '@mui/material/TablePagination'
 import type { TextFieldProps } from '@mui/material/TextField'
@@ -20,7 +21,8 @@ import type { TextFieldProps } from '@mui/material/TextField'
 import classnames from 'classnames'
 import { rankItem } from '@tanstack/match-sorter-utils'
 import {
-  createColumnHelper,
+
+  // createColumnHelper,
   flexRender,
   getCoreRowModel,
   useReactTable,
@@ -37,13 +39,14 @@ import type { RankingInfo } from '@tanstack/match-sorter-utils'
 // Type Imports
 import type { ThemeColor } from '@core/types'
 import type { OrderType } from '@/types/apps/ecommerceTypes'
-import type { Locale } from '@configs/i18n'
+
+// import type { Locale } from '@configs/i18n'
 
 // Component Imports
-import OptionMenu from '@core/components/option-menu'
+// import OptionMenu from '@core/components/option-menu'
 
 // Util Imports
-import { getLocalizedUrl } from '@/utils/i18n'
+// import { getLocalizedUrl } from '@/utils/i18n'
 
 // Style Imports
 import tableStyles from '@core/styles/table.module.css'
@@ -127,7 +130,7 @@ const DebouncedInput = ({
 }
 
 // Column Definitions
-const columnHelper = createColumnHelper<ECommerceOrderTypeWithAction>()
+// const columnHelper = createColumnHelper<ECommerceOrderTypeWithAction>()
 
 const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
   // States
@@ -136,67 +139,67 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
   const [globalFilter, setGlobalFilter] = useState('')
 
   // Hooks
-  const { lang: locale } = useParams()
+  // const { lang: locale } = useParams()
 
   const columns = useMemo<ColumnDef<ECommerceOrderTypeWithAction, any>[]>(
     () => [
-      columnHelper.accessor('order', {
-        header: 'order',
-        cell: ({ row }) => (
-          <Typography
-            component={Link}
-            href={getLocalizedUrl(`/apps/ecommerce/orders/details/${row.original.order}`, locale as Locale)}
-            color='primary'
-          >{`#${row.original.order}`}</Typography>
-        )
-      }),
-      columnHelper.accessor('date', {
-        header: 'Date',
-        cell: ({ row }) => <Typography>{`${new Date(row.original.date).toDateString()}`}</Typography>
-      }),
-      columnHelper.accessor('status', {
-        header: 'Status',
-        cell: ({ row }) => (
-          <Chip
-            label={row.original.status}
-            color={statusChipColor[row.original.status].color}
-            variant='tonal'
-            size='small'
-          />
-        )
-      }),
-      columnHelper.accessor('spent', {
-        header: 'Spent',
-        cell: ({ row }) => <Typography>${row.original.spent}</Typography>
-      }),
-      columnHelper.accessor('action', {
-        header: 'Actions',
-        cell: ({ row }) => (
-          <div className='flex items-center'>
-            <OptionMenu
-              iconButtonProps={{ size: 'medium' }}
-              iconClassName='text-textSecondary text-[22px]'
-              options={[
-                {
-                  text: 'View',
-                  icon: 'ri-eye-line',
-                  href: getLocalizedUrl(`/apps/ecommerce/orders/details/${row.original.order}`, locale as Locale),
-                  linkProps: { className: 'flex items-center gap-2 is-full plb-1.5 pli-4' }
-                },
-                {
-                  text: 'Delete',
-                  icon: 'ri-delete-bin-7-line text-[22px]',
-                  menuItemProps: {
-                    onClick: () => setData(data?.filter(order => order.id !== row.original.id)),
-                    className: 'flex items-center pli-4'
-                  }
-                }
-              ]}
-            />
-          </div>
-        ),
-        enableSorting: false
-      })
+      // columnHelper.accessor('order', {
+      //   header: 'order',
+      //   cell: ({ row }) => (
+      //     <Typography
+      //       component={Link}
+      //       href={getLocalizedUrl(`/apps/ecommerce/orders/details/${row.original.order}`, locale as Locale)}
+      //       color='primary'
+      //     >{`#${row.original.order}`}</Typography>
+      //   )
+      // }),
+      // columnHelper.accessor('date', {
+      //   header: 'Date',
+      //   cell: ({ row }) => <Typography>{`${new Date(row.original.date).toDateString()}`}</Typography>
+      // }),
+      // columnHelper.accessor('status', {
+      //   header: 'Status',
+      //   cell: ({ row }) => (
+      //     <Chip
+      //       label={row.original.status}
+      //       color={statusChipColor[row.original.status].color}
+      //       variant='tonal'
+      //       size='small'
+      //     />
+      //   )
+      // }),
+      // columnHelper.accessor('spent', {
+      //   header: 'Spent',
+      //   cell: ({ row }) => <Typography>${row.original.spent}</Typography>
+      // }),
+      // columnHelper.accessor('action', {
+      //   header: 'Actions',
+      //   cell: ({ row }) => (
+      //     <div className='flex items-center'>
+      //       <OptionMenu
+      //         iconButtonProps={{ size: 'medium' }}
+      //         iconClassName='text-textSecondary text-[22px]'
+      //         options={[
+      //           {
+      //             text: 'View',
+      //             icon: 'ri-eye-line',
+      //             href: getLocalizedUrl(`/apps/ecommerce/orders/details/${row.original.order}`, locale as Locale),
+      //             linkProps: { className: 'flex items-center gap-2 is-full plb-1.5 pli-4' }
+      //           },
+      //           {
+      //             text: 'Delete',
+      //             icon: 'ri-delete-bin-7-line text-[22px]',
+      //             menuItemProps: {
+      //               onClick: () => setData(data?.filter(order => order.id !== row.original.id)),
+      //               className: 'flex items-center pli-4'
+      //             }
+      //           }
+      //         ]}
+      //       />
+      //     </div>
+      //   ),
+      //   enableSorting: false
+      // })
     ],
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [data]
