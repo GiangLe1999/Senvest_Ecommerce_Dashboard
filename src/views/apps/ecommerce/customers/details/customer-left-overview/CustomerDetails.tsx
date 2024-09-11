@@ -8,6 +8,8 @@ import Button from '@mui/material/Button'
 import type { ButtonProps } from '@mui/material/Button'
 
 // Type Imports
+import { Avatar } from '@mui/material'
+
 import type { Customer } from '@/types/apps/ecommerceTypes'
 
 // Component Imports
@@ -27,10 +29,10 @@ const CustomerDetails = ({ customerData }: { customerData?: Customer }) => {
       <CardContent className='flex flex-col pbs-12 gap-6'>
         <div className='flex flex-col justify-self-center items-center gap-6'>
           <div className='flex flex-col items-center gap-4'>
-            <CustomAvatar src={customerData?.avatar} variant='rounded' alt='Customer Avatar' size={120} />
+            <Avatar src = "" sizes='120px'/>
             <div className='flex flex-col items-center'>
-              <Typography variant='h5'>{customerData?.customer}</Typography>
-              <Typography>Customer ID #{customerData?.customerId}</Typography>
+              {/* <Typography variant='h5'>{customerData?.customer}</Typography>
+              <Typography>Customer ID #{customerData?.customerId}</Typography> */}
             </div>
           </div>
           <div className='flex items-center justify-center gap-x-12 gap-y-3 flex-wrap'>
@@ -39,7 +41,7 @@ const CustomerDetails = ({ customerData }: { customerData?: Customer }) => {
                 <i className='ri-shopping-cart-2-line' />
               </CustomAvatar>
               <div>
-                <Typography variant='h5'>{customerData?.order}</Typography>
+                {/* <Typography variant='h5'>{customerData?.order}</Typography> */}
                 <Typography>Orders</Typography>
               </div>
             </div>
@@ -48,7 +50,7 @@ const CustomerDetails = ({ customerData }: { customerData?: Customer }) => {
                 <i className='ri-money-dollar-circle-line' />
               </CustomAvatar>
               <div>
-                <Typography variant='h5'>${customerData?.totalSpent}</Typography>
+                {/* <Typography variant='h5'>${customerData?.totalSpent}</Typography> */}
                 <Typography>Spent</Typography>
               </div>
             </div>
@@ -62,7 +64,7 @@ const CustomerDetails = ({ customerData }: { customerData?: Customer }) => {
               <Typography color='text.primary' className='font-medium'>
                 Username:
               </Typography>
-              <Typography>{customerData?.customer}</Typography>
+              {/* <Typography>{customerData?.customer}</Typography> */}
             </div>
             <div className='flex items-center gap-1'>
               <Typography color='text.primary' className='font-medium'>
@@ -86,7 +88,7 @@ const CustomerDetails = ({ customerData }: { customerData?: Customer }) => {
               <Typography color='text.primary' className='font-medium'>
                 Country:
               </Typography>
-              <Typography>{customerData?.country}</Typography>
+              {/* <Typography>{customerData?.country}</Typography> */}
             </div>
           </div>
         </div>
