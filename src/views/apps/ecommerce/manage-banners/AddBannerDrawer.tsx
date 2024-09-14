@@ -37,6 +37,14 @@ type FormValues = {
   status: string;
   order: string;
   link: string;
+  line_1_vi: string;
+  line_1_en: string;
+  line_2_vi: string;
+  line_2_en: string;
+  line_3_vi: string;
+  line_3_en: string;
+  button_text_vi: string;
+  button_text_en: string;
 };
 
 const AddBannerDrawer = (props: Props) => {
@@ -63,6 +71,14 @@ const AddBannerDrawer = (props: Props) => {
       status: "",
       order: "",
       link: "",
+      line_1_vi: "",
+      line_1_en: "",
+      line_2_vi: "",
+      line_2_en: "",
+      line_3_vi: "",
+      line_3_en: "",
+      button_text_vi: "",
+      button_text_en: "",
     },
   });
 
@@ -86,6 +102,14 @@ const AddBannerDrawer = (props: Props) => {
     formData.append("status", formValues.status);
     formData.append("order", formValues.order);
     formData.append("link", formValues.link);
+    formData.append("line_1_vi", formValues.line_1_vi);
+    formData.append("line_1_en", formValues.line_1_en);
+    formData.append("line_2_vi", formValues.line_1_vi);
+    formData.append("line_2_en", formValues.line_2_en);
+    formData.append("line_3_vi", formValues.line_3_vi);
+    formData.append("line_3_en", formValues.line_3_en);
+    formData.append("button_text_vi", formValues.button_text_vi);
+    formData.append("button_text_en", formValues.button_text_en);
 
     try {
       const result = await createBanner(formData);
@@ -102,6 +126,14 @@ const AddBannerDrawer = (props: Props) => {
             link: result?.banner?.link,
             order: result?.banner?.order,
             image: result?.banner?.image,
+            line_1_vi: result?.banner?.line_1_vi,
+            line_1_en: result?.banner?.line_1_en,
+            line_2_vi: result?.banner?.line_2_vi,
+            line_2_en: result?.banner?.line_2_en,
+            line_3_vi: result?.banner?.line_3_vi,
+            line_3_en: result?.banner?.line_3_en,
+            button_text_vi: result?.banner?.button_text_vi,
+            button_text_en: result?.banner?.button_text_en,
           },
         ]);
       } else {
@@ -211,6 +243,151 @@ const AddBannerDrawer = (props: Props) => {
               </FormControl>
             )}
           />
+
+          <div className="grid grid-cols-2 gap-4">
+            <Controller
+              name="line_1_vi"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="Vietnamese Line 1"
+                  placeholder="Vietnamese Line 1"
+                  {...(errors.link && {
+                    error: true,
+                    helperText: "This field is required.",
+                  })}
+                />
+              )}
+            />
+
+            <Controller
+              name="line_1_en"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="English Line 1"
+                  placeholder="English Line 1"
+                  {...(errors.link && {
+                    error: true,
+                    helperText: "This field is required.",
+                  })}
+                />
+              )}
+            />
+
+            <Controller
+              name="line_2_vi"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="Vietnamese Line 2"
+                  placeholder="Vietnamese Line 2"
+                  {...(errors.link && {
+                    error: true,
+                    helperText: "This field is required.",
+                  })}
+                />
+              )}
+            />
+
+            <Controller
+              name="line_2_en"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="English Line 2"
+                  placeholder="English Line 2"
+                  {...(errors.link && {
+                    error: true,
+                    helperText: "This field is required.",
+                  })}
+                />
+              )}
+            />
+            <Controller
+              name="line_3_vi"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="Vietnamese Line 3"
+                  placeholder="Vietnamese Line 3"
+                  {...(errors.link && {
+                    error: true,
+                    helperText: "This field is required.",
+                  })}
+                />
+              )}
+            />
+
+            <Controller
+              name="line_3_en"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="English Line 3"
+                  placeholder="English Line 3"
+                  {...(errors.link && {
+                    error: true,
+                    helperText: "This field is required.",
+                  })}
+                />
+              )}
+            />
+
+            <Controller
+              name="button_text_vi"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="Vietnamese Button"
+                  placeholder="Vietnamese Button"
+                  {...(errors.link && {
+                    error: true,
+                    helperText: "This field is required.",
+                  })}
+                />
+              )}
+            />
+
+            <Controller
+              name="button_text_en"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="English Button"
+                  placeholder="English Button"
+                  {...(errors.link && {
+                    error: true,
+                    helperText: "This field is required.",
+                  })}
+                />
+              )}
+            />
+          </div>
 
           <Controller
             name="order"

@@ -28,7 +28,7 @@ import type { bannerType } from "./BannerListTable";
 import { getChangedFields } from "@/utils/getChangedFields";
 
 type Props = {
-  originalBanner: bannerType | undefined;
+  originalBanner: any | undefined;
   open: boolean;
   handleClose: () => void;
   setData: Dispatch<SetStateAction<bannerType[]>>;
@@ -40,6 +40,14 @@ type FormValues = {
   status: string;
   order: string;
   link: string;
+  line_1_vi: string;
+  line_1_en: string;
+  line_2_vi: string;
+  line_2_en: string;
+  line_3_vi: string;
+  line_3_en: string;
+  button_text_vi: string;
+  button_text_en: string;
 };
 
 const EditBannerDrawer = (props: Props) => {
@@ -66,6 +74,14 @@ const EditBannerDrawer = (props: Props) => {
       status: "",
       order: "",
       link: "",
+      line_1_vi: "",
+      line_1_en: "",
+      line_2_vi: "",
+      line_2_en: "",
+      line_3_vi: "",
+      line_3_en: "",
+      button_text_vi: "",
+      button_text_en: "",
     },
   });
 
@@ -77,6 +93,14 @@ const EditBannerDrawer = (props: Props) => {
       status: originalBanner?.status,
       image: originalBanner?.image || "",
       link: originalBanner?.link || "",
+      line_1_vi: originalBanner?.line_1.vi,
+      line_1_en: originalBanner?.line_1.en,
+      line_2_vi: originalBanner?.line_2.vi,
+      line_2_en: originalBanner?.line_2.en,
+      line_3_vi: originalBanner?.line_3.vi,
+      line_3_en: originalBanner?.line_3.en,
+      button_text_vi: originalBanner?.button_text.vi,
+      button_text_en: originalBanner?.button_text.en,
     };
 
     const formattedFormValues = {
@@ -85,6 +109,14 @@ const EditBannerDrawer = (props: Props) => {
       status: formValues.status,
       image: fileName,
       link: formValues.link,
+      line_1_vi: formValues.line_1_vi,
+      line_1_en: formValues.line_1_en,
+      line_2_vi: formValues.line_2_vi,
+      line_2_en: formValues.line_2_en,
+      line_3_vi: formValues.line_3_vi,
+      line_3_en: formValues.line_3_en,
+      button_text_vi: formValues.button_text_vi,
+      button_text_en: formValues.button_text_en,
     };
 
     const changedFields = getChangedFields({
@@ -126,6 +158,38 @@ const EditBannerDrawer = (props: Props) => {
       formData.append("link", formValues.link);
     }
 
+    if (changedFields.line_1_vi) {
+      formData.append("line_1_vi", formValues.line_1_vi);
+    }
+
+    if (changedFields.line_1_en) {
+      formData.append("line_1_en", formValues.line_1_en);
+    }
+
+    if (changedFields.line_2_vi) {
+      formData.append("line_2_vi", formValues.line_2_vi);
+    }
+
+    if (changedFields.line_2_en) {
+      formData.append("line_2_en", formValues.line_2_en);
+    }
+
+    if (changedFields.line_3_vi) {
+      formData.append("line_3_vi", formValues.line_3_vi);
+    }
+
+    if (changedFields.line_3_en) {
+      formData.append("line_3_en", formValues.line_3_en);
+    }
+
+    if (changedFields.button_text_vi) {
+      formData.append("button_text_vi", formValues.button_text_vi);
+    }
+
+    if (changedFields.button_text_en) {
+      formData.append("button_text_en", formValues.button_text_en);
+    }
+
     try {
       const result = await updateBanner(formData);
 
@@ -147,7 +211,23 @@ const EditBannerDrawer = (props: Props) => {
             order: newBanner?.order,
             status: newBanner?.status,
             link: newBanner?.link,
-          };
+            line_1: {
+              vi: formValues.line_1_vi,
+              en: formValues.line_1_en,
+            },
+            line_2: {
+              vi: formValues.line_2_vi,
+              en: formValues.line_2_en,
+            },
+            line_3: {
+              vi: formValues.line_3_vi,
+              en: formValues.line_3_en,
+            },
+            button_text: {
+              vi: formValues.button_text_vi,
+              en: formValues.button_text_en,
+            },
+          } as any;
 
           return newData;
         });
@@ -180,6 +260,14 @@ const EditBannerDrawer = (props: Props) => {
       setValue("status", originalBanner?.status);
       setValue("order", originalBanner?.order);
       setValue("link", originalBanner?.link);
+      setValue("line_1_vi", originalBanner?.line_1.vi);
+      setValue("line_1_en", originalBanner?.line_1.en);
+      setValue("line_2_vi", originalBanner?.line_2.vi);
+      setValue("line_2_en", originalBanner?.line_2.en);
+      setValue("line_3_vi", originalBanner?.line_3.vi);
+      setValue("line_3_en", originalBanner?.line_3.en);
+      setValue("button_text_vi", originalBanner?.button_text.vi);
+      setValue("button_text_en", originalBanner?.button_text.en);
       setFileName(originalBanner?.image);
     }
   }, [originalBanner, setValue]);
@@ -255,6 +343,151 @@ const EditBannerDrawer = (props: Props) => {
               </FormControl>
             )}
           />
+
+          <div className="grid grid-cols-2 gap-4">
+            <Controller
+              name="line_1_vi"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="Vietnamese Line 1"
+                  placeholder="Vietnamese Line 1"
+                  {...(errors.link && {
+                    error: true,
+                    helperText: "This field is required.",
+                  })}
+                />
+              )}
+            />
+
+            <Controller
+              name="line_1_en"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="English Line 1"
+                  placeholder="English Line 1"
+                  {...(errors.link && {
+                    error: true,
+                    helperText: "This field is required.",
+                  })}
+                />
+              )}
+            />
+
+            <Controller
+              name="line_2_vi"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="Vietnamese Line 2"
+                  placeholder="Vietnamese Line 2"
+                  {...(errors.link && {
+                    error: true,
+                    helperText: "This field is required.",
+                  })}
+                />
+              )}
+            />
+
+            <Controller
+              name="line_2_en"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="English Line 2"
+                  placeholder="English Line 2"
+                  {...(errors.link && {
+                    error: true,
+                    helperText: "This field is required.",
+                  })}
+                />
+              )}
+            />
+            <Controller
+              name="line_3_vi"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="Vietnamese Line 3"
+                  placeholder="Vietnamese Line 3"
+                  {...(errors.link && {
+                    error: true,
+                    helperText: "This field is required.",
+                  })}
+                />
+              )}
+            />
+
+            <Controller
+              name="line_3_en"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="English Line 3"
+                  placeholder="English Line 3"
+                  {...(errors.link && {
+                    error: true,
+                    helperText: "This field is required.",
+                  })}
+                />
+              )}
+            />
+
+            <Controller
+              name="button_text_vi"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="Vietnamese Button"
+                  placeholder="Vietnamese Button"
+                  {...(errors.link && {
+                    error: true,
+                    helperText: "This field is required.",
+                  })}
+                />
+              )}
+            />
+
+            <Controller
+              name="button_text_en"
+              control={control}
+              rules={{ required: true }}
+              render={({ field }) => (
+                <TextField
+                  {...field}
+                  fullWidth
+                  label="English Button"
+                  placeholder="English Button"
+                  {...(errors.link && {
+                    error: true,
+                    helperText: "This field is required.",
+                  })}
+                />
+              )}
+            />
+          </div>
 
           <Controller
             name="order"

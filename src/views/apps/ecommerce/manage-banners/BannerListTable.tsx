@@ -69,8 +69,16 @@ export type bannerType = {
   name: string;
   image: string;
   status: string;
-  order: string;
   link: string;
+  order: string;
+  line_1_vi: string;
+  line_1_en: string;
+  line_2_vi: string;
+  line_2_en: string;
+  line_3_vi: string;
+  line_3_en: string;
+  button_text_vi: string;
+  button_text_en: string;
 };
 
 type BannerWithActionsType = bannerType & {
@@ -343,7 +351,7 @@ const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
           rowsPerPageOptions={[10, 15, 25]}
           component="div"
           className="border-bs"
-          count={table.getFilteredRowModel().rows.length}
+          count={table?.getFilteredRowModel()?.rows?.length}
           rowsPerPage={table.getState().pagination.pageSize}
           page={table.getState().pagination.pageIndex}
           onPageChange={(_, page) => {

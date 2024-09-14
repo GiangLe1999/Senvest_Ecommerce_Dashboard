@@ -119,7 +119,7 @@ const DebouncedInput = ({
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      onChange(value)
+      onChange(value) 
     }, debounce)
 
     return () => clearTimeout(timeout)
