@@ -39,7 +39,7 @@ import tableStyles from "@core/styles/table.module.css";
 import type { ThemeColor } from "@/@core/types";
 import DeleteConfirmDialog from "@/views/dashboards/ecommerce/DeleteConfirmDialog";
 import EditBannerDrawer from "./EditBannerDrawer";
-import AddCouponDrawer from "../coupons/AddCouponDrawer";
+import AddBannerDrawer from "./AddBannerDrawer";
 
 type bannerStatusType = {
   [key: string]: {
@@ -360,7 +360,7 @@ const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
           onRowsPerPageChange={(e) => table.setPageSize(Number(e.target.value))}
         />
       </Card>
-      <AddCouponDrawer
+      <AddBannerDrawer
         open={addBannerOpen}
         setData={setData}
         handleClose={() => setAddBannerOpen(!addBannerOpen)}
