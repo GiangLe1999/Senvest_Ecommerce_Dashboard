@@ -135,11 +135,10 @@ export const deleteProduct = async (_id: string) => {
   return data;
 };
 
-
 export const removeProductVideos = async (_id: string) => {
-  const { data } = await axiosInstance.put(
-    "/admin-products/delete-videos",
-    {_id});
+  const { data } = await axiosInstance.put("/admin-products/delete-videos", {
+    _id,
+  });
 
   return data;
 };
@@ -159,21 +158,15 @@ export const createVariant = async (formData: FormData) => {
   return data;
 };
 
-
 export const updateVariant = async (formData: FormData) => {
-  const { data } = await axiosInstance.put(
-    "/admin-variants/update",
-    formData,
-    {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+  const { data } = await axiosInstance.put("/admin-variants/update", formData, {
+    headers: {
+      "Content-Type": "multipart/form-data",
     },
-  );
+  });
 
   return data;
 };
-
 
 // Banners
 export const getAdminBanners = async () => {
@@ -256,7 +249,6 @@ export const deleteSlogan = async (_id: string) => {
   return data;
 };
 
-
 // Reviews
 export const getTotalReviews = async () => {
   try {
@@ -270,25 +262,27 @@ export const getTotalReviews = async () => {
 
 export const publishReview = async ({ _id }: { _id: string }) => {
   try {
-    const { data } = await axiosInstance.put("/admin-reviews/publish-review", { _id });
+    const { data } = await axiosInstance.put("/admin-reviews/publish-review", {
+      _id,
+    });
 
     return data;
   } catch (error) {
     console.log(error);
   }
 };
-
 
 export const deleteReview = async ({ _id }: { _id: string }) => {
   try {
-    const { data } = await axiosInstance.delete("/admin-reviews/delete-review/" + _id);
+    const { data } = await axiosInstance.delete(
+      "/admin-reviews/delete-review/" + _id,
+    );
 
     return data;
   } catch (error) {
     console.log(error);
   }
 };
-
 
 // Orders
 export const getOrders = async () => {
@@ -308,20 +302,19 @@ export const getOrderById = async (_id: string) => {
     return data;
   } catch (error) {
     console.log(error);
-}}
+  }
+};
 
-
-  // Users
+// Users
 export const getAllUsers = async () => {
-    try {
-      const { data } = await axiosInstance(`/admin-users`);
-  
-      return data;
-    } catch (error) {
-      console.log(error);
-    }
-}
-  
+  try {
+    const { data } = await axiosInstance(`/admin-users`);
+
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
 
 export const getUserById = async (_id: string) => {
   try {
@@ -330,4 +323,46 @@ export const getUserById = async (_id: string) => {
     return data;
   } catch (error) {
     console.log(error);
-}}
+  }
+};
+
+// Coupons
+export const getAdminCoupons = async () => {
+  try {
+    const { data } = await axiosInstance("/admin-coupons");
+
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+export const createCoupon = async (body: {
+  code: string;
+  discount_value: number;
+  discount_type: "Percent" | "Value";
+  expiry_date: Date;
+  assigned_to_email?: string;
+}) => {
+  const { data } = await axiosInstance.post("/admin-coupons/create", body);
+
+  return data;
+};
+
+export const updateCoupon = async (updateData: {
+  code?: string;
+  discount_value?: number;
+  discount_type?: "Percent" | "Value";
+  expiry_date?: Date;
+  assigned_to_email?: string;
+}) => {
+  const { data } = await axiosInstance.put("/admin-coupons/update", updateData);
+
+  return data;
+};
+
+export const deleteCoupon = async (_id: string) => {
+  const { data } = await axiosInstance.delete(`/admin-coupons/delete/${_id}`);
+
+  return data;
+};

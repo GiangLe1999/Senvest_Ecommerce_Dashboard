@@ -31,26 +31,30 @@ import {
 } from "@mui/material";
 import { toast } from "react-toastify";
 
-import { deleteBanner } from "@/app/server/actions";
+import { deleteBanner, deleteCoupon } from "@/app/server/actions";
 import DebouncedInput from "@/components/DebouncedInput";
 
 // Style Imports
 import tableStyles from "@core/styles/table.module.css";
+import AddBannerDrawer from "./AddCouponDrawer";
 import type { ThemeColor } from "@/@core/types";
 import DeleteConfirmDialog from "@/views/dashboards/ecommerce/DeleteConfirmDialog";
-import EditBannerDrawer from "./EditBannerDrawer";
-import AddCouponDrawer from "../coupons/AddCouponDrawer";
+import EditBannerDrawer from "./EditCouponDrawer";
+import { formatCurrencyVND } from "@/libs/utils";
+import AddCouponDrawer from "./AddCouponDrawer";
+import EditCouponDrawer from "./EditCouponDrawer";
 
-type bannerStatusType = {
+type couponStatusType = {
   [key: string]: {
     title: string;
     color: ThemeColor;
   };
 };
 
-const bannerStatusObj: bannerStatusType = {
+const couponStatusObj: couponStatusType = {
   Active: { title: "Active", color: "success" },
-  Inactive: { title: "Inactive", color: "error" },
+  Expired: { title: "Expired", color: "error" },
+  Used: { title: "Used", color: "warning" },
 };
 
 interface Props {}
@@ -64,24 +68,18 @@ declare module "@tanstack/table-core" {
   }
 }
 
-export type bannerType = {
+export type couponType = {
   _id: string;
-  name: string;
-  image: string;
-  status: string;
-  link: string;
-  order: string;
-  line_1_vi: string;
-  line_1_en: string;
-  line_2_vi: string;
-  line_2_en: string;
-  line_3_vi: string;
-  line_3_en: string;
-  button_text_vi: string;
-  button_text_en: string;
+  code: string;
+  status: "Active" | "Expired" | "Used";
+  discount_value: number;
+  expiry_date: Date;
+  usage_count: number;
+  assigned_to_email?: string;
+  discount_type: "Percent" | "Value";
 };
 
-type BannerWithActionsType = bannerType & {
+type CouponWithActionsType = couponType & {
   actions?: string;
 };
 
@@ -99,72 +97,59 @@ const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
 };
 
 // Column Definitions
-const columnHelper = createColumnHelper<BannerWithActionsType>();
+const columnHelper = createColumnHelper<CouponWithActionsType>();
 
 interface Props {
-  banners: bannerType[];
+  coupons: couponType[];
 }
 
-const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
+const CouponListTable: FC<Props> = ({ coupons }): JSX.Element => {
   // States
-  const [addBannerOpen, setAddBannerOpen] = useState(false);
-  const [editBannerOpen, setEditBannerOpen] = useState(false);
-  const [editedBanner, setEditedBanner] = useState<bannerType>();
-  const [deleteBannerOpen, setDeleteBannerOpen] = useState(false);
-  const [deletedBannerId, setDeletedBannerId] = useState<string>();
-  const [deleteBannerLoading, setDeleteBannerLoading] = useState(false);
+  const [addCouponOpen, setAddCouponOpen] = useState(false);
+  const [editCouponOpen, setEditCouponOpen] = useState(false);
+  const [editedCoupon, setEditedCoupon] = useState<couponType>();
+  const [deleteCouponOpen, setDeleteCouponOpen] = useState(false);
+  const [deletedCouponId, setDeletedCouponId] = useState<string>();
+  const [deleteCouponLoading, setDeleteCouponLoading] = useState(false);
 
-  const [data, setData] = useState(...[banners]);
+  const [data, setData] = useState(...[coupons]);
 
   const [globalFilter, setGlobalFilter] = useState("");
 
-  const columns = useMemo<ColumnDef<BannerWithActionsType, any>[]>(
+  const columns = useMemo<ColumnDef<CouponWithActionsType, any>[]>(
     () => [
       {
-        id: "order",
-        header: "Order",
-        cell: ({ row }) => <Typography>{row.original.order}</Typography>,
+        id: "code",
+        header: "Code",
+        cell: ({ row }) => <Typography>{row.original.code}</Typography>,
       },
-      columnHelper.accessor("name", {
-        header: "Name",
-        cell: ({ row }) => (
-          <div className="flex items-center gap-3">
-            <img
-              src={row.original.image}
-              width={38}
-              height={38}
-              className="rounded-md bg-actionHover object-contain"
-            />
-            <Typography className="font-medium" color="text.primary">
-              {row.original.name}
-            </Typography>
-          </div>
-        ),
-      }),
       columnHelper.accessor("status", {
         header: "Status",
         cell: ({ row }) => (
           <div className="flex items-center gap-3">
             <Chip
-              label={bannerStatusObj[row.original.status]?.title}
+              label={couponStatusObj[row.original.status]?.title}
               variant="tonal"
-              color={bannerStatusObj[row.original.status]?.color}
+              color={couponStatusObj[row.original.status]?.color}
               size="small"
             />
           </div>
         ),
       }),
-      columnHelper.accessor("link", {
-        header: "Link",
+      columnHelper.accessor("discount_value", {
+        header: "Discount Value",
         cell: ({ row }) => (
-          <div className="max-w-[600px]">
-            <Typography
-              className="font-medium line-clamp-1"
-              color="text.primary"
-            >
-              {row.original.link}
-            </Typography>
-          </div>
+          <Typography className="font-medium line-clamp-1" color="text.primary">
+            {row.original.discount_type === "Percent"
+              ? row.original.discount_value + "%"
+              : formatCurrencyVND(row.original.discount_value)}
+          </Typography>
+        ),
+      }),
+      columnHelper.accessor("expiry_date", {
+        header: "Expiry Date",
+        cell: ({ row }) => (
+          <Typography>{`${new Date(row.original.expiry_date).toDateString()}`}</Typography>
         ),
       }),
       columnHelper.accessor("actions", {
@@ -174,8 +159,8 @@ const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
             <IconButton
               size="small"
               onClick={() => {
-                setEditBannerOpen(true);
-                setEditedBanner(row.original);
+                setEditCouponOpen(true);
+                setEditedCoupon(row.original);
               }}
             >
               <i className="ri-edit-box-line text-[22px] text-textSecondary" />
@@ -183,8 +168,8 @@ const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
             <IconButton
               size="small"
               onClick={() => {
-                setDeleteBannerOpen(true);
-                setDeletedBannerId(row.original._id);
+                setDeleteCouponOpen(true);
+                setDeletedCouponId(row.original._id);
               }}
             >
               <i className="ri-delete-bin-7-line text-[22px] text-textSecondary" />
@@ -199,7 +184,7 @@ const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
   );
 
   const table = useReactTable({
-    data: data as bannerType[],
+    data: data as couponType[],
     columns,
     filterFns: {
       fuzzy: fuzzyFilter,
@@ -225,18 +210,18 @@ const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
   });
 
-  const deleteBannerHandler = async () => {
-    setDeleteBannerLoading(true);
+  const deleteCouponHandler = async () => {
+    setDeleteCouponLoading(true);
 
     try {
-      if (deletedBannerId) {
-        const result = await deleteBanner(deletedBannerId);
+      if (deletedCouponId) {
+        const result = await deleteCoupon(deletedCouponId);
 
         if (result.ok) {
-          toast.success("Delete banner successfully");
+          toast.success("Delete coupon successfully");
 
           setData((prev) => {
-            return prev.filter((banner) => banner._id !== deletedBannerId);
+            return prev.filter((banner) => banner._id !== deletedCouponId);
           });
         } else {
           console.log;
@@ -247,8 +232,8 @@ const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
       toast.error("Something went wrong");
     }
 
-    setDeleteBannerLoading(false);
-    setDeleteBannerOpen(false);
+    setDeleteCouponLoading(false);
+    setDeleteCouponOpen(false);
   };
 
   return (
@@ -265,7 +250,7 @@ const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
             <Button
               variant="contained"
               className="is-full sm:is-auto"
-              onClick={() => setAddBannerOpen(!addBannerOpen)}
+              onClick={() => setAddCouponOpen(!addCouponOpen)}
               startIcon={<i className="ri-add-line" />}
             >
               Add Coupon
@@ -361,27 +346,27 @@ const BannerListTable: FC<Props> = ({ banners }): JSX.Element => {
         />
       </Card>
       <AddCouponDrawer
-        open={addBannerOpen}
+        open={addCouponOpen}
         setData={setData}
-        handleClose={() => setAddBannerOpen(!addBannerOpen)}
+        handleClose={() => setAddCouponOpen(!addCouponOpen)}
       />
 
-      <EditBannerDrawer
-        open={editBannerOpen}
-        setOpen={setEditBannerOpen}
-        originalBanner={editedBanner}
+      <EditCouponDrawer
+        open={editCouponOpen}
+        setOpen={setEditCouponOpen}
+        originalCoupon={editedCoupon}
         setData={setData}
-        handleClose={() => setEditBannerOpen(!editBannerOpen)}
+        handleClose={() => setEditCouponOpen(!editCouponOpen)}
       />
 
       <DeleteConfirmDialog
-        open={deleteBannerOpen}
-        setOpen={setDeleteBannerOpen}
-        loading={deleteBannerLoading}
-        onConfirmDelete={deleteBannerHandler}
+        open={deleteCouponOpen}
+        setOpen={setDeleteCouponOpen}
+        loading={deleteCouponLoading}
+        onConfirmDelete={deleteCouponHandler}
       />
     </>
   );
 };
 
-export default BannerListTable;
+export default CouponListTable;

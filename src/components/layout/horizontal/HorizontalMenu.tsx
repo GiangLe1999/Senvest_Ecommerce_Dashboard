@@ -114,7 +114,7 @@ const HorizontalMenu = () => {
         </SubMenu>
 
         <MenuItem
-         href={`/orders/list`}
+          href={`/orders/list`}
           icon={<i className="ri-refund-2-line" />}
           exactMatch={false}
           activeUrl="/orders"
@@ -172,6 +172,42 @@ const HorizontalMenu = () => {
           activeUrl="/manage-slogans"
         >
           Slogans
+        </MenuItem>
+
+        <MenuItem
+          href={`/coupons`}
+          icon={<i className="ri-coupon-3-line" />}
+          exactMatch={false}
+          activeUrl="/coupon"
+        >
+          Coupons
+        </MenuItem>
+
+        <MenuItem
+          href={`/subsribers`}
+          icon={<i className="ri-mail-add-line" />}
+          exactMatch={false}
+          activeUrl="/subsribers"
+        >
+          Subsribers
+        </MenuItem>
+
+        <MenuItem
+          href={`/contacts`}
+          icon={<i className="ri-contacts-book-3-line" />}
+          exactMatch={false}
+          activeUrl="/contacts"
+        >
+          Contacts
+        </MenuItem>
+
+        <MenuItem
+          href={`/questions`}
+          icon={<i className="ri-questionnaire-line" />}
+          exactMatch={false}
+          activeUrl="/questions"
+        >
+          Questions
         </MenuItem>
       </Menu>
     </HorizontalNav>
