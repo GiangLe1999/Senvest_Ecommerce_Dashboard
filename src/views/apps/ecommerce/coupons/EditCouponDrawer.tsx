@@ -45,6 +45,7 @@ type FormValues = {
   expiry_date: Date;
   assigned_to_email?: string;
   discount_type: "Percent" | "Value";
+  max_usage_count: number;
 };
 
 const EditCouponDrawer = (props: Props) => {
@@ -66,6 +67,7 @@ const EditCouponDrawer = (props: Props) => {
       expiry_date: new Date(),
       assigned_to_email: "",
       discount_type: "Percent",
+      max_usage_count: 0,
     },
   });
 
@@ -79,6 +81,7 @@ const EditCouponDrawer = (props: Props) => {
         assigned_to_email: originalCoupon?.assigned_to_email,
       }),
       discount_type: originalCoupon?.discount_type,
+      max_usage_count: originalCoupon?.max_usage_count || 0,
     };
 
     const formattedFormValues = {
@@ -89,6 +92,7 @@ const EditCouponDrawer = (props: Props) => {
       ...(formValues?.assigned_to_email && {
         assigned_to_email: formValues?.assigned_to_email,
       }),
+      max_usage_count: Number(formValues.max_usage_count),
     };
 
     const changedFields = getChangedFields({
@@ -137,6 +141,7 @@ const EditCouponDrawer = (props: Props) => {
             usage_count: newCoupon?.usage_count,
             assigned_to_email: newCoupon?.assigned_to_email,
             discount_type: newCoupon?.discount_type,
+            max_usage_count: newCoupon?.max_usage_count.toString(),
           } as any;
 
           return newData;
@@ -159,6 +164,7 @@ const EditCouponDrawer = (props: Props) => {
       setValue("discount_type", originalCoupon?.discount_type);
       setValue("expiry_date", new Date(originalCoupon?.expiry_date));
       setValue("assigned_to_email", originalCoupon?.assigned_to_email);
+      setValue("max_usage_count", originalCoupon?.max_usage_count);
     }
   }, [originalCoupon, setValue]);
 
@@ -254,6 +260,25 @@ const EditCouponDrawer = (props: Props) => {
                   {...field}
                 />
               </LocalizationProvider>
+            )}
+          />
+
+          <Controller
+            name="max_usage_count"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                fullWidth
+                label="Max Usage"
+                placeholder="Max Usage"
+                type="number"
+                {...(errors.max_usage_count && {
+                  error: true,
+                  helperText: "This field is required.",
+                })}
+              />
             )}
           />
 

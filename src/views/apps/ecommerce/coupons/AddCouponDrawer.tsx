@@ -41,6 +41,7 @@ type FormValues = {
   expiry_date: Date;
   assigned_to_email?: string;
   discount_type: "Percent" | "Value";
+  max_usage_count: number;
 };
 
 const AddCouponDrawer = (props: Props) => {
@@ -59,6 +60,7 @@ const AddCouponDrawer = (props: Props) => {
       expiry_date: new Date(),
       assigned_to_email: "",
       discount_type: "Percent",
+      max_usage_count: 0,
     },
   });
 
@@ -71,6 +73,7 @@ const AddCouponDrawer = (props: Props) => {
       const result = await createCoupon({
         ...formValues,
         discount_value: Number(formValues.discount_value),
+        max_usage_count: Number(formValues.max_usage_count),
         expiry_date: expiryDate,
       });
 
@@ -88,6 +91,7 @@ const AddCouponDrawer = (props: Props) => {
             usage_count: result?.coupon?.usage_count,
             assigned_to_email: result?.coupon?.assigned_to_email,
             discount_type: result?.coupon?.discount_type,
+            max_usage_count: result?.coupon?.max_usage_count,
           },
         ]);
       } else {
@@ -199,6 +203,25 @@ const AddCouponDrawer = (props: Props) => {
                   {...field}
                 />
               </LocalizationProvider>
+            )}
+          />
+
+          <Controller
+            name="max_usage_count"
+            control={control}
+            rules={{ required: true }}
+            render={({ field }) => (
+              <TextField
+                {...field}
+                fullWidth
+                label="Max Usage"
+                placeholder="Max Usage"
+                type="number"
+                {...(errors.max_usage_count && {
+                  error: true,
+                  helperText: "This field is required.",
+                })}
+              />
             )}
           />
 

@@ -77,6 +77,7 @@ export type couponType = {
   usage_count: number;
   assigned_to_email?: string;
   discount_type: "Percent" | "Value";
+  max_usage_count: number;
 };
 
 type CouponWithActionsType = couponType & {
@@ -155,6 +156,12 @@ const CouponListTable: FC<Props> = ({ coupons }): JSX.Element => {
       columnHelper.accessor("usage_count", {
         header: "Usage count",
         cell: ({ row }) => <Typography>{row.original.usage_count}</Typography>,
+      }),
+      columnHelper.accessor("max_usage_count", {
+        header: "Max usage",
+        cell: ({ row }) => (
+          <Typography>{row.original.max_usage_count}</Typography>
+        ),
       }),
       columnHelper.accessor("actions", {
         header: "Actions",

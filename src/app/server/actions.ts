@@ -343,6 +343,7 @@ export const createCoupon = async (body: {
   discount_type: "Percent" | "Value";
   expiry_date: Date;
   assigned_to_email?: string;
+  max_usage_count: number;
 }) => {
   const { data } = await axiosInstance.post("/admin-coupons/create", body);
 
@@ -355,6 +356,7 @@ export const updateCoupon = async (updateData: {
   discount_type?: "Percent" | "Value";
   expiry_date?: Date;
   assigned_to_email?: string;
+  max_usage_count?: number;
 }) => {
   const { data } = await axiosInstance.put("/admin-coupons/update", updateData);
 
