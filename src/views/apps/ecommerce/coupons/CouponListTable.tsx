@@ -152,6 +152,10 @@ const CouponListTable: FC<Props> = ({ coupons }): JSX.Element => {
           <Typography>{`${new Date(row.original.expiry_date).toDateString()}`}</Typography>
         ),
       }),
+      columnHelper.accessor("usage_count", {
+        header: "Usage count",
+        cell: ({ row }) => <Typography>{row.original.usage_count}</Typography>,
+      }),
       columnHelper.accessor("actions", {
         header: "Actions",
         cell: ({ row }) => (
