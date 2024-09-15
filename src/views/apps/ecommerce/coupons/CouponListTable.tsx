@@ -119,11 +119,10 @@ const CouponListTable: FC<Props> = ({ coupons }): JSX.Element => {
 
   const columns = useMemo<ColumnDef<CouponWithActionsType, any>[]>(
     () => [
-      {
-        id: "code",
+      columnHelper.accessor("code", {
         header: "Code",
         cell: ({ row }) => <Typography>{row.original.code}</Typography>,
-      },
+      }),
       columnHelper.accessor("status", {
         header: "Status",
         cell: ({ row }) => (
