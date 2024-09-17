@@ -35,6 +35,8 @@ import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 import tableStyles from "@core/styles/table.module.css";
 import type { OrderType } from "@/types/apps/ecommerceTypes";
 import { formatCurrencyVND, getPriceForVariant } from "@/libs/utils";
+import { Button } from "@mui/material";
+import { exportOrderData } from "@/utils/exportOrder";
 
 const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
   // Rank the item
@@ -232,20 +234,69 @@ interface Props {
 }
 
 const OrderDetailsCard: FC<Props> = ({ orderData }) => {
+  const exportHandler = async () => {
+    const customerInfo = orderData?.not_user_info
+      ? orderData.not_user_info
+      : orderData?.user_address;
+
+    const subtotal = orderData.items.reduce(
+      (acc: number, item: any) => acc + item.price * item.quantity,
+      0,
+    );
+
+    try {
+      exportOrderData({
+        orderNumber: `#${orderData.orderCode}`,
+        paymentStatus: orderData.status,
+        createdDate: `${new Date(orderData.createdAt).toDateString()} - ${new Date(orderData.createdAt ?? "").toLocaleTimeString("vi-VN")}`,
+        paidDate: orderData?.transactionDateTime
+          ? `${new Date(orderData?.transactionDateTime).toDateString()} - ${new Date(orderData.transactionDateTime ?? "").toLocaleTimeString("vi-VN")}`
+          : `${new Date(orderData.updatedAt).toDateString()} - ${new Date(orderData.updatedAt ?? "").toLocaleTimeString("vi-VN")}`,
+        customer: {
+          name: customerInfo?.name,
+          email: orderData?.not_user_info?.email || orderData?.user?.email,
+          phone: customerInfo?.phone,
+          paymentTerms: "Immediate payment",
+          orderCode: `#${orderData.orderCode}`,
+          couponCode: orderData?.coupon_code || "",
+          deliveryMethod: "Kindle Hope Candles",
+        },
+        shippingAddress: `${customerInfo.address}, ${customerInfo.city}, ${
+          customerInfo.province
+        }, ${customerInfo.zip} Vietnam`,
+        billingAddress: `${customerInfo.address}, ${customerInfo.city}, ${
+          customerInfo.province
+        }, ${customerInfo.zip} Vietnam`,
+        items: orderData.items.map((item: any) => ({
+          name: item._id.name.en || "",
+          scent: item.variant_id.fragrance || "",
+          quantity: item.quantity,
+          price: item.price,
+          total: item.price * item.quantity,
+        })),
+        subtotal,
+        discount: orderData?.coupon_value || 0,
+        shipping: 0,
+        taxAmount: 0,
+        total: orderData.amount,
+      });
+    } catch (error) {
+      console.error("Failed to export user order:", error);
+    }
+  };
+
   return (
     <Card>
       <CardHeader
         title="Order Details"
         action={
-          <Typography
-            component={Link}
-            href="/"
-            onClick={(e) => e.preventDefault()}
-            color="primary.main"
-            className="font-medium"
+          <Button
+            variant="contained"
+            startIcon={<i className="ri-upload-2-line" />}
+            onClick={exportHandler}
           >
-            Edit
-          </Typography>
+            Export
+          </Button>
         }
       />
       <OrderTable orderData={orderData} />

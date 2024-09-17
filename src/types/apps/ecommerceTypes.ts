@@ -87,6 +87,7 @@ export type OrderType = {
   };
   transactionDateTime?: Date;
   createdAt: Date;
+  updatedAt: Date;
   coupon_code?: string;
   coupon_value?: number;
 };

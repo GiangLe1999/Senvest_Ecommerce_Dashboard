@@ -43,6 +43,7 @@ import OptionMenu from "@core/components/option-menu";
 
 // Style Imports
 import tableStyles from "@core/styles/table.module.css";
+import { exportOrderList } from "@/utils/exportOrderList";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -175,22 +176,24 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
       columnHelper.accessor("createdAt", {
         header: "Date",
         cell: ({ row }) => (
-          <Typography>{`${new Date(row.original.createdAt).toDateString()} - ${new Date(row.original.createdAt ?? '').toLocaleTimeString("vi-VN")}`}</Typography>
+          <Typography>{`${new Date(row.original.createdAt).toDateString()} - ${new Date(row.original.createdAt ?? "").toLocaleTimeString("vi-VN")}`}</Typography>
         ),
       }),
       columnHelper.accessor("user", {
         header: "Customers",
         cell: ({ row }) => (
-            <div className="flex flex-col">
-              <Typography
-                component={Link}
-                href={`/orders/details/${row.original._id}`}
-                color="text.primary"
-                className="font-medium hover:text-primary"
-              >
-                {row.original?.user?.name || row.original?.not_user_info?.name}
-              </Typography>
-              <Typography variant="body2">{row.original?.user?.email || row.original?.not_user_info?.email}</Typography>
+          <div className="flex flex-col">
+            <Typography
+              component={Link}
+              href={`/orders/details/${row.original._id}`}
+              color="text.primary"
+              className="font-medium hover:text-primary"
+            >
+              {row.original?.user?.name || row.original?.not_user_info?.name}
+            </Typography>
+            <Typography variant="body2">
+              {row.original?.user?.email || row.original?.not_user_info?.email}
+            </Typography>
           </div>
         ),
       }),
@@ -208,7 +211,13 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
               color={`${(paymentStatus[row.original.status as keyof typeof paymentStatus] as any).color}.main`}
               className="font-medium"
             >
-              {(paymentStatus[row.original.status as keyof typeof paymentStatus] as any).text}
+              {
+                (
+                  paymentStatus[
+                    row.original.status as keyof typeof paymentStatus
+                  ] as any
+                ).text
+              }
             </Typography>
           </div>
         ),
@@ -227,9 +236,7 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
       // }),
       columnHelper.accessor("amount", {
         header: "Total Price",
-        cell: ({ row }) => (
-          <Typography>{row.original.amount}</Typography>
-        ),
+        cell: ({ row }) => <Typography>{row.original.amount}</Typography>,
       }),
       columnHelper.accessor("action", {
         header: "Action",
@@ -298,7 +305,6 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
     getFacetedMinMaxValues: getFacetedMinMaxValues(),
   });
 
-
   return (
     <Card>
       <CardContent className="flex justify-between items-center gap-4">
@@ -309,9 +315,9 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
           className="sm:is-auto"
         />
         <Button
-          variant="outlined"
-          color="secondary"
+          variant="contained"
           startIcon={<i className="ri-upload-2-line" />}
+          onClick={() => exportOrderList(data)}
         >
           Export
         </Button>
