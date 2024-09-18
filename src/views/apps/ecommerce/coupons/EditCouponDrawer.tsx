@@ -1,6 +1,6 @@
 // React Imports
-import { useState, useRef, useEffect } from "react";
-import type { ChangeEvent, Dispatch, SetStateAction } from "react";
+import { useState, useEffect } from "react";
+import type { Dispatch, SetStateAction } from "react";
 
 // MUI Imports
 import Button from "@mui/material/Button";
@@ -13,7 +13,6 @@ import Select from "@mui/material/Select";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
 import Divider from "@mui/material/Divider";
-import InputAdornment from "@mui/material/InputAdornment";
 
 // Third-party Imports
 import { useForm, Controller } from "react-hook-form";
@@ -23,7 +22,7 @@ import { toast } from "react-toastify";
 
 import LoadingButton from "@mui/lab/LoadingButton";
 
-import { updateBanner, updateCoupon } from "@/app/server/actions";
+import { updateCoupon } from "@/app/server/actions";
 import type { couponType } from "./CouponListTable";
 import { getChangedFields } from "@/utils/getChangedFields";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
@@ -43,7 +42,6 @@ type FormValues = {
   code: string;
   discount_value: number;
   expiry_date: Date;
-  assigned_to_email?: string;
   discount_type: "Percent" | "Value";
   max_usage_count: number;
 };
@@ -65,7 +63,6 @@ const EditCouponDrawer = (props: Props) => {
       code: "",
       discount_value: 0,
       expiry_date: new Date(),
-      assigned_to_email: "",
       discount_type: "Percent",
       max_usage_count: 0,
     },
@@ -77,9 +74,6 @@ const EditCouponDrawer = (props: Props) => {
       code: originalCoupon?.code || "",
       discount_value: originalCoupon?.discount_value || 0,
       expiry_date: new Date(originalCoupon?.expiry_date).toISOString(),
-      ...(originalCoupon?.assigned_to_email && {
-        assigned_to_email: originalCoupon?.assigned_to_email,
-      }),
       discount_type: originalCoupon?.discount_type,
       max_usage_count: originalCoupon?.max_usage_count || 0,
     };
@@ -89,9 +83,6 @@ const EditCouponDrawer = (props: Props) => {
       discount_value: Number(formValues.discount_value),
       expiry_date: new Date(formValues.expiry_date).toISOString(),
       discount_type: formValues.discount_type,
-      ...(formValues?.assigned_to_email && {
-        assigned_to_email: formValues?.assigned_to_email,
-      }),
       max_usage_count: Number(formValues.max_usage_count),
     };
 
@@ -139,7 +130,6 @@ const EditCouponDrawer = (props: Props) => {
             discount_value: newCoupon?.discount_value.toString(),
             expiry_date: newCoupon?.expiry_date,
             usage_count: newCoupon?.usage_count,
-            assigned_to_email: newCoupon?.assigned_to_email,
             discount_type: newCoupon?.discount_type,
             max_usage_count: newCoupon?.max_usage_count.toString(),
           } as any;
@@ -163,7 +153,6 @@ const EditCouponDrawer = (props: Props) => {
       setValue("discount_value", originalCoupon?.discount_value);
       setValue("discount_type", originalCoupon?.discount_type);
       setValue("expiry_date", new Date(originalCoupon?.expiry_date));
-      setValue("assigned_to_email", originalCoupon?.assigned_to_email);
       setValue("max_usage_count", originalCoupon?.max_usage_count);
     }
   }, [originalCoupon, setValue]);
@@ -278,19 +267,6 @@ const EditCouponDrawer = (props: Props) => {
                   error: true,
                   helperText: "This field is required.",
                 })}
-              />
-            )}
-          />
-
-          <Controller
-            name="assigned_to_email"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                fullWidth
-                label="Assigned To Email (Optional)"
-                placeholder="Assigned To Email"
               />
             )}
           />

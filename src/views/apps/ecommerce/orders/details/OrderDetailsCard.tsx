@@ -4,9 +4,6 @@
 import type { FC } from "react";
 import { useState, useMemo } from "react";
 
-// Next Imports
-import Link from "next/link";
-
 // MUI Imports
 import Card from "@mui/material/Card";
 import CardHeader from "@mui/material/CardHeader";
@@ -34,7 +31,7 @@ import type { ColumnDef, FilterFn } from "@tanstack/react-table";
 // Style Imports
 import tableStyles from "@core/styles/table.module.css";
 import type { OrderType } from "@/types/apps/ecommerceTypes";
-import { formatCurrencyVND, getPriceForVariant } from "@/libs/utils";
+import { formatCurrencyVND } from "@/libs/utils";
 import { Button } from "@mui/material";
 import { exportOrderData } from "@/utils/exportOrder";
 

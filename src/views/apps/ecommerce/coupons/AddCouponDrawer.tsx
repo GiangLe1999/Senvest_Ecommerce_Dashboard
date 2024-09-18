@@ -39,7 +39,6 @@ type FormValues = {
   code: string;
   discount_value: number;
   expiry_date: Date;
-  assigned_to_email?: string;
   discount_type: "Percent" | "Value";
   max_usage_count: number;
 };
@@ -58,7 +57,6 @@ const AddCouponDrawer = (props: Props) => {
       code: "",
       discount_value: 0,
       expiry_date: new Date(),
-      assigned_to_email: "",
       discount_type: "Percent",
       max_usage_count: 0,
     },
@@ -89,7 +87,6 @@ const AddCouponDrawer = (props: Props) => {
             discount_value: result?.coupon?.discount_value.toString(),
             expiry_date: result?.coupon?.expiry_date,
             usage_count: result?.coupon?.usage_count,
-            assigned_to_email: result?.coupon?.assigned_to_email,
             discount_type: result?.coupon?.discount_type,
             max_usage_count: result?.coupon?.max_usage_count,
           },
@@ -221,19 +218,6 @@ const AddCouponDrawer = (props: Props) => {
                   error: true,
                   helperText: "This field is required.",
                 })}
-              />
-            )}
-          />
-
-          <Controller
-            name="assigned_to_email"
-            control={control}
-            render={({ field }) => (
-              <TextField
-                {...field}
-                fullWidth
-                label="Assigned To Email (Optional)"
-                placeholder="Assigned To Email"
               />
             )}
           />

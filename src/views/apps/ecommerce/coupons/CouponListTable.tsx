@@ -31,15 +31,13 @@ import {
 } from "@mui/material";
 import { toast } from "react-toastify";
 
-import { deleteBanner, deleteCoupon } from "@/app/server/actions";
+import { deleteCoupon } from "@/app/server/actions";
 import DebouncedInput from "@/components/DebouncedInput";
 
 // Style Imports
 import tableStyles from "@core/styles/table.module.css";
-import AddBannerDrawer from "./AddCouponDrawer";
 import type { ThemeColor } from "@/@core/types";
 import DeleteConfirmDialog from "@/views/dashboards/ecommerce/DeleteConfirmDialog";
-import EditBannerDrawer from "./EditCouponDrawer";
 import { formatCurrencyVND } from "@/libs/utils";
 import AddCouponDrawer from "./AddCouponDrawer";
 import EditCouponDrawer from "./EditCouponDrawer";
@@ -75,7 +73,6 @@ export type couponType = {
   discount_value: number;
   expiry_date: Date;
   usage_count: number;
-  assigned_to_email?: string;
   discount_type: "Percent" | "Value";
   max_usage_count: number;
 };
