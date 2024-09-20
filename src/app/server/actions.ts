@@ -366,3 +366,25 @@ export const deleteCoupon = async (_id: string) => {
 
   return data;
 };
+
+// Subscribers
+export const getSubscribers = async () => {
+  try {
+    const { data } = await axiosInstance("/admin-subscribers");
+
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// Contacts
+export const getContacts = async () => {
+  try {
+    const { data } = await axiosInstance("/admin-contacts");
+
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};

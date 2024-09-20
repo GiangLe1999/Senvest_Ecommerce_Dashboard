@@ -184,12 +184,12 @@ const HorizontalMenu = () => {
         </MenuItem>
 
         <MenuItem
-          href={`/subsribers`}
+          href={`/subscribers`}
           icon={<i className="ri-mail-add-line" />}
           exactMatch={false}
-          activeUrl="/subsribers"
+          activeUrl="/subscribers"
         >
-          Subsribers
+          Subscribers
         </MenuItem>
 
         <MenuItem
