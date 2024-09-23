@@ -64,10 +64,20 @@ export const enum StatusEnum {
   refunded = "refunded",
 }
 
+export enum AdminStatusEnum {
+  pending = "pending",
+  processing = "processing",
+  shipped = "shipped",
+  delivered = "delivered",
+  cancelled = "cancelled",
+  refunded = "refunded",
+}
+
 export type OrderType = {
   _id: string;
   orderCode: number;
   status: StatusEnum;
+  admin_status: AdminStatusEnum;
   amount: number;
   items: {
     _id: any;

@@ -6,6 +6,7 @@ import axiosInstance from "@/configs/axios";
 import { db as eCommerceData } from "@/fake-db/apps/ecommerce";
 import { db as userData } from "@/fake-db/apps/userList";
 import { db as statisticsData } from "@/fake-db/pages/widgetExamples";
+import { AdminStatusEnum } from "@/types/apps/ecommerceTypes";
 
 export const getEcommerceData = async () => {
   return eCommerceData;
@@ -305,6 +306,23 @@ export const getOrderById = async (_id: string) => {
   }
 };
 
+export const updateProcessingStatus = async (
+  _id: string,
+  status: AdminStatusEnum,
+) => {
+  try {
+    const { data } = await axiosInstance.put(`/admin-payments/${_id}`, {
+      status,
+    });
+
+    console.log(data);
+
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 // Users
 export const getAllUsers = async () => {
   try {
@@ -382,6 +400,17 @@ export const getSubscribers = async () => {
 export const getContacts = async () => {
   try {
     const { data } = await axiosInstance("/admin-contacts");
+
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// Questions
+export const getQuestions = async () => {
+  try {
+    const { data } = await axiosInstance("/admin-questions");
 
     return data;
   } catch (error) {

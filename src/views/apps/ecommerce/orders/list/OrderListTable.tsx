@@ -34,7 +34,7 @@ import type { RankingInfo } from "@tanstack/match-sorter-utils";
 
 // Type Imports
 import type { ThemeColor } from "@core/types";
-import type { OrderType } from "@/types/apps/ecommerceTypes";
+import { AdminStatusEnum, type OrderType } from "@/types/apps/ecommerceTypes";
 
 // Component Imports
 import OptionMenu from "@core/components/option-menu";
@@ -44,6 +44,9 @@ import OptionMenu from "@core/components/option-menu";
 // Style Imports
 import tableStyles from "@core/styles/table.module.css";
 import { exportOrderList } from "@/utils/exportOrderList";
+import Image from "next/image";
+import { formatCurrencyVND } from "@/libs/utils";
+import UpdateStatusDialog from "./UpdateStatusDialog";
 
 declare module "@tanstack/table-core" {
   interface FilterFns {
@@ -68,6 +71,15 @@ export const paymentStatus: { [key: string]: PayementStatusType } = {
   pending: { text: "Pending", color: "warning" },
   refunded: { text: "Refunded", color: "secondary" },
   cancelled: { text: "Cancelled", color: "error" },
+};
+
+export const processingStatus: { [key: string]: PayementStatusType } = {
+  pending: { text: "Pending", color: "warning" },
+  processing: { text: "Processing", color: "info" },
+  shipped: { text: "Shipped", color: "primary" },
+  delivered: { text: "Delivered", color: "success" },
+  cancelled: { text: "Cancelled", color: "error" },
+  refunded: { text: "Refunded", color: "secondary" },
 };
 
 export const statusChipColor: { [key: string]: StatusChipColorType } = {
@@ -139,30 +151,14 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
   const [data, setData] = useState(...[orderData]);
   const [globalFilter, setGlobalFilter] = useState("");
 
+  const [openUpdateStatusDialog, setOpenUpdateStatusDialog] = useState(false);
+  const [updateStatusPayment, setUpdateStatusPayment] = useState({
+    _id: "",
+    status: AdminStatusEnum.pending,
+  });
+
   const columns = useMemo<ColumnDef<ECommerceOrderTypeWithAction, any>[]>(
     () => [
-      {
-        id: "select",
-        header: ({ table }) => (
-          <Checkbox
-            {...{
-              checked: table.getIsAllRowsSelected(),
-              indeterminate: table.getIsSomeRowsSelected(),
-              onChange: table.getToggleAllRowsSelectedHandler(),
-            }}
-          />
-        ),
-        cell: ({ row }) => (
-          <Checkbox
-            {...{
-              checked: row.getIsSelected(),
-              disabled: !row.getCanSelect(),
-              indeterminate: row.getIsSomeSelected(),
-              onChange: row.getToggleSelectedHandler(),
-            }}
-          />
-        ),
-      },
       columnHelper.accessor("orderCode", {
         header: "Order",
         cell: ({ row }) => (
@@ -173,32 +169,9 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
           >{`#${row.original.orderCode}`}</Typography>
         ),
       }),
-      columnHelper.accessor("createdAt", {
-        header: "Date",
-        cell: ({ row }) => (
-          <Typography>{`${new Date(row.original.createdAt).toDateString()} - ${new Date(row.original.createdAt ?? "").toLocaleTimeString("vi-VN")}`}</Typography>
-        ),
-      }),
-      columnHelper.accessor("user", {
-        header: "Customers",
-        cell: ({ row }) => (
-          <div className="flex flex-col">
-            <Typography
-              component={Link}
-              href={`/orders/details/${row.original._id}`}
-              color="text.primary"
-              className="font-medium hover:text-primary"
-            >
-              {row.original?.user?.name || row.original?.not_user_info?.name}
-            </Typography>
-            <Typography variant="body2">
-              {row.original?.user?.email || row.original?.not_user_info?.email}
-            </Typography>
-          </div>
-        ),
-      }),
+
       columnHelper.accessor("status", {
-        header: "Payment",
+        header: "Payment Status",
         cell: ({ row }) => (
           <div className="flex items-center gap-1">
             <i
@@ -223,21 +196,99 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
         ),
       }),
 
-      // columnHelper.accessor("status", {
-      //   header: "Status",
-      //   cell: ({ row }) => (
-      //     <Chip
-      //       label={row.original.status}
-      //       color={statusChipColor[row.original.status].color}
-      //       variant="tonal"
-      //       size="small"
-      //     />
-      //   ),
-      // }),
+      columnHelper.accessor("status", {
+        header: "Processing Status",
+        cell: ({ row }) => (
+          <div className="flex items-center gap-1">
+            <i
+              className={classnames(
+                "ri-circle-fill bs-2.5 is-2.5",
+                `text-${(processingStatus[row.original.admin_status as keyof typeof processingStatus] as any).color}`,
+              )}
+            />
+            <Typography
+              color={`${(processingStatus[row.original.admin_status as keyof typeof processingStatus] as any).color}.main`}
+              className="font-medium"
+            >
+              {
+                (
+                  processingStatus[
+                    row.original.admin_status as keyof typeof processingStatus
+                  ] as any
+                ).text
+              }
+            </Typography>
+          </div>
+        ),
+      }),
+
+      columnHelper.accessor("createdAt", {
+        header: "Date",
+        cell: ({ row }) => (
+          <Typography>{`${new Date(row.original.createdAt).toDateString()} - ${new Date(row.original.createdAt ?? "").toLocaleTimeString("vi-VN")}`}</Typography>
+        ),
+      }),
+      columnHelper.accessor("user", {
+        header: "Customers",
+        cell: ({ row }) => (
+          <div className="flex flex-col">
+            <Typography
+              component={Link}
+              href={`/orders/details/${row.original._id}`}
+              color="text.primary"
+              className="font-medium hover:text-primary"
+            >
+              {row.original?.user?.name || row.original?.not_user_info?.name}
+            </Typography>
+            <Typography variant="body2">
+              {row.original?.user?.email || row.original?.not_user_info?.email}
+            </Typography>
+          </div>
+        ),
+      }),
+
+      columnHelper.accessor("items", {
+        header: "Details",
+        cell: ({ row }) => (
+          <div className="flex flex-col gap-y-3">
+            {row.original.items?.map((item: any) => (
+              <div key={item._id._id} className="flex items-center gap-3">
+                <Image
+                  src={item.variant_id.images[0]}
+                  alt={item._id.name.en}
+                  width={80}
+                  height={80}
+                  className="border rounded-sm"
+                />
+                <div className="flex flex-col text-xs space-y-2">
+                  <p className="font-bold">{item._id.name.en}</p>
+                  <p>Quantity: {item.quantity} products</p>
+                  <p>Price: {formatCurrencyVND(item.price)}</p>
+                  <p>Scent: {item.variant_id.fragrance}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        ),
+      }),
+
+      columnHelper.accessor("coupon_value", {
+        header: "Coupon",
+        cell: ({ row }) => (
+          <Typography>
+            {row.original.coupon_value &&
+              formatCurrencyVND(row.original.coupon_value)}
+          </Typography>
+        ),
+      }),
+
       columnHelper.accessor("amount", {
         header: "Total Price",
-        cell: ({ row }) => <Typography>{row.original.amount}</Typography>,
+        cell: ({ row }) => (
+          <Typography>{formatCurrencyVND(row.original.amount)}</Typography>
+        ),
       }),
+
       columnHelper.accessor("action", {
         header: "Action",
         cell: ({ row }) => (
@@ -262,6 +313,20 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
                       setData(
                         data?.filter((order) => order._id !== row.original._id),
                       ),
+                    className: "flex items-center gap-2 pli-4",
+                  },
+                },
+                {
+                  text: "Update status",
+                  icon: "ri-refresh-line text-[22px]",
+                  menuItemProps: {
+                    onClick: () => {
+                      setOpenUpdateStatusDialog(true);
+                      setUpdateStatusPayment({
+                        _id: row.original._id,
+                        status: row.original.admin_status,
+                      });
+                    },
                     className: "flex items-center gap-2 pli-4",
                   },
                 },
@@ -306,111 +371,121 @@ const OrderListTable = ({ orderData }: { orderData?: OrderType[] }) => {
   });
 
   return (
-    <Card>
-      <CardContent className="flex justify-between items-center gap-4">
-        <DebouncedInput
-          value={globalFilter ?? ""}
-          onChange={(value) => setGlobalFilter(String(value))}
-          placeholder="Search Order"
-          className="sm:is-auto"
+    <>
+      <Card>
+        <CardContent className="flex justify-between items-center gap-4">
+          <DebouncedInput
+            value={globalFilter ?? ""}
+            onChange={(value) => setGlobalFilter(String(value))}
+            placeholder="Search Order"
+            className="sm:is-auto"
+          />
+          <Button
+            variant="contained"
+            startIcon={<i className="ri-upload-2-line" />}
+            onClick={() => exportOrderList(data)}
+          >
+            Export
+          </Button>
+        </CardContent>
+        <div className="overflow-x-auto">
+          <table className={tableStyles.table}>
+            <thead>
+              {table.getHeaderGroups().map((headerGroup) => (
+                <tr key={headerGroup.id}>
+                  {headerGroup.headers.map((header) => (
+                    <th key={header.id}>
+                      {header.isPlaceholder ? null : (
+                        <>
+                          <div
+                            className={classnames({
+                              "flex items-center": header.column.getIsSorted(),
+                              "cursor-pointer select-none":
+                                header.column.getCanSort(),
+                            })}
+                            onClick={header.column.getToggleSortingHandler()}
+                          >
+                            {flexRender(
+                              header.column.columnDef.header,
+                              header.getContext(),
+                            )}
+                            {{
+                              asc: <i className="ri-arrow-up-s-line text-xl" />,
+                              desc: (
+                                <i className="ri-arrow-down-s-line text-xl" />
+                              ),
+                            }[header.column.getIsSorted() as "asc" | "desc"] ??
+                              null}
+                          </div>
+                        </>
+                      )}
+                    </th>
+                  ))}
+                </tr>
+              ))}
+            </thead>
+            {table.getFilteredRowModel().rows.length === 0 ? (
+              <tbody>
+                <tr>
+                  <td
+                    colSpan={table.getVisibleFlatColumns().length}
+                    className="text-center"
+                  >
+                    No data available
+                  </td>
+                </tr>
+              </tbody>
+            ) : (
+              <tbody>
+                {table
+                  .getRowModel()
+                  .rows.slice(0, table.getState().pagination.pageSize)
+                  .map((row) => {
+                    return (
+                      <tr
+                        key={row.id}
+                        className={classnames({
+                          selected: row.getIsSelected(),
+                        })}
+                      >
+                        {row.getVisibleCells().map((cell) => (
+                          <td key={cell.id}>
+                            {flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext(),
+                            )}
+                          </td>
+                        ))}
+                      </tr>
+                    );
+                  })}
+              </tbody>
+            )}
+          </table>
+        </div>
+        <TablePagination
+          rowsPerPageOptions={[10, 25, 50, 100]}
+          component="div"
+          className="border-bs"
+          count={table.getFilteredRowModel().rows.length}
+          rowsPerPage={table.getState().pagination.pageSize}
+          page={table.getState().pagination.pageIndex}
+          SelectProps={{
+            inputProps: { "aria-label": "rows per page" },
+          }}
+          onPageChange={(_, page) => {
+            table.setPageIndex(page);
+          }}
+          onRowsPerPageChange={(e) => table.setPageSize(Number(e.target.value))}
         />
-        <Button
-          variant="contained"
-          startIcon={<i className="ri-upload-2-line" />}
-          onClick={() => exportOrderList(data)}
-        >
-          Export
-        </Button>
-      </CardContent>
-      <div className="overflow-x-auto">
-        <table className={tableStyles.table}>
-          <thead>
-            {table.getHeaderGroups().map((headerGroup) => (
-              <tr key={headerGroup.id}>
-                {headerGroup.headers.map((header) => (
-                  <th key={header.id}>
-                    {header.isPlaceholder ? null : (
-                      <>
-                        <div
-                          className={classnames({
-                            "flex items-center": header.column.getIsSorted(),
-                            "cursor-pointer select-none":
-                              header.column.getCanSort(),
-                          })}
-                          onClick={header.column.getToggleSortingHandler()}
-                        >
-                          {flexRender(
-                            header.column.columnDef.header,
-                            header.getContext(),
-                          )}
-                          {{
-                            asc: <i className="ri-arrow-up-s-line text-xl" />,
-                            desc: (
-                              <i className="ri-arrow-down-s-line text-xl" />
-                            ),
-                          }[header.column.getIsSorted() as "asc" | "desc"] ??
-                            null}
-                        </div>
-                      </>
-                    )}
-                  </th>
-                ))}
-              </tr>
-            ))}
-          </thead>
-          {table.getFilteredRowModel().rows.length === 0 ? (
-            <tbody>
-              <tr>
-                <td
-                  colSpan={table.getVisibleFlatColumns().length}
-                  className="text-center"
-                >
-                  No data available
-                </td>
-              </tr>
-            </tbody>
-          ) : (
-            <tbody>
-              {table
-                .getRowModel()
-                .rows.slice(0, table.getState().pagination.pageSize)
-                .map((row) => {
-                  return (
-                    <tr
-                      key={row.id}
-                      className={classnames({ selected: row.getIsSelected() })}
-                    >
-                      {row.getVisibleCells().map((cell) => (
-                        <td key={cell.id}>
-                          {flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext(),
-                          )}
-                        </td>
-                      ))}
-                    </tr>
-                  );
-                })}
-            </tbody>
-          )}
-        </table>
-      </div>
-      <TablePagination
-        rowsPerPageOptions={[10, 25, 50, 100]}
-        component="div"
-        className="border-bs"
-        count={table.getFilteredRowModel().rows.length}
-        rowsPerPage={table.getState().pagination.pageSize}
-        page={table.getState().pagination.pageIndex}
-        SelectProps={{
-          inputProps: { "aria-label": "rows per page" },
-        }}
-        onPageChange={(_, page) => {
-          table.setPageIndex(page);
-        }}
-        onRowsPerPageChange={(e) => table.setPageSize(Number(e.target.value))}
+      </Card>
+
+      <UpdateStatusDialog
+        open={openUpdateStatusDialog}
+        setOpen={setOpenUpdateStatusDialog}
+        payment={updateStatusPayment}
       />
-    </Card>
+    </>
   );
 };
 
