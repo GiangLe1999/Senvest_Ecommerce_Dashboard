@@ -209,6 +209,15 @@ const HorizontalMenu = () => {
         >
           Questions
         </MenuItem>
+
+        <MenuItem
+          href={`/donations`}
+          icon={<i className="ri-hand-heart-line" />}
+          exactMatch={false}
+          activeUrl="/donations"
+        >
+          Donations
+        </MenuItem>
       </Menu>
     </HorizontalNav>
   );

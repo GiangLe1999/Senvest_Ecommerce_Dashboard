@@ -417,3 +417,14 @@ export const getQuestions = async () => {
     console.log(error);
   }
 };
+
+// Donations
+export const getDonations = async () => {
+  try {
+    const { data } = await axiosInstance("/admin-donations");
+
+    return data;
+  } catch (error) {
+    console.log(error);
+  }
+};
