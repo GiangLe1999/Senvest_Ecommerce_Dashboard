@@ -21,7 +21,7 @@ import {
   type ColumnDef,
   type FilterFn,
 } from "@tanstack/react-table";
-import { Card, Chip, TablePagination, Typography } from "@mui/material";
+import { Button, Card, Chip, TablePagination, Typography } from "@mui/material";
 
 import DebouncedInput from "@/components/DebouncedInput";
 
@@ -30,6 +30,7 @@ import tableStyles from "@core/styles/table.module.css";
 import type { ThemeColor } from "@/@core/types";
 import { Product } from "@/entities/product.entity";
 import { formatCurrencyVND } from "@/libs/utils";
+import { exportDonationList } from "@/utils/exportDonationList";
 
 type donationStatusType = {
   [key: string]: {
@@ -207,6 +208,14 @@ const DonationListTable: FC<Props> = ({ donations }): JSX.Element => {
             placeholder="Search"
             className="is-full sm:is-auto"
           />
+
+          <Button
+            variant="contained"
+            startIcon={<i className="ri-upload-2-line" />}
+            onClick={() => exportDonationList(data)}
+          >
+            Export
+          </Button>
         </div>
         <div className="overflow-x-auto">
           <table className={tableStyles.table}>

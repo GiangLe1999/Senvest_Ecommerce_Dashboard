@@ -6,7 +6,7 @@ export const exportOrderList = (orders: any) => {
     orderCode: `#${order.orderCode}`,
     createAt: `${new Date(order.createdAt).toDateString()} - ${new Date(order.createdAt ?? "").toLocaleTimeString("vi-VN")}`,
     name: order?.user?.name || order?.not_user_info?.name,
-    email: order.user.email || order?.not_user_info?.email,
+    email: order?.user?.email || order?.not_user_info?.email,
     status:
       order.status === "paid"
         ? "Paid"
@@ -16,12 +16,18 @@ export const exportOrderList = (orders: any) => {
     amount: formatCurrencyVND(order.amount),
     couponCode: order.coupon_code || "",
     couponValue: formatCurrencyVND(order.coupon_value || 0),
+    details: order.items
+      .map(
+        (item: any) =>
+          `Fragrance: ${item.variant_id.fragrance}, Quantity: ${item.quantity}, Price: ${formatCurrencyVND(item.price)}`,
+      )
+      .join("\n"), // Join all item details into a single string, separating them by line breaks.
   }));
 
   const workbook = new ExcelJS.Workbook();
   const worksheet = workbook.addWorksheet("Order Data");
 
-  // Đặt các cột tương ứng với dữ liệu từ ảnh
+  // Set columns for order details
   worksheet.columns = [
     { header: "Order", key: "orderCode", width: 20 },
     { header: "Date", key: "createAt", width: 30 },
@@ -31,17 +37,18 @@ export const exportOrderList = (orders: any) => {
     { header: "Coupon", key: "couponCode", width: 15 },
     { header: "Coupon Value", key: "couponValue", width: 15 },
     { header: "Total Price", key: "amount", width: 15 },
+    { header: "Details", key: "details", width: 50 }, // Details column for all item information
   ];
 
-  // Thêm từng hàng dữ liệu vào bảng tính
+  // Adding each order's data to the worksheet
   orderData.forEach((order: any) => {
     worksheet.addRow(order);
   });
 
-  // Định dạng chữ đậm cho các tiêu đề
+  // Format the header row
   worksheet.getRow(1).font = { bold: true };
 
-  // Áp dụng đường viền cho tất cả các ô
+  // Apply borders to all cells
   worksheet.eachRow((row) => {
     row.eachCell((cell) => {
       cell.border = {
@@ -53,7 +60,7 @@ export const exportOrderList = (orders: any) => {
     });
   });
 
-  // Xuất file Excel
+  // Export Excel file
   workbook.xlsx.writeBuffer().then((buffer) => {
     const blob = new Blob([buffer], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
