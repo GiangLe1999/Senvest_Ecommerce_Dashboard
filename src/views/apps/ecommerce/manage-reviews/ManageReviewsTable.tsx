@@ -115,7 +115,6 @@ const DebouncedInput = ({
 // Column Definitions
 const columnHelper = createColumnHelper<ReviewWithActionsType>();
 
-
 const ManageReviewsTable = ({
   reviewsData,
 }: {
@@ -158,7 +157,7 @@ const ManageReviewsTable = ({
         cell: ({ row }) => (
           <div className="flex items-center gap-3">
             <img
-              src={row.original.variant.images[0]}
+              src={row?.original?.variant?.images[0]}
               width={38}
               height={38}
               className="rounded-md bg-actionHover"
@@ -177,17 +176,17 @@ const ManageReviewsTable = ({
       columnHelper.accessor("email", {
         header: "Reviewer",
         cell: ({ row }) => (
-            <div>
-              <Typography
-                component={Link}
-                href={"/apps/ecommerce/customers/details/879861"}
-                color="primary"
-                className="font-medium"
-              >
-                {row.original.name}
-              </Typography>
-              <Typography variant="body2">{row.original.email}</Typography>
-            </div>
+          <div>
+            <Typography
+              component={Link}
+              href={"/apps/ecommerce/customers/details/879861"}
+              color="primary"
+              className="font-medium"
+            >
+              {row.original.name}
+            </Typography>
+            <Typography variant="body2">{row.original.email}</Typography>
+          </div>
         ),
       }),
       columnHelper.accessor("rating", {
@@ -216,11 +215,14 @@ const ManageReviewsTable = ({
           return dateA.getTime() - dateB.getTime();
         },
         cell: ({ row }) => {
-          const date = new Date(row.original.createdAt).toLocaleDateString("en-US", {
-            month: "short",
-            day: "2-digit",
-            year: "numeric",
-          });
+          const date = new Date(row.original.createdAt).toLocaleDateString(
+            "en-US",
+            {
+              month: "short",
+              day: "2-digit",
+              year: "numeric",
+            },
+          );
 
           return <Typography>{date}</Typography>;
         },
@@ -247,54 +249,55 @@ const ManageReviewsTable = ({
             iconButtonProps={{ size: "medium" }}
             iconClassName="text-textSecondary text-[22px]"
             options={[
-              ...row.original.status === "Pending" ? [{
-                text:"Publish",
-                icon: "ri-edit-line",
-                menuItemProps: {
-                  onClick: async () => {
-                    try {
-                      const res = await publishReview(
-                        {_id: row.original._id}
-                      )
-                      
-                      if (res.ok) {
-                        toast.success("Update review successfully")
-                        setTimeout(() => {
-                          window.location.reload()
-                        }, 1000)
-                      } else {
-                        toast.error(res?.error)
-                      }
-                    } catch (error) {
-                      toast.error("Something went wrong")
-                    }
-                  },
-                  className: "flex items-center",
-                },
-              }] : [],
+              ...(row.original.status === "Pending"
+                ? [
+                    {
+                      text: "Publish",
+                      icon: "ri-edit-line",
+                      menuItemProps: {
+                        onClick: async () => {
+                          try {
+                            const res = await publishReview({
+                              _id: row.original._id,
+                            });
+
+                            if (res.ok) {
+                              toast.success("Update review successfully");
+                              setTimeout(() => {
+                                window.location.reload();
+                              }, 1000);
+                            } else {
+                              toast.error(res?.error);
+                            }
+                          } catch (error) {
+                            toast.error("Something went wrong");
+                          }
+                        },
+                        className: "flex items-center",
+                      },
+                    },
+                  ]
+                : []),
               {
                 text: "Delete",
                 icon: "ri-delete-bin-7-line",
                 menuItemProps: {
-                  onClick: async () =>
-                   {
+                  onClick: async () => {
                     try {
-                      const res = await deleteReview(
-                        {_id: row.original._id}
-                      )
-                      
+                      const res = await deleteReview({ _id: row.original._id });
+
                       if (res.ok) {
-                        toast.success("Delete review successfully")
+                        toast.success("Delete review successfully");
                         setTimeout(() => {
-                          window.location.reload()
-                        }, 1000)
+                          window.location.reload();
+                        }, 1000);
                       } else {
-                        toast.error(res?.error)
+                        toast.error(res?.error);
                       }
                     } catch (error) {
-                      toast.error("Something went wrong")
+                      toast.error("Something went wrong");
                     }
-                   },
+                  },
                   className: "flex items-center",
                 },
               },
@@ -367,7 +370,9 @@ const ManageReviewsTable = ({
                 fullWidth
                 id="select-status"
                 value={status}
-                onChange={(e) => setStatus(e.target.value as "Published" | "Pending")}
+                onChange={(e) =>
+                  setStatus(e.target.value as "Published" | "Pending")
+                }
                 labelId="status-select"
               >
                 <MenuItem value="Published">Published</MenuItem>
@@ -436,23 +441,25 @@ const ManageReviewsTable = ({
                   .getRowModel()
                   .rows.slice(0, table.getState().pagination.pageSize)
                   .map((row) => {
-                    return (
-                      <tr
-                        key={row.id}
-                        className={classnames({
-                          selected: row.getIsSelected(),
-                        })}
-                      >
-                        {row.getVisibleCells().map((cell) => (
-                          <td key={cell.id}>
-                            {flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext(),
-                            )}
-                          </td>
-                        ))}
-                      </tr>
-                    );
+                    if (row?.original?.product && row?.original?.variant) {
+                      return (
+                        <tr
+                          key={row.id}
+                          className={classnames({
+                            selected: row.getIsSelected(),
+                          })}
+                        >
+                          {row.getVisibleCells().map((cell) => (
+                            <td key={cell.id}>
+                              {flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext(),
+                              )}
+                            </td>
+                          ))}
+                        </tr>
+                      );
+                    } else return null;
                   })}
               </tbody>
             )}
